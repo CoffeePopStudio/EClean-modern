@@ -1,0 +1,26 @@
+package top.e404.eclean.clean
+
+import top.e404.eclean.PL
+import top.e404.eclean.app.RuntimeServices
+import top.e404.eclean.config.Config
+import top.e404.eclean.util.noOnline
+import top.e404.eclean.util.noOnlineClean
+
+object Clean {
+    private val duration get() = Config.config.duration
+
+    /**
+     * 计数, 每20tick++
+     */
+    val count get() = RuntimeServices.statusSnapshots.current().cleanup.elapsedSeconds
+
+    fun schedule() {
+        PL.info("&f设置清理任务, 间隔${duration}秒")
+        RuntimeServices.cleanupTickService.start()
+    }
+
+    fun clean() {
+        if (noOnline && !noOnlineClean) return
+        RuntimeServices.cleanupCoordinator.cleanNow()
+    }
+}

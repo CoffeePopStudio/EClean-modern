@@ -1,0 +1,184 @@
+# 若设置为true则会在后台输出检查的详细信息
+debug: false
+
+# 检查更新
+update: true
+
+# 每次清理的间隔时长, 单位秒
+duration: 600
+
+# 清理前的消息
+# 格式 时长: 对应时长的消息
+# 如 60: 将在1分钟后清理实体
+message:
+  60: "&f将在1分钟后进行清理"
+  30: "&f将在30秒后进行清理"
+  10: "&f将在10秒后进行清理"
+  0: "&f正在清理"
+
+# 清理'有生命的'实体
+# 比如僵尸或者牛
+# 展示框, 雪球等就不包含在内
+living:
+  # 设置为true以启用
+  enable: true
+
+  # 禁用的世界(不支持正则)
+  disable_world:
+    - "不清理的世界"
+
+  # 清理结束后的通知(设置为""以禁用)
+  finish: "&a生物清理完成, 已清理{clean}/{all}"
+
+  settings:
+    # 若设置为true则清理被命名的生物
+    # 否则不清理清被命名的生物
+    name: false
+    # 若设置为true则清理拴绳拴住的生物
+    # 否则不清理拴绳拴住的生物
+    lead: false
+    # 若设置为true则清理乘骑中的生物(比如船上的生物, 或者载着玩家的马匹)
+    # 否则不清理乘骑中的生物
+    mount: false
+
+  # 若设置为true则按黑名单匹配(名字匹配的才清理)
+  # 若设置为false则按白名单匹配(名字匹配的不清理)
+  is_black: true
+
+  # 清理的实体(支持正则)
+  # 此处的实体是清理所有符合settings中条件的实体(不会剩下)
+  # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html
+  match:
+    - "BLAZE"
+    - "EVOKER"
+    - "GHAST"
+    - "(GLOW_)?SQUID"
+    - "PHANTOM"
+    - "PILLAGER"
+
+# 清理掉落物
+drop:
+  # 设置为true以启用
+  enable: true
+
+  # 禁用的世界(不支持正则)
+  disable_world:
+    - "不清理的世界"
+
+  # 清理结束后的通知(设置为""以禁用)
+  finish: "&a掉落物清理完成, 已清理{clean}/{all}"
+
+  # 若设置为true则按黑名单匹配(名字匹配的才清理)
+  # 若设置为false则按白名单匹配(名字匹配的不清理)
+  is_black: false
+
+  # 若设置为true则不清理带附魔的物品
+  # 若设置为false则清理带附魔的物品
+  enchant: false
+
+  # 若设置为true则不清理带描述的物品
+  # 若设置为false则清理带描述的物品
+  lore: false
+
+  # 若设置为true则不清理写过的书
+  # 若设置为false则清理写过的书 (match规则匹配时才会清理)
+  written_book: false
+
+
+  # 掉落物类型(支持正则)
+  # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  match:
+    - "DIAMOND[A-Z_]*"
+    - "NETHERITE[A-Z_]*"
+    - "[A-Z_]*SHULKER_BOX"
+    - "[A-Z_]*(HEAD|SKULL)"
+    - "SHULKER_SHELL"
+    - "BEACON"
+    - "(ENCHANTED_)?GOLDEN_APPLE"
+    - "TRIDENT"
+    - "TOTEM_OF_UNDYING"
+    - "ENDER_CHEST"
+    - "DRAGON_EGG"
+    - "ELYTRA"
+
+# 区块检查(密集实体清理)
+chunk:
+  # 设置为true以启用
+  enable: true
+
+  # 禁用的世界(不支持正则)
+  disable_world:
+    - "不清理的世界"
+
+  # 清理结束后的通知(设置为""以禁用)
+  finish: "&a密集实体清理完成, 清理{clean}个"
+
+  settings:
+    # 若设置为true则清理被命名的生物
+    # 否则不清理清被命名的生物
+    name: false
+    # 若设置为true则清理拴绳拴住的生物
+    # 否则不清理拴绳拴住的生物
+    lead: false
+    # 若设置为true则清理乘骑中的生物(比如船上的生物, 或者载着玩家的马匹)
+    # 否则不清理乘骑中的生物
+    mount: false
+
+  # 未清理的实体提醒
+  # 进行通知所需要的数量(区块中的某种实体数量超过此数量)
+  count: 50
+
+  # 发送消息的格式(有 eclean.admin 权限者会收到)
+  format: "{chunk}中{entity}的数量较多({count})"
+
+  # 每区块允许的实体上限(正则)
+  # 匹配到的实体共用后面的上限
+  # 超过上限的实体将会被清理
+  # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html
+  limit:
+    # 怪物
+    ZOMBIE|SKELETON: 10
+    SPIDER: 2
+    # 动物
+    CHICKEN|PIG|COW|SHEEP: 50
+    # 投掷物
+    EGG|ENDER_PEARL|EXPERIENCE_ORB|FIREBALL|FIREWORK|SMALL_FIREBALL|SNOWBALL|ARROW|SPECTRAL_ARROW|SPLASH_POTION: 10
+
+# 公共垃圾桶设置
+trashcan:
+  # 设置为false则禁用公共垃圾桶
+  enable: true
+  # 设置为true则掉落物清理的掉落物会收集到垃圾桶中
+  collect: true
+  # 清空垃圾桶的时间间隔, 单位秒, 设置为空则不会主动清理(可能导致内存泄露占用大量内存)
+  duration: 6000
+  despawn:
+    # 设置为true则回收despawn的物品
+    enable: false
+    # 禁用的世界(支持正则)
+    disable_world:
+      - "不回收的世界"
+    # 放入垃圾桶的掉落物类型(支持正则) 可以设置如下格式回收所有物品
+    # match:
+    #   - .*
+    # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+    match:
+      - "DIAMOND[A-Z_]*"
+      - "NETHERITE[A-Z_]*"
+      - "[A-Z_]*SHULKER_BOX"
+      - "[A-Z_]*(HEAD|SKULL)"
+      - "SHULKER_SHELL"
+      - "BEACON"
+      - "(ENCHANTED_)?GOLDEN_APPLE"
+      - "TRIDENT"
+      - "TOTEM_OF_UNDYING"
+      - "ENDER_CHEST"
+      - "DRAGON_EGG"
+      - "ELYTRA"
+
+# 无在线玩家时的配置
+no_online:
+  # 设置为false则没有在线玩家时不发送消息(倒计时和清理结果)
+  message: true
+  # 设置为false则没有在线玩家时不清理(但是会显示清理倒计时)
+  clean: true

@@ -1,0 +1,56 @@
+package top.e404.eclean.feature.trashcan
+
+import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
+import top.e404.eclean.config.Lang
+import top.e404.eclean.menu.MenuManager
+import top.e404.eclean.menu.trashcan.TrashcanMenu
+import top.e404.eclean.platform.SchedulerFacade
+import top.e404.eclean.service.StatusSnapshotService
+import top.e404.eplugin.EPlugin
+
+class TrashcanService(
+    private val plugin: EPlugin,
+    private val scheduler: SchedulerFacade,
+    private val repository: TrashcanRepository,
+    private val snapshots: StatusSnapshotService,
+) {
+    var countdown: Long = 0
+        private set
+
+    fun open(player: Player) {
+        val menu = TrashcanMenu()
+        MenuManager.openMenu(menu, player)
+    }
+
+    fun collectStacks(items: Collection<ItemStack>) {
+        items.forEach(::addItem)
+        updateMenus()
+    }
+
+    fun addItem(item: ItemStack) {
+        repository.upsert(item)
+        updateMenus()
+    }
+
+    fun clearAll() {
+        plugin.debug { "清空垃圾桶" }
+        repository.clear()
+        plugin.broadcastMsg(Lang["command.trash_clean_done"])
+        updateMenus()
+    }
+
+    fun syncCountdown(countdown: Long) {
+        this.countdown = countdown
+        snapshots.updateTrashcanCountdown(countdown)
+    }
+
+    fun updateMenus() {
+        MenuManager.menus.entries
+            .filter { (_, menu) -> menu is TrashcanMenu }
+            .forEach { (_, menu) -> (menu as TrashcanMenu).updateIcon() }
+    }
+
+    fun values() = repository.trashValues
+    fun data() = repository.trashData
+}

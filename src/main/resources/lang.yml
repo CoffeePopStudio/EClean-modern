@@ -1,0 +1,121 @@
+prefix: "&7[&aEClean&7]"
+debug_prefix: "&7[&6ECleanDebug&7]"
+
+debug:
+  console_enable: "&f已临时(修改config.yml永久设置)&a启用&bDebug&f, 下次重启前你将会收到&bDebug&f消息, 再使用一次此指令以&c禁用"
+  console_disable: "&f已临时(修改config.yml永久设置)&c禁用&bDebug&f, 下次重启前你不会收到&bDebug&f消息, 再使用一次此指令以&a启用"
+  player_enable: "&f已&a启用&bDebug&f, 你将会收到&bDebug&f消息, 再使用一次此指令以&c禁用"
+  player_disable: "&f已&c禁用&bDebug&f, 你不会收到&bDebug&f消息, 再使用一次此指令以&a启用"
+
+warn:
+  out_of_range: "清理前的消息`{message}`&e设置的时长超过清理间隔`{duration}`&e, 请在设置中修改(此消息将不会被发送)"
+  invalid_number: "清理消息的时长只能是小于清理间隔的数字"
+
+hook:
+  enable: "扫描到依赖{plugin}, 已启用相关支持"
+  disable: "未扫描到依赖{plugin}, 已禁用"
+
+message:
+  noperm: "&c无权限"
+  non_player: "&c仅玩家可用"
+  unknown_command: "&c未知指令"
+  invalid_args: "&c无效参数"
+  invalid_world: "&c不存在名为`{world}`的世界"
+  invalid_number: "{number}不是有效数字"
+  invalid_config: "&c配置文件`{file}`格式错误"
+  invalid_entity_type: "&e{type}&c不是有效的实体类型"
+
+menu:
+  dense:
+    title: "&6密集实体检测"
+    item:
+      name: "&6{type}"
+      lore: |-
+        &f{amount}
+        &f{chunk}
+        &a左键点击传送
+        &4右键点击清除该区块的所有该实体
+    prev:
+      name: "&6上一页"
+      lore: |-
+        &f点击前往上一页
+    next:
+      name: "&6下一页"
+      lore: |-
+        &f点击前往下一页
+    temp:
+      name: "&6点击切换临时传送功能"
+      lore: |-
+        &f传送完成30s后传送回当前位置
+        &f临时传送非切换功能, 启用后仅下次传送生效
+        &f当前状态为{status}
+      status:
+        true: "&a启用"
+        false: "&c禁用"
+    clean: "清理区块({chunk})的{type}, 共{count}个"
+  trashcan:
+    title: "&6临时垃圾桶"
+    item:
+      # 物品最后加的lore
+      lore: |-
+        &f共{amount}个
+        &a左键点击拿取一个
+        &a右键点击拿取半组
+        &aShift+左键点击拿取一组
+    prev:
+      name: "&6上一页"
+      lore: |-
+        &f点击前往上一页
+    next:
+      name: "&6下一页"
+      lore: |-
+        &f点击前往下一页
+
+trash:
+  title: "&6垃圾桶, &4关闭后垃圾桶内物品无法找回"
+
+command:
+  reload_done: "&a重载完成"
+  trash_disable: "&a垃圾桶功能已被禁用"
+  trash_open: "&a已打开垃圾桶"
+  trash_clean_done: "&a垃圾桶清理完成"
+  clean_done: "&a共清理&6{count}&a个实体"
+  teleport:
+    done: "&a传送完成"
+    temp: "&a传送完成, 将在30秒后传送回之前的位置"
+    cover: "&a传送完成, 将在30秒后传送回上一个传送的返回位置"
+    back: "&a已返回传送前的位置"
+  stats:
+    spacing: "&7, "
+    content: "&f{type}: {count}个"
+    empty: "&c无结果"
+
+    # {force}占位符在1.12及以下版本不可用
+    world: |-
+      &f世界&a{world}&f共加载区块{count}个(强加载{force}个)
+      &b实体统计信息:
+      {entity}
+    entity: |-
+      &f实体&e{type}&f的统计信息
+      {entity}
+  usage:
+    debug: "&a/eclean debug &f切换debug消息的接受与否"
+    reload: "&a/eclean reload &f重载插件"
+    trash: "&a/eclean trash &f打开垃圾桶"
+    players: "&a/eclean players &f展示玩家及其所在的位置"
+    show: "&a/eclean show &f打开密集实体统计信息菜单"
+    stats: |-
+      &a/eclean stats &f统计当前所在世界的实体和区块统计
+      &a/eclean stats <世界名> &f统计实体和区块统计
+    entity: |-
+      &a/eclean entity <实体名> &f统计当前世界每个区块的指定实体
+      &a/eclean entity <实体名> <世界名>&f 统计指定世界个区块的指定实体
+      &a/eclean entity <实体名> <世界名> <纳入统计所需数量> &f统计指定世界个区块的指定实体并隐藏数量不超过指定数量的内容
+    clean: |-
+      &a/eclean clean &f立刻执行一次清理(执行清理通知, 按照配置文件中的规则)
+      &a/eclean clean entity &f立刻执行一次实体清理(执行清理通知, 按照配置文件中的规则)
+      &a/eclean clean entity <世界名> &f立刻在指定世界执行一次实体清理(&c不&f执行清理通知, 按照配置文件中的规则)
+      &a/eclean clean drop &f立刻执行一次掉落物清理(执行清理通知, 按照配置文件中的规则)
+      &a/eclean clean drop <世界名> &f立刻在指定世界执行一次掉落物清理(&c不&f执行清理通知, 按照配置文件中的规则)
+      &a/eclean clean chunk &f立刻执行一次密集实体清理(执行清理通知, 按照配置文件中的规则)
+      &a/eclean clean chunk <世界名> &f立刻在指定世界执行一次密集实体清理(&c不&f执行清理通知, 按照配置文件中的规则)

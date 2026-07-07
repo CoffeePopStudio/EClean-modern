@@ -1,0 +1,22 @@
+# modern 分支的配置骨架，当前阶段仍桥接到现有 config.yml 数据结构。
+cleanup:
+  duration: 600
+  messages:
+    60: "&f将在1分钟后进行清理"
+    30: "&f将在30秒后进行清理"
+    10: "&f将在10秒后进行清理"
+    0: "&f正在清理"
+
+drop:
+  enabled: true
+
+living:
+  enabled: true
+
+chunkDensity:
+  enabled: true
+  threshold: 50
+
+trashcan:
+  enabled: true
+  collect: true
