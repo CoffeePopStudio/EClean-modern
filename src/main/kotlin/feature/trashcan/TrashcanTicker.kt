@@ -14,11 +14,12 @@ class TrashcanTicker(
 
     fun start() {
         stop()
-        val duration = Config.config.trashcan.duration ?: run {
+        val trashcanConfig = Config.current.trashcan
+        val duration = trashcanConfig.clearIntervalSeconds ?: run {
             service.syncCountdown(0)
             return
         }
-        if (!Config.config.trashcan.enable) return
+        if (!trashcanConfig.enabled) return
         service.syncCountdown(duration)
         task = scheduler.scheduleRepeatingGlobal(20, 20) {
             val next = (service.countdown - 1).coerceAtLeast(0)

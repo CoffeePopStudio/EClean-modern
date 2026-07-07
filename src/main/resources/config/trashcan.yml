@@ -1,0 +1,20 @@
+enabled: true
+collectFromDropCleanup: true
+clearIntervalSeconds: 6000
+despawnRecovery:
+  enabled: false
+  disabledWorlds:
+    - "not_recovered_world"
+  matchers:
+    - "DIAMOND[A-Z_]*"
+    - "NETHERITE[A-Z_]*"
+    - "[A-Z_]*SHULKER_BOX"
+    - "[A-Z_]*(HEAD|SKULL)"
+    - "SHULKER_SHELL"
+    - "BEACON"
+    - "(ENCHANTED_)?GOLDEN_APPLE"
+    - "TRIDENT"
+    - "TOTEM_OF_UNDYING"
+    - "ENDER_CHEST"
+    - "DRAGON_EGG"
+    - "ELYTRA"

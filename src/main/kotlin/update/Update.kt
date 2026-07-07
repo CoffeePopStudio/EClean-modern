@@ -10,5 +10,5 @@ object Update : EUpdater(
     mcbbs = "https://www.mcbbs.net/thread-1305548-1-1.html",
     github = "https://github.com/4o4E/EClean"
 ) {
-    override fun enableUpdate() = Config.config.update
+    override fun enableUpdate() = Config.current.global.updateCheck
 }

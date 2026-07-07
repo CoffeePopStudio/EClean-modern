@@ -48,11 +48,11 @@
 
 ## 配置
 
-插件默认配置见[配置文件](src/main/resources/config.yml), 配置项均有注释描述用法和含义
+插件默认配置已拆分到 `src/main/resources/config/` 目录下的多文件模板中，配置项均带注释描述用法和含义
 
 ## 下载
 - [最新版](https://github.com/CoffeePopStudio/EClean-modern/releases/latest)
 
 ## 更新记录
-详见[release](https://github.com/CoffeePopStudio/EClean-modern/releases)
+详见 [release](https://github.com/CoffeePopStudio/EClean-modern/releases)
 

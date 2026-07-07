@@ -22,7 +22,7 @@ class CleanupCoordinator(
         snapshots.updateCleanup {
             it.copy(
                 elapsedSeconds = 0,
-                remainingSeconds = Config.config.duration,
+                remainingSeconds = Config.current.cleanup.intervalSeconds,
             )
         }
     }

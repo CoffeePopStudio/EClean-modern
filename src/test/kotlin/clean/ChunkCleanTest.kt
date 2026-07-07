@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import top.e404.eclean.clean.cleanDenseEntities
 import top.e404.eclean.clean.lastChunk
-import top.e404.eclean.config.Config
 import top.e404.eclean.test.*
 
 abstract class ChunkCleanTest {
@@ -18,7 +17,7 @@ abstract class ChunkCleanTest {
     @BeforeEach
     fun enable() {
         resetConfig()
-        Config.config.chunk.enable = true
+        updateChunkDensityConfig { it.copy(enabled = true) }
     }
 
     @Nested
@@ -28,9 +27,13 @@ abstract class ChunkCleanTest {
         @DisplayName("启用")
         fun onEnable() {
             // 设置为true则清理被命名的生物
-            Config.config.chunk.settings.name = true
             val limit = 5
-            Config.config.chunk.limit[Regex("ZOMBIE")] = limit
+            updateChunkDensityConfig {
+                it.copy(
+                    settings = it.settings.copy(cleanNamed = true),
+                    entityLimits = mapOf(Regex("ZOMBIE") to limit),
+                )
+            }
 
             val chunk = world.getChunkAt(0, 0)
             chunk.load()
@@ -50,8 +53,12 @@ abstract class ChunkCleanTest {
         @DisplayName("禁用")
         fun onDisable() {
             // 设置为true则清理被命名的生物
-            Config.config.chunk.settings.name = false
-            Config.config.chunk.limit[Regex("ZOMBIE")] = 5
+            updateChunkDensityConfig {
+                it.copy(
+                    settings = it.settings.copy(cleanNamed = false),
+                    entityLimits = mapOf(Regex("ZOMBIE") to 5),
+                )
+            }
 
             val chunk = world.getChunkAt(0, 0)
             chunk.load()
@@ -73,9 +80,13 @@ abstract class ChunkCleanTest {
         @DisplayName("启用")
         fun onEnable() {
             // 设置为true则清理被拴绳拴住的生物
-            Config.config.chunk.settings.lead = true
             val limit = 5
-            Config.config.chunk.limit = mutableMapOf(Regex("SHEEP") to limit)
+            updateChunkDensityConfig {
+                it.copy(
+                    settings = it.settings.copy(cleanLeashed = true),
+                    entityLimits = mapOf(Regex("SHEEP") to limit),
+                )
+            }
 
             val chunk = world.getChunkAt(0, 0)
             chunk.load()
@@ -94,8 +105,12 @@ abstract class ChunkCleanTest {
         @DisplayName("禁用")
         fun onDisable() {
             // 设置为true则清理被拴绳拴住的生物
-            Config.config.chunk.settings.lead = false
-            Config.config.chunk.limit = mutableMapOf(Regex("SHEEP") to 5)
+            updateChunkDensityConfig {
+                it.copy(
+                    settings = it.settings.copy(cleanLeashed = false),
+                    entityLimits = mapOf(Regex("SHEEP") to 5),
+                )
+            }
 
             val chunk = world.getChunkAt(0, 0)
             chunk.load()
@@ -117,9 +132,13 @@ abstract class ChunkCleanTest {
         @DisplayName("启用")
         fun onEnable() {
             // 设置为true则清理乘骑中的生物
-            Config.config.chunk.settings.mount = true
             val limit = 5
-            Config.config.chunk.limit = mutableMapOf(Regex("HORSE") to limit)
+            updateChunkDensityConfig {
+                it.copy(
+                    settings = it.settings.copy(cleanMounted = true),
+                    entityLimits = mapOf(Regex("HORSE") to limit),
+                )
+            }
 
             val chunk = world.getChunkAt(0, 0)
             chunk.load()
@@ -139,8 +158,12 @@ abstract class ChunkCleanTest {
         @DisplayName("禁用")
         fun onDisable() {
             // 设置为true则清理乘骑中的生物
-            Config.config.chunk.settings.mount = false
-            Config.config.chunk.limit = mutableMapOf(Regex("HORSE") to 5)
+            updateChunkDensityConfig {
+                it.copy(
+                    settings = it.settings.copy(cleanMounted = false),
+                    entityLimits = mapOf(Regex("HORSE") to 5),
+                )
+            }
 
             val chunk = world.getChunkAt(0, 0)
             chunk.load()
@@ -161,7 +184,9 @@ abstract class ChunkCleanTest {
     fun testPapi() {
         val limit = 5
         val count = 16
-        Config.config.chunk.limit = mutableMapOf(Regex("ZOMBIE") to limit)
+        updateChunkDensityConfig {
+            it.copy(entityLimits = mapOf(Regex("ZOMBIE") to limit))
+        }
 
         val chunk = world.getChunkAt(0, 0)
         chunk.load()

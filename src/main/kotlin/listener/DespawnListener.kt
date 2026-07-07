@@ -6,7 +6,7 @@ import org.bukkit.event.entity.ItemDespawnEvent
 import top.e404.eclean.PL
 import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.config.Config
-import top.e404.eplugin.config.matches
+import top.e404.eclean.config.matches
 import top.e404.eplugin.listener.EListener
 
 object DespawnListener : EListener(PL) {
@@ -14,11 +14,11 @@ object DespawnListener : EListener(PL) {
     fun ItemDespawnEvent.onEvent() {
         val item = entity.itemStack
         PL.debug { "物品到时间后销毁: ${item.type.name}, 世界: ${entity.world.name}" }
-        Config.config.trashcan.run {
-            if (!enable
-                || !despawn.enable
-                || despawn.disableWorlds.matches(entity.world.name)
-                || !despawn.match.matches(item.type.name)
+        Config.current.trashcan.run {
+            if (!enabled
+                || !despawnRecovery.enabled
+                || despawnRecovery.disabledWorlds.matches(entity.world.name)
+                || !despawnRecovery.matchers.matches(item.type.name)
             ) return
         }
         PL.debug { "回收匹配物品到垃圾桶: ${item.type.name}, 世界: ${entity.world.name}" }

@@ -1,9 +1,12 @@
 package top.e404.eclean.config
 
 object ModernConfig {
-    val cleanupDuration get() = Config.config.duration
-    val drop get() = Config.config.drop
-    val living get() = Config.config.living
-    val chunkDensity get() = Config.config.chunk
-    val trashcan get() = Config.config.trashcan
+    val global get() = Config.current.global
+    val cleanup get() = Config.current.cleanup
+    val drop get() = Config.current.drop
+    val living get() = Config.current.living
+    val chunkDensity get() = Config.current.chunkDensity
+    val trashcan get() = Config.current.trashcan
+
+    val cleanupDuration get() = cleanup.intervalSeconds
 }

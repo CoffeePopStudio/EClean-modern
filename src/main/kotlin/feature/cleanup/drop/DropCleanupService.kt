@@ -12,38 +12,38 @@ import top.e404.eclean.util.isMatch
 
 class DropCleanupService {
     fun cleanAllWorlds(): List<DropCleanupResult> {
-        val cfg = Config.config.drop
+        val cfg = Config.current.drop
         val worlds = Bukkit.getWorlds().filterNot { world ->
-            cfg.disableWorld.any { regex -> world.name matches regex }
+            cfg.disabledWorlds.any { regex -> world.name matches regex }
         }
         return worlds.map(::cleanWorld)
     }
 
     fun cleanWorld(world: World): DropCleanupResult {
-        val cfg = Config.config.drop
-        val trashCfg = Config.config.trashcan
+        val cfg = Config.current.drop
+        val trashCfg = Config.current.trashcan
         val waitingForClean = world.entities.filterIsInstance<Item>().toMutableList()
 
-        if (cfg.enchant) waitingForClean.removeIf { it.itemStack.itemMeta?.hasEnchants() == true }
-        if (cfg.writtenBook) waitingForClean.removeIf {
+        if (cfg.protectEnchanted) waitingForClean.removeIf { it.itemStack.itemMeta?.hasEnchants() == true }
+        if (cfg.protectWrittenBook) waitingForClean.removeIf {
             it.itemStack.type == Material.WRITABLE_BOOK &&
                     (it.itemStack.itemMeta as? BookMeta)?.hasPages() == true
         }
-        if (cfg.lore) waitingForClean.removeIf { it.itemStack.itemMeta?.hasLore() == true }
+        if (cfg.protectLore) waitingForClean.removeIf { it.itemStack.itemMeta?.hasLore() == true }
 
         val items = mutableMapOf<String, MutableList<Item>>()
         waitingForClean.forEach {
             items.getOrPut(it.itemStack.type.name) { mutableListOf() }.add(it)
         }
 
-        if (cfg.black) {
-            items.entries.removeIf { (type, _) -> type.isMatch(cfg.match) == null }
+        if (cfg.blacklistMode) {
+            items.entries.removeIf { (type, _) -> type.isMatch(cfg.matchers) == null }
         } else {
-            items.entries.removeIf { (type, _) -> type.isMatch(cfg.match) != null }
+            items.entries.removeIf { (type, _) -> type.isMatch(cfg.matchers) != null }
         }
 
         var cleaned = 0
-        if (trashCfg.enable && trashCfg.collect) {
+        if (trashCfg.enabled && trashCfg.collectFromDropCleanup) {
             items.values.forEach { grouped ->
                 cleaned += grouped.size
                 RuntimeServices.trashcanService.collectStacks(grouped.map(Item::getItemStack))

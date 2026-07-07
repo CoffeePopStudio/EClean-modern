@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import top.e404.eclean.clean.cleanLiving
 import top.e404.eclean.clean.lastLiving
-import top.e404.eclean.config.Config
 import top.e404.eclean.test.*
 
 abstract class LivingCleanTest {
@@ -18,7 +17,7 @@ abstract class LivingCleanTest {
     @BeforeEach
     fun enable() {
         resetConfig()
-        Config.config.living.enable = true
+        updateLivingConfig { it.copy(enabled = true) }
     }
 
     @Nested
@@ -28,8 +27,12 @@ abstract class LivingCleanTest {
         @DisplayName("启用")
         fun onEnable() {
             // 设置为true则清理被命名的生物
-            Config.config.living.settings.name = true
-            Config.config.living.match = mutableListOf(Regex("ZOMBIE"))
+            updateLivingConfig {
+                it.copy(
+                    settings = it.settings.copy(cleanNamed = true),
+                    matchers = listOf(Regex("ZOMBIE")),
+                )
+            }
 
             val chunk = world.getChunkAt(0, 0)
             chunk.load()
@@ -48,8 +51,12 @@ abstract class LivingCleanTest {
         @DisplayName("禁用")
         fun onDisable() {
             // 设置为true则清理被命名的生物
-            Config.config.living.settings.name = false
-            Config.config.living.match = mutableListOf(Regex("ZOMBIE"))
+            updateLivingConfig {
+                it.copy(
+                    settings = it.settings.copy(cleanNamed = false),
+                    matchers = listOf(Regex("ZOMBIE")),
+                )
+            }
 
             val chunk = world.getChunkAt(0, 0)
             chunk.load()
@@ -71,8 +78,12 @@ abstract class LivingCleanTest {
         @DisplayName("启用")
         fun onEnable() {
             // 设置为true则清理被拴绳拴住的生物
-            Config.config.living.settings.lead = true
-            Config.config.living.match = mutableListOf(Regex("SHEEP"))
+            updateLivingConfig {
+                it.copy(
+                    settings = it.settings.copy(cleanLeashed = true),
+                    matchers = listOf(Regex("SHEEP")),
+                )
+            }
 
             val chunk = world.getChunkAt(0, 0)
             chunk.load()
@@ -90,8 +101,12 @@ abstract class LivingCleanTest {
         @DisplayName("禁用")
         fun onDisable() {
             // 设置为true则清理被拴绳拴住的生物
-            Config.config.living.settings.lead = false
-            Config.config.living.match = mutableListOf(Regex("SHEEP"))
+            updateLivingConfig {
+                it.copy(
+                    settings = it.settings.copy(cleanLeashed = false),
+                    matchers = listOf(Regex("SHEEP")),
+                )
+            }
 
             val chunk = world.getChunkAt(0, 0)
             chunk.load()
@@ -113,8 +128,12 @@ abstract class LivingCleanTest {
         @DisplayName("启用")
         fun onEnable() {
             // 设置为true则清理乘骑中的生物
-            Config.config.living.settings.mount = true
-            Config.config.living.match = mutableListOf(Regex("HORSE"))
+            updateLivingConfig {
+                it.copy(
+                    settings = it.settings.copy(cleanMounted = true),
+                    matchers = listOf(Regex("HORSE")),
+                )
+            }
 
             val chunk = world.getChunkAt(0, 0)
             chunk.load()
@@ -133,8 +152,12 @@ abstract class LivingCleanTest {
         @DisplayName("禁用")
         fun onDisable() {
             // 设置为true则清理乘骑中的生物
-            Config.config.living.settings.mount = false
-            Config.config.living.match = mutableListOf(Regex("HORSE"))
+            updateLivingConfig {
+                it.copy(
+                    settings = it.settings.copy(cleanMounted = false),
+                    matchers = listOf(Regex("HORSE")),
+                )
+            }
 
             val chunk = world.getChunkAt(0, 0)
             chunk.load()
@@ -157,8 +180,12 @@ abstract class LivingCleanTest {
         @DisplayName("黑名单")
         fun blackList() {
             // 设置为true则按黑名单匹配(名字匹配的才清理)
-            Config.config.living.black = true
-            Config.config.living.match = mutableListOf(Regex("ZOMBIE.*"))
+            updateLivingConfig {
+                it.copy(
+                    blacklistMode = true,
+                    matchers = listOf(Regex("ZOMBIE.*")),
+                )
+            }
 
             val chunk = world.getChunkAt(0, 0)
             chunk.load()
@@ -182,8 +209,12 @@ abstract class LivingCleanTest {
         @DisplayName("白名单")
         fun whiteList() {
             // 设置为false则按白名单匹配(名字匹配的不清理)
-            Config.config.living.black = false
-            Config.config.living.match = mutableListOf(Regex("ZOMBIE.*"))
+            updateLivingConfig {
+                it.copy(
+                    blacklistMode = false,
+                    matchers = listOf(Regex("ZOMBIE.*")),
+                )
+            }
 
             val chunk = world.getChunkAt(0, 0)
             chunk.load()
@@ -208,7 +239,7 @@ abstract class LivingCleanTest {
     @DisplayName("papi")
     fun testPapi() {
         val count = 2
-        Config.config.living.match = mutableListOf(Regex("ZOMBIE"))
+        updateLivingConfig { it.copy(matchers = listOf(Regex("ZOMBIE"))) }
 
         val chunk = world.getChunkAt(0, 0)
         chunk.load()

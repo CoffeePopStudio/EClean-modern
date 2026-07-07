@@ -2,12 +2,12 @@ package top.e404.eclean.clean
 
 import top.e404.eclean.PL
 import top.e404.eclean.app.RuntimeServices
-import top.e404.eclean.config.Config
+import top.e404.eclean.config.ModernConfig
 import top.e404.eclean.util.noOnline
 import top.e404.eclean.util.noOnlineClean
 
 object Clean {
-    private val duration get() = Config.config.duration
+    private val duration get() = ModernConfig.cleanupDuration
 
     /**
      * 计数, 每20tick++

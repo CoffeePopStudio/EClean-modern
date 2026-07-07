@@ -1,0 +1,16 @@
+enabled: true
+disabledWorlds:
+  - "not_cleaned_world"
+finishMessage: "&a生物清理完成, 已清理{clean}/{all}"
+settings:
+  cleanNamed: false
+  cleanLeashed: false
+  cleanMounted: false
+blacklistMode: true
+matchers:
+  - "BLAZE"
+  - "EVOKER"
+  - "GHAST"
+  - "(GLOW_)?SQUID"
+  - "PHANTOM"
+  - "PILLAGER"

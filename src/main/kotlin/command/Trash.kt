@@ -19,7 +19,7 @@ object Trash : ECommand(
 
     override fun onCommand(sender: CommandSender, args: Array<out String>) {
         sender as Player
-        if (!Config.config.trashcan.enable) {
+        if (!Config.current.trashcan.enabled) {
             plugin.sendMsgWithPrefix(sender, Lang["command.trash_disable"])
             return
         }

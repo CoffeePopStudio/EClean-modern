@@ -45,9 +45,9 @@ open class EClean : EPlugin {
 
     override val bstatsId = 14312
     override var debug: Boolean
-        get() = Config.config.debug
+        get() = Config.current.global.debug
         set(value) {
-            Config.config.debug = value
+            Config.update { it.copy(global = it.global.copy(debug = value)) }
         }
     override val langManager by lazy { Lang }
 

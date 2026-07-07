@@ -9,7 +9,14 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.inventory.ItemStack
 import top.e404.eclean.EClean
-import top.e404.eclean.config.*
+import top.e404.eclean.config.Config
+import top.e404.eclean.config.ConfigBundle
+import top.e404.eclean.config.model.ChunkDensityConfig
+import top.e404.eclean.config.model.CleanupConfig
+import top.e404.eclean.config.model.DropConfig
+import top.e404.eclean.config.model.GlobalConfig
+import top.e404.eclean.config.model.LivingConfig
+import top.e404.eclean.config.model.TrashcanConfig
 
 lateinit var server: ServerMock
 lateinit var plugin: EClean
@@ -52,18 +59,46 @@ val consoleOut
     }
 
 val enableDebug = System.getProperty("eclean.debug") != null
+
+fun updateConfig(transform: (ConfigBundle) -> ConfigBundle) {
+    Config.update(transform)
+}
+
+fun updateDropConfig(transform: (DropConfig) -> DropConfig) {
+    updateConfig { it.copy(drop = transform(it.drop)) }
+}
+
+fun updateLivingConfig(transform: (LivingConfig) -> LivingConfig) {
+    updateConfig { it.copy(living = transform(it.living)) }
+}
+
+fun updateChunkDensityConfig(transform: (ChunkDensityConfig) -> ChunkDensityConfig) {
+    updateConfig { it.copy(chunkDensity = transform(it.chunkDensity)) }
+}
+
+fun updateTrashcanConfig(transform: (TrashcanConfig) -> TrashcanConfig) {
+    updateConfig { it.copy(trashcan = transform(it.trashcan)) }
+}
+
 fun resetConfig() {
     world.entities.forEach(Entity::remove)
-    Config.config = ConfigData(
-        debug = enableDebug,
-        update = false,
-        duration = Long.MAX_VALUE,
-        message = mutableMapOf(),
-        living = LivingConfig(enable = false),
-        drop = DropConfig(enable = false),
-        chunk = ChunkConfig(enable = false),
-        trashcan = TrashcanConfig(),
-        noOnline = NoOnlineConfig()
+    Config.replaceForTest(
+        ConfigBundle(
+            global = GlobalConfig(
+                debug = enableDebug,
+                updateCheck = false,
+            ),
+            cleanup = CleanupConfig(
+                intervalSeconds = Long.MAX_VALUE,
+                countdownMessages = emptyMap(),
+                cleanWhenNoPlayers = true,
+                broadcastWhenNoPlayers = true,
+            ),
+            living = LivingConfig(enabled = false),
+            drop = DropConfig(enabled = false),
+            chunkDensity = ChunkDensityConfig(enabled = false),
+            trashcan = TrashcanConfig(),
+        )
     )
     // 清空控制台输出
     consoleOut

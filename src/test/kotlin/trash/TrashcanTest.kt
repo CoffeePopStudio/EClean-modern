@@ -12,7 +12,6 @@ import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.*
 import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.clean.cleanDrop
-import top.e404.eclean.config.Config
 import top.e404.eclean.menu.MenuManager
 import top.e404.eclean.test.*
 import top.e404.eplugin.menu.menu.InventoryMenu
@@ -23,8 +22,12 @@ abstract class TrashcanTest {
     @BeforeEach
     fun setup() {
         resetConfig()
-        Config.config.trashcan.enable = true
-        Config.config.trashcan.duration = null
+        updateTrashcanConfig {
+            it.copy(
+                enabled = true,
+                clearIntervalSeconds = null,
+            )
+        }
 
         Trashcan.trashData.clear()
         Trashcan.trashValues.clear()
@@ -44,9 +47,13 @@ abstract class TrashcanTest {
         @Test
         @DisplayName("启用")
         fun enable() {
-            Config.config.drop.enable = true
-            Config.config.drop.match = mutableListOf(Regex(".*"))
-            Config.config.trashcan.collect = true
+            updateDropConfig {
+                it.copy(
+                    enabled = true,
+                    matchers = listOf(Regex(".*")),
+                )
+            }
+            updateTrashcanConfig { it.copy(collectFromDropCleanup = true) }
 
             val chunk = world.getChunkAt(0, 0)
             chunk.load()
@@ -63,9 +70,13 @@ abstract class TrashcanTest {
         @Test
         @DisplayName("禁用")
         fun disable() {
-            Config.config.drop.enable = true
-            Config.config.drop.match = mutableListOf(Regex(".*"))
-            Config.config.trashcan.collect = false
+            updateDropConfig {
+                it.copy(
+                    enabled = true,
+                    matchers = listOf(Regex(".*")),
+                )
+            }
+            updateTrashcanConfig { it.copy(collectFromDropCleanup = false) }
 
             val chunk = world.getChunkAt(0, 0)
             chunk.load()

@@ -21,7 +21,7 @@ class CleanupTickService(
     fun start() {
         stop()
         elapsedSeconds = 0
-        val duration = Config.config.duration
+        val duration = Config.current.cleanup.intervalSeconds
         snapshots.updateCleanup {
             it.copy(elapsedSeconds = 0, remainingSeconds = duration)
         }

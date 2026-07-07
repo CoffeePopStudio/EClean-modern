@@ -1,0 +1,8 @@
+intervalSeconds: 600
+countdownMessages:
+  60: "&f将在1分钟后进行清理"
+  30: "&f将在30秒后进行清理"
+  10: "&f将在10秒后进行清理"
+  0: "&f正在清理"
+cleanWhenNoPlayers: true
+broadcastWhenNoPlayers: true

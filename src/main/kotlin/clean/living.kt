@@ -4,13 +4,13 @@ import org.bukkit.Bukkit
 import org.bukkit.World
 import top.e404.eclean.PL
 import top.e404.eclean.app.RuntimeServices
-import top.e404.eclean.config.Config
+import top.e404.eclean.config.ModernConfig
 import top.e404.eclean.feature.cleanup.living.LivingCleanupService
 import top.e404.eclean.util.noOnline
 import top.e404.eclean.util.noOnlineMessage
 import top.e404.eplugin.EPlugin.Companion.placeholder
 
-private inline val livingCfg get() = Config.config.living
+private inline val livingCfg get() = ModernConfig.living
 private val livingService by lazy { LivingCleanupService() }
 
 /**
@@ -23,19 +23,19 @@ var lastLiving = 0
  * 清理全服生物
  */
 fun cleanLiving(announce: Boolean = true) {
-    if (!livingCfg.enable) {
+    if (!livingCfg.enabled) {
         PL.debug { "生物清理已禁用" }
         return
     }
-    val worlds = Bukkit.getWorlds().filterNot { livingCfg.disableWorld.any { regex -> it.name matches regex } }
+    val worlds = Bukkit.getWorlds().filterNot { livingCfg.disabledWorlds.any { regex -> it.name matches regex } }
     PL.buildDebug {
         append("开始清理生物, 启用生物清理的世界: [")
         worlds.joinTo(this, ", ", transform = World::getName)
         append("]")
     }
-    PL.debug { if (livingCfg.settings.name) "清理被命名的生物" else "不清理被命名的生物" }
-    PL.debug { if (livingCfg.settings.lead) "清理拴绳拴住的生物" else "不清理拴绳拴住的生物" }
-    PL.debug { if (livingCfg.settings.mount) "清理乘骑中的生物" else "不清理乘骑中的生物" }
+    PL.debug { if (livingCfg.settings.cleanNamed) "清理被命名的生物" else "不清理被命名的生物" }
+    PL.debug { if (livingCfg.settings.cleanLeashed) "清理拴绳拴住的生物" else "不清理拴绳拴住的生物" }
+    PL.debug { if (livingCfg.settings.cleanMounted) "清理乘骑中的生物" else "不清理乘骑中的生物" }
 
     var time = System.currentTimeMillis()
     val result = worlds.map { livingService.cleanWorld(it) }
@@ -49,14 +49,14 @@ fun cleanLiving(announce: Boolean = true) {
     if (noOnline) {
         if (noOnlineMessage) {
             val all = result.sumOf { it.total }
-            val finish = livingCfg.finish
+            val finish = livingCfg.finishMessage
             if (finish.isNotBlank()) RuntimeServices.cleanupAnnouncementService.announceLivingFinish(
                 finish.placeholder(mapOf("clean" to lastLiving, "all" to all))
             )
         }
     } else {
         val all = result.sumOf { it.total }
-        val finish = livingCfg.finish
+        val finish = livingCfg.finishMessage
         if (finish.isNotBlank()) RuntimeServices.cleanupAnnouncementService.announceLivingFinish(
             finish.placeholder(mapOf("clean" to lastLiving, "all" to all))
         )

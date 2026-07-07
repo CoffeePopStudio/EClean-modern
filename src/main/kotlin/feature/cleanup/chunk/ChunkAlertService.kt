@@ -7,7 +7,7 @@ import top.e404.eplugin.EPlugin.Companion.placeholder
 
 class ChunkAlertService {
     fun alert(entries: List<ChunkDensityEntry>) {
-        val format = Config.config.chunk.format ?: return
+        val format = Config.current.chunkDensity.alertFormat ?: return
         if (format.isBlank()) return
         val receivers = Bukkit.getOnlinePlayers().filter { it.hasPermission("eclean.admin") }
         entries.forEach { entry ->

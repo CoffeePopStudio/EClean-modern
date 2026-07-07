@@ -11,9 +11,9 @@ import top.e404.eclean.util.info
 
 class ChunkDensityScanner {
     fun cleanAllWorlds(): ChunkDensityResult {
-        val cfg = Config.config.chunk
+        val cfg = Config.current.chunkDensity
         val worlds = Bukkit.getWorlds().filterNot { world ->
-            cfg.disableWorld.any { regex -> world.name matches regex }
+            cfg.disabledWorlds.any { regex -> world.name matches regex }
         }
 
         var cleaned = 0
@@ -31,7 +31,7 @@ class ChunkDensityScanner {
     fun cleanWorld(world: World): Int = world.loadedChunks.sumOf { cleanChunk(it).cleaned }
 
     fun scanDenseEntries(): List<ChunkDensityEntry> {
-        val threshold = Config.config.chunk.count
+        val threshold = Config.current.chunkDensity.alertThreshold
         return Bukkit.getWorlds()
             .flatMap { it.loadedChunks.toList() }
             .flatMap { chunk ->
@@ -43,16 +43,16 @@ class ChunkDensityScanner {
     }
 
     private fun cleanChunk(chunk: Chunk): ChunkDensityResult {
-        val cfg = Config.config.chunk
+        val cfg = Config.current.chunkDensity
         val willBeRemoved = chunk.entities.toMutableList()
         if (willBeRemoved.isEmpty()) return ChunkDensityResult(cleaned = 0, denseEntries = emptyList())
 
-        if (!cfg.settings.name) willBeRemoved.removeIf { it.customName != null }
-        if (!cfg.settings.lead) willBeRemoved.removeIf { it is LivingEntity && it.isLeashed }
-        if (!cfg.settings.mount) willBeRemoved.removeIf { it.isInsideVehicle || it.passengers.isNotEmpty() }
+        if (!cfg.settings.cleanNamed) willBeRemoved.removeIf { it.customName != null }
+        if (!cfg.settings.cleanLeashed) willBeRemoved.removeIf { it is LivingEntity && it.isLeashed }
+        if (!cfg.settings.cleanMounted) willBeRemoved.removeIf { it.isInsideVehicle || it.passengers.isNotEmpty() }
 
         var cleaned = 0
-        cfg.limit.entries.mapNotNull { (regex, limit) ->
+        cfg.entityLimits.entries.mapNotNull { (regex, limit) ->
             val matches = willBeRemoved.filter { it.type.name.matches(regex) }.toMutableList()
             if (matches.size <= limit) return@mapNotNull null
             matches.subList(limit, matches.size).also {
@@ -64,7 +64,7 @@ class ChunkDensityScanner {
         }
 
         val denseEntries = chunk.entities.asList().info()
-            .filter { it.value > cfg.count }
+            .filter { it.value > cfg.alertThreshold }
             .mapNotNull { (name, amount) ->
                 val type = runCatching { org.bukkit.entity.EntityType.valueOf(name) }.getOrNull() ?: return@mapNotNull null
                 ChunkDensityEntry(chunk, type, amount)

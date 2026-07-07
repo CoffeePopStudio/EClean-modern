@@ -21,11 +21,11 @@ object Debug : AbstractDebugCommand(
         args: Array<out String>,
     ) {
         if (sender !is Player) {
-            if (Config.config.debug) {
-                Config.config.debug = false
+            if (Config.current.global.debug) {
+                Config.update { it.copy(global = it.global.copy(debug = false)) }
                 plugin.sendMsgWithPrefix(sender, Lang["debug.console_disable"])
             } else {
-                Config.config.debug = true
+                Config.update { it.copy(global = it.global.copy(debug = true)) }
                 plugin.sendMsgWithPrefix(sender, Lang["debug.console_enable"])
             }
             return

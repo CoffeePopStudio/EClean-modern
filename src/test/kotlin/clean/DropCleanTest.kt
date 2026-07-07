@@ -12,10 +12,10 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import top.e404.eclean.clean.cleanDrop
 import top.e404.eclean.clean.lastDrop
-import top.e404.eclean.config.Config
 import top.e404.eclean.test.consoleOut
 import top.e404.eclean.test.dropItems
 import top.e404.eclean.test.resetConfig
+import top.e404.eclean.test.updateDropConfig
 import top.e404.eclean.test.world
 import top.e404.eplugin.util.editItemMeta
 
@@ -24,7 +24,7 @@ abstract class DropCleanTest {
     @BeforeEach
     fun enable() {
         resetConfig()
-        Config.config.drop.enable = true
+        updateDropConfig { it.copy(enabled = true) }
     }
 
     @Nested
@@ -34,8 +34,12 @@ abstract class DropCleanTest {
         @DisplayName("启用")
         fun onEnable() {
             // 设置为true则不清理被附魔的物品
-            Config.config.drop.enchant = true
-            Config.config.drop.match = mutableListOf(Regex("DIAMOND.*"))
+            updateDropConfig {
+                it.copy(
+                    protectEnchanted = true,
+                    matchers = listOf(Regex("DIAMOND.*")),
+                )
+            }
 
             val location = Location(world, 8.0, 8.0, 8.0)
             val entities = world.dropItems(location, 2) { index ->
@@ -53,8 +57,12 @@ abstract class DropCleanTest {
         @DisplayName("禁用")
         fun onDisable() {
             // 设置为true则不清理被附魔的物品
-            Config.config.drop.enchant = false
-            Config.config.drop.match = mutableListOf(Regex("DIAMOND.*"))
+            updateDropConfig {
+                it.copy(
+                    protectEnchanted = false,
+                    matchers = listOf(Regex("DIAMOND.*")),
+                )
+            }
 
             val location = Location(world, 8.0, 8.0, 8.0)
             val entities = world.dropItems(location, 2) { index ->
@@ -76,8 +84,12 @@ abstract class DropCleanTest {
         @DisplayName("启用")
         fun onEnable() {
             // 设置为true则不清理写过的书
-            Config.config.drop.writtenBook = true
-            Config.config.drop.match = mutableListOf(Regex("WRITABLE_BOOK"))
+            updateDropConfig {
+                it.copy(
+                    protectWrittenBook = true,
+                    matchers = listOf(Regex("WRITABLE_BOOK")),
+                )
+            }
 
             val location = Location(world, 8.0, 8.0, 8.0)
             val entities = world.dropItems(location, 2) { index ->
@@ -99,8 +111,12 @@ abstract class DropCleanTest {
         @DisplayName("禁用")
         fun onDisable() {
             // 设置为true则不清理写过的书
-            Config.config.drop.writtenBook = false
-            Config.config.drop.match = mutableListOf(Regex("WRITABLE_BOOK"))
+            updateDropConfig {
+                it.copy(
+                    protectWrittenBook = false,
+                    matchers = listOf(Regex("WRITABLE_BOOK")),
+                )
+            }
 
             val location = Location(world, 8.0, 8.0, 8.0)
             val entities = world.dropItems(location, 2) { index ->
@@ -126,8 +142,12 @@ abstract class DropCleanTest {
         @DisplayName("黑名单")
         fun blackList() {
             // 设置为true则按黑名单匹配(名字匹配的才清理)
-            Config.config.drop.black = true
-            Config.config.drop.match = mutableListOf(Regex("DIAMOND.*"))
+            updateDropConfig {
+                it.copy(
+                    blacklistMode = true,
+                    matchers = listOf(Regex("DIAMOND.*")),
+                )
+            }
 
             val location = Location(world, 8.0, 8.0, 8.0)
             val shouldClean = world.dropItems(location, 2) { index ->
@@ -155,8 +175,12 @@ abstract class DropCleanTest {
         @DisplayName("白名单")
         fun whiteList() {
             // 设置为false则按白名单匹配(名字匹配的不清理)
-            Config.config.drop.black = false
-            Config.config.drop.match = mutableListOf(Regex("DIAMOND.*"))
+            updateDropConfig {
+                it.copy(
+                    blacklistMode = false,
+                    matchers = listOf(Regex("DIAMOND.*")),
+                )
+            }
 
             val location = Location(world, 8.0, 8.0, 8.0)
             val shouldNotClean = world.dropItems(location, 2) { index ->
@@ -185,7 +209,7 @@ abstract class DropCleanTest {
     @DisplayName("papi")
     fun testPapi() {
         val count = 2
-        Config.config.drop.match = mutableListOf(Regex("DIAMOND"))
+        updateDropConfig { it.copy(matchers = listOf(Regex("DIAMOND"))) }
 
         val location = Location(world, 8.0, 8.0, 8.0)
         world.dropItems(location, count) { _ -> ItemStack(Material.DIAMOND) }

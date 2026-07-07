@@ -11,31 +11,31 @@ import top.e404.eclean.util.isMatch
 
 class LivingCleanupService {
     fun cleanAllWorlds(): List<LivingCleanupResult> {
-        val cfg = Config.config.living
+        val cfg = Config.current.living
         val worlds = Bukkit.getWorlds().filterNot { world ->
-            cfg.disableWorld.any { regex -> world.name matches regex }
+            cfg.disabledWorlds.any { regex -> world.name matches regex }
         }
         return worlds.map(::cleanWorld)
     }
 
     fun cleanWorld(world: World): LivingCleanupResult {
-        val cfg = Config.config.living
+        val cfg = Config.current.living
         val all = world.livingEntities.filterNot { it is Player }.toMutableList()
         val total = all.size
 
-        if (!cfg.settings.name) all.removeIf { it.customName != null }
-        if (!cfg.settings.lead) all.removeIf { it.isLeashed }
-        if (!cfg.settings.mount) all.removeIf { it.isInsideVehicle || it.passengers.isNotEmpty() }
+        if (!cfg.settings.cleanNamed) all.removeIf { it.customName != null }
+        if (!cfg.settings.cleanLeashed) all.removeIf { it.isLeashed }
+        if (!cfg.settings.cleanMounted) all.removeIf { it.isInsideVehicle || it.passengers.isNotEmpty() }
 
         val groupBy = mutableMapOf<String, MutableList<LivingEntity>>()
         for (entity in all) {
             groupBy.getOrPut(entity.type.name) { mutableListOf() }.add(entity)
         }
 
-        if (cfg.black) {
-            groupBy.entries.removeIf { (type, _) -> type.isMatch(cfg.match) == null }
+        if (cfg.blacklistMode) {
+            groupBy.entries.removeIf { (type, _) -> type.isMatch(cfg.matchers) == null }
         } else {
-            groupBy.entries.removeIf { (type, _) -> type.isMatch(cfg.match) != null }
+            groupBy.entries.removeIf { (type, _) -> type.isMatch(cfg.matchers) != null }
         }
 
         var cleaned = 0

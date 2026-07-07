@@ -2,12 +2,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "2.4.0"
-    kotlin("plugin.serialization") version "2.3.20"
+    kotlin("plugin.serialization") version "2.4.0"
     id("com.gradleup.shadow") version "9.0.0-beta4"
 }
 
 group = "top.e404"
-version = "1.21.0"
+version = "0.1.3"
 val epluginVer = "1.4.0-SNAPSHOT"
 
 fun eplugin(module: String, version: String = epluginVer) = "top.e404.eplugin:eplugin-$module:$version"
@@ -28,17 +28,17 @@ dependencies {
     // eplugin
     implementation(eplugin("core"))
     implementation(eplugin("menu"))
-    implementation(eplugin("serialization"))
     implementation(eplugin("hook-placeholderapi"))
+    implementation("com.charleskorn.kaml:kaml:0.104.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.11.0")
     // placeholderAPI
     compileOnly("me.clip:placeholderapi:2.11.6")
     // Bstats
     implementation("org.bstats:bstats-bukkit:3.0.2")
 
     // mock bukkit
-    testImplementation(kotlin("test", "2.1.21"))
-    testImplementation("io.papermc.paper:paper-api:26.1.2.build.+")
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.87.0")
+    testImplementation(kotlin("test", "2.4.0"))
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.21:3.133.2")
     testImplementation("org.slf4j:slf4j-simple:2.0.13")
     testImplementation("net.kyori:adventure-text-serializer-legacy:4.17.0")
 }

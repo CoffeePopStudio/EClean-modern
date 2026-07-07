@@ -10,7 +10,7 @@ class CleanupAnnouncementService(
     private val snapshots: top.e404.eclean.service.StatusSnapshotService,
 ) {
     fun announceCountdown(remainingSeconds: Long) {
-        val message = Config.config.message[remainingSeconds] ?: return
+        val message = Config.current.cleanup.countdownMessages[remainingSeconds] ?: return
         if (noOnline && !noOnlineMessage) return
         plugin.broadcastMsg(message)
     }
