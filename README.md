@@ -1,14 +1,6 @@
-# [EClean](https://github.com/4o4E/EClean)
-
-> 基于BukkitAPI的清理插件, 适用于Spigot和Paper等Bukkit的下游分支核心, 支持`1.8.x`
-> 及以上版本, `1.8和1.18.x`, `1.19.x`, `1.20.x`经过测试
->
-> mod核心(`mohist`/`arclight`)不在支持范围内, 若一定要使用请不要在此反馈问题
-
-[![Release](https://img.shields.io/github/v/release/4o4E/EClean?label=Release)](https://github.com/4o4E/EClean/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/4o4E/EClean/total?label=Download)](https://github.com/4o4E/EClean/releases)
-
-[![bstats](https://bstats.org/signatures/bukkit/EClean.svg)](https://bstats.org/plugin/bukkit/EClean)
+# EClean Modern
+> [!IMPORTANT] 
+> 该插件为`EClean Modern`, 由`CoffeePopStudio`组织维护, 插件旨意完善原版`EClean`插件的功能, 解决原版插件在新版本中存在的兼容性问题, 并增加更多功能和配置选项
 
 ## 支持设置
 
@@ -59,21 +51,8 @@
 插件默认配置见[配置文件](src/main/resources/config.yml), 配置项均有注释描述用法和含义
 
 ## 下载
-
-- [最新版](https://github.com/4o4E/EClean/releases/latest)
-
-## 计划添加
-
-- [x] ~~不清理附魔物品，以及书写过的书~~ 2023.01.11添加
-- [ ] 清理规则按世界单独配置(判断优先级: 实体规则 -> 世界规则 -> 默认规则)
-- [x] ~~公共垃圾桶(支持翻页, 物品过期时间)~~ ~~如果做会单独做一个插件~~ 写了轻量版的不在关服后持久化垃圾桶物品数据的实现
-- [ ] 红石统计及高频清理
-- [ ] 区块卸载
-- [x] ~~区块上限实现多种实体共用一个上限~~ 2023.07.29添加
-
-~~咕咕咕~~
+- [最新版](https://github.com/CoffeePopStudio/EClean-modern/releases/latest)
 
 ## 更新记录
-
-详见[release](https://github.com/4o4E/EClean/releases)
+详见[release](https://github.com/CoffeePopStudio/EClean-modern/releases)
 
