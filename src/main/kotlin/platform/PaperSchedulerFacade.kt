@@ -36,4 +36,8 @@ class PaperSchedulerFacade(
         val scheduled = plugin.server.scheduler.runTaskTimer(plugin, Runnable(task), delayTicks, periodTicks)
         return SchedulerHandle { scheduled.cancel() }
     }
+
+    override fun cancelPluginTasks() {
+        plugin.server.scheduler.cancelTasks(plugin)
+    }
 }

@@ -11,6 +11,7 @@ interface SchedulerFacade {
     fun runLaterGlobal(delayTicks: Long, task: () -> Unit): SchedulerHandle?
     fun runLaterForEntity(entity: Entity, delayTicks: Long, task: () -> Unit): SchedulerHandle?
     fun scheduleRepeatingGlobal(delayTicks: Long, periodTicks: Long, task: () -> Unit): SchedulerHandle?
+    fun cancelPluginTasks()
 }
 
 fun interface SchedulerHandle {
