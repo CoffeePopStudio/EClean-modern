@@ -20,9 +20,11 @@ class DenseZone(
     override fun onClick(menuIndex: Int, zoneIndex: Int, itemIndex: Int, event: InventoryClickEvent): Boolean {
         val info = data.getOrNull(itemIndex) ?: return true
         val player = event.whoClicked as Player
+        val world = player.server.getWorld(info.chunk.world) ?: return true
+        val chunk = world.getChunkAt(info.chunk.x, info.chunk.z)
         // 右键点击清理区块实体
         if (event.isRightClick) {
-            val entities = info.chunk.entities.filter { it.type == info.type }
+            val entities = chunk.entities.filter { it.type == info.type }
             PL.sendMsgWithPrefix(
                 player,
                 Lang[
@@ -40,10 +42,10 @@ class DenseZone(
         // 左键点击传送到区块
         val x = info.chunk.x * 16 + 8
         val z = info.chunk.z * 16 + 8
-        val y = info.chunk.world.getHighestBlockYAt(x, z)
+        val y = world.getHighestBlockYAt(x, z)
         val oldLocation = player.location
         RuntimeServices.scheduler.runForEntity(player) {
-            player.teleport(Location(info.chunk.world, x + 0.5, y + 1.0, z + 0.5))
+            player.teleport(Location(world, x + 0.5, y + 1.0, z + 0.5))
         }
         if (!menu.temp) {
             PL.sendMsgWithPrefix(player, Lang["command.teleport.done"])

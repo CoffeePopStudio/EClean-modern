@@ -1,26 +1,23 @@
 package top.e404.eclean.feature.cleanup.chunk
 
-import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.World
-import org.bukkit.entity.Entity
-import org.bukkit.entity.LivingEntity
 import top.e404.eclean.PL
 import top.e404.eclean.config.Config
-import top.e404.eclean.util.info
 
-class ChunkDensityScanner {
+class ChunkDensityScanner(
+    private val planner: ChunkScanPlanner = ChunkScanPlanner(),
+    private val snapshotter: ChunkEntitySnapshotter = ChunkEntitySnapshotter(),
+    private val policy: ChunkDensityPolicy = ChunkDensityPolicy(),
+    private val cleaner: ChunkDensityCleaner = ChunkDensityCleaner(),
+) {
     fun cleanAllWorlds(): ChunkDensityResult {
-        val cfg = Config.current.chunkDensity
-        val worlds = Bukkit.getWorlds().filterNot { world ->
-            cfg.disabledWorlds.any { regex -> world.name matches regex }
-        }
-
+        val rule = ChunkDensityRule.fromConfig(Config.current.chunkDensity)
         var cleaned = 0
         val dense = mutableListOf<ChunkDensityEntry>()
-        worlds.forEach { world ->
-            world.loadedChunks.forEach { chunk ->
-                val result = cleanChunk(chunk)
+        planner.planWorlds().forEach { world ->
+            planner.planChunks(world).forEach { chunk ->
+                val result = cleanChunk(chunk, rule)
                 cleaned += result.cleaned
                 dense += result.denseEntries
             }
@@ -28,48 +25,33 @@ class ChunkDensityScanner {
         return ChunkDensityResult(cleaned = cleaned, denseEntries = dense)
     }
 
-    fun cleanWorld(world: World): Int = world.loadedChunks.sumOf { cleanChunk(it).cleaned }
+    fun cleanWorld(world: World): Int {
+        val rule = ChunkDensityRule.fromConfig(Config.current.chunkDensity)
+        return planner.planChunks(world).sumOf { cleanChunk(it, rule).cleaned }
+    }
 
     fun scanDenseEntries(): List<ChunkDensityEntry> {
-        val threshold = Config.current.chunkDensity.alertThreshold
-        return Bukkit.getWorlds()
-            .flatMap { it.loadedChunks.toList() }
+        val rule = ChunkDensityRule.fromConfig(Config.current.chunkDensity)
+        return planner.planWorlds(includeDisabled = true)
+            .flatMap(planner::planChunks)
             .flatMap { chunk ->
-                chunk.entities.groupBy(Entity::getType)
-                    .filter { (_, list) -> list.size > threshold }
-                    .map { (type, list) -> ChunkDensityEntry(chunk, type, list.size) }
+                val snapshot = snapshotter.snapshot(chunk)
+                policy.decide(snapshot, rule).denseEntries
             }
             .sortedByDescending { it.amount }
     }
 
-    private fun cleanChunk(chunk: Chunk): ChunkDensityResult {
-        val cfg = Config.current.chunkDensity
-        val willBeRemoved = chunk.entities.toMutableList()
-        if (willBeRemoved.isEmpty()) return ChunkDensityResult(cleaned = 0, denseEntries = emptyList())
-
-        if (!cfg.settings.cleanNamed) willBeRemoved.removeIf { it.customName != null }
-        if (!cfg.settings.cleanLeashed) willBeRemoved.removeIf { it is LivingEntity && it.isLeashed }
-        if (!cfg.settings.cleanMounted) willBeRemoved.removeIf { it.isInsideVehicle || it.passengers.isNotEmpty() }
-
-        var cleaned = 0
-        cfg.entityLimits.entries.mapNotNull { (regex, limit) ->
-            val matches = willBeRemoved.filter { it.type.name.matches(regex) }.toMutableList()
-            if (matches.size <= limit) return@mapNotNull null
-            matches.subList(limit, matches.size).also {
-                cleaned += it.size
-                willBeRemoved.removeAll(it)
-            }
-        }.forEach { toRemove ->
-            toRemove.forEach(Entity::remove)
+    private fun cleanChunk(chunk: Chunk, rule: ChunkDensityRule): ChunkDensityChunkReport {
+        val snapshot = snapshotter.snapshot(chunk)
+        if (snapshot.entities.isEmpty()) {
+            return ChunkDensityChunkReport(
+                cleaned = 0,
+                denseEntries = emptyList(),
+            )
         }
-
-        val denseEntries = chunk.entities.asList().info()
-            .filter { it.value > cfg.alertThreshold }
-            .mapNotNull { (name, amount) ->
-                val type = runCatching { org.bukkit.entity.EntityType.valueOf(name) }.getOrNull() ?: return@mapNotNull null
-                ChunkDensityEntry(chunk, type, amount)
-            }
-        PL.debug { "区块${chunk.x},${chunk.z}密集清理完成($cleaned)" }
-        return ChunkDensityResult(cleaned = cleaned, denseEntries = denseEntries)
+        val decision = policy.decide(snapshot, rule)
+        val report = cleaner.clean(chunk, decision)
+        PL.debug { "区块${chunk.x},${chunk.z}密集清理完成(${report.cleaned})" }
+        return report
     }
 }

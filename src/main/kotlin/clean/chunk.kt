@@ -8,6 +8,7 @@ import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.ModernConfig
 import top.e404.eclean.feature.cleanup.chunk.ChunkAlertService
 import top.e404.eclean.feature.cleanup.chunk.ChunkDensityScanner
+import top.e404.eclean.platform.execution.ChunkRef
 import top.e404.eclean.util.info
 import top.e404.eclean.util.noOnline
 import top.e404.eclean.util.noOnlineMessage
@@ -81,3 +82,5 @@ private fun Chunk.cleanDenseEntities(): Int {
 }
 
 fun Chunk.info() = "x: ${x * 16}..${x * 16 + 15}, z: ${z * 16}..${z * 16 + 15}"
+
+fun ChunkRef.info() = "x: ${x * 16}..${x * 16 + 15}, z: ${z * 16}..${z * 16 + 15}"

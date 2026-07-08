@@ -1,10 +1,10 @@
 package top.e404.eclean.menu.dense
 
-import org.bukkit.Chunk
 import org.bukkit.Material
 import org.bukkit.entity.EntityType
 import top.e404.eclean.clean.info
 import top.e404.eclean.config.Lang
+import top.e404.eclean.platform.execution.ChunkRef
 import top.e404.eplugin.EPlugin.Companion.placeholder
 import top.e404.eplugin.menu.Displayable
 import top.e404.eplugin.util.buildItemStack
@@ -12,7 +12,7 @@ import top.e404.eplugin.util.buildItemStack
 class EntityInfo(
     val type: EntityType,
     val amount: Int,
-    val chunk: Chunk
+    val chunk: ChunkRef
 ) : Displayable {
     private companion object {
         val materials = Material.values().filter { it.name.contains("WOOL") }

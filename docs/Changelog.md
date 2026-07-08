@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a modern multi-file configuration system based on `Kaml` and `kotlinx.serialization`.
 - Added dedicated configuration models, snapshot loading, runtime apply hooks, and config reload flow.
 - Added initial `RuntimePlatform` and `ExecutionGateway` abstractions for the Folia-first runtime boundary.
+- Added chunk-density snapshot and policy tests to lock the new workflow behavior.
 
 ### Changed
 - Updated the plugin to Paper API `26.1.2`.
@@ -24,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replaced the legacy `eplugin config`-based configuration layer with the new internal config system.
 - Migrated runtime config access in cleanup, trashcan, commands, listeners, and update checks to the new config facade.
 - Refactored runtime bootstrap to inject platform-aware execution services into `RuntimeServices`.
+- Refactored chunk-density cleanup into planner, snapshotter, policy, cleaner, and report components while keeping the existing entrypoints intact.
 
 ### Notes
 - This version is not released yet.

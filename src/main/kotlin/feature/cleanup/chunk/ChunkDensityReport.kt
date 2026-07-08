@@ -1,15 +1,15 @@
 package top.e404.eclean.feature.cleanup.chunk
 
-import org.bukkit.entity.EntityType
 import top.e404.eclean.platform.execution.ChunkRef
+import java.util.UUID
 
-data class ChunkDensityEntry(
+data class ChunkDensityDecision(
     val chunk: ChunkRef,
-    val entityType: EntityType,
-    val amount: Int,
+    val entityIdsToRemove: List<UUID>,
+    val denseEntries: List<ChunkDensityEntry>,
 )
 
-data class ChunkDensityResult(
+data class ChunkDensityChunkReport(
     val cleaned: Int,
     val denseEntries: List<ChunkDensityEntry>,
 )
