@@ -6,9 +6,9 @@ import top.e404.eplugin.update.EUpdater
 
 object Update : EUpdater(
     plugin = PL,
-    url = "https://api.github.com/repos/4o4E/EClean/releases",
+    url = "https://api.github.com/repos/CoffeePopStudio/EClean-modern/releases",
     mcbbs = "https://www.mcbbs.net/thread-1305548-1-1.html",
-    github = "https://github.com/4o4E/EClean"
+    github = "https://github.com/CoffeePopStudio/EClean-modern"
 ) {
     override fun enableUpdate() = Config.current.global.updateCheck
 }
