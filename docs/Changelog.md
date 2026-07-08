@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added initial `RuntimePlatform` and `ExecutionGateway` abstractions for the Folia-first runtime boundary.
 - Added chunk-density snapshot and policy tests to lock the new workflow behavior.
 - Added drop and living cleanup policy tests to lock the protected-entity and matcher behavior after the cleanup split.
+- Added focused `TemporaryReturnService` tests covering delayed return, replacement, and quit handling.
 
 ### Changed
 - Updated the plugin to Paper API `26.1.2`.
@@ -28,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored runtime bootstrap to inject platform-aware execution services into `RuntimeServices`.
 - Refactored chunk-density cleanup into planner, snapshotter, policy, cleaner, and report components while keeping the existing entrypoints intact.
 - Refactored drop and living cleanup into planner, collector, policy, executor, and report components while keeping the existing entrypoints intact.
+- Extracted `PlayerTeleportService` and `TemporaryReturnService`, and routed `DenseZone` and `MenuManager` through the new services while preserving existing player-facing menu behavior.
 
 ### Notes
 - This version is not released yet.

@@ -14,6 +14,7 @@
 - 新增面向 Folia 优先运行时边界的 `RuntimePlatform` 与 `ExecutionGateway` 初始抽象。
 - 新增 `chunk-density` 快照与策略定向测试，用于锁定新工作流行为。
 - 新增 `drop` 与 `living` 清理策略测试，用于锁定拆分后的保护规则与匹配行为。
+- 新增聚焦 `TemporaryReturnService` 的定向测试，覆盖延时回传、覆盖重置与退出回传场景。
 
 ### 变更
 - 将插件目标 API 更新为 Paper API `26.1.2`。
@@ -28,6 +29,7 @@
 - 重构运行时启动流程，使 `RuntimeServices` 注入平台感知的执行服务。
 - 将 `chunk-density` 清理重构为 `planner`、`snapshotter`、`policy`、`cleaner`、`report` 小组件，同时保持现有入口兼容。
 - 将 `drop` 与 `living` 清理重构为 `planner`、`collector`、`policy`、`executor`、`report` 小组件，同时保持现有入口兼容。
+- 抽离 `PlayerTeleportService` 与 `TemporaryReturnService`，并让 `DenseZone` 与 `MenuManager` 改为依赖新服务，同时保持玩家侧菜单行为不变。
 
 ### 说明
 - 此版本当前尚未发布。
