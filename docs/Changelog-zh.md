@@ -27,6 +27,9 @@
 - 移除了基于 `eplugin config` 的旧配置层，改为项目内部的配置系统。
 - 将清理逻辑、垃圾桶、命令、监听器与更新检查中的运行时配置读取迁移到新的配置门面。
 - 重构运行时启动流程，使 `RuntimeServices` 注入平台感知的执行服务。
+- 将清理与垃圾桶的运行时生命周期收拢到 `RuntimeServices`，使插件启用、重载、停用统一复用同一组启动、重载与关闭入口。
+- 精简 `CleanupCoordinator` 注入，只保留其实际拥有的依赖，并让配置运行时应用流程不再直接耦合旧的 `Clean.schedule()` 调用。
+- 将 `FoliaSchedulerFacade` 从反射式调度器查找切换为直接的 Paper/Folia 调度 API，同时继续通过 `SchedulerFacade` 统一插件任务取消入口。
 - 将 `chunk-density` 清理重构为 `planner`、`snapshotter`、`policy`、`cleaner`、`report` 小组件，同时保持现有入口兼容。
 - 将 `drop` 与 `living` 清理重构为 `planner`、`collector`、`policy`、`executor`、`report` 小组件，同时保持现有入口兼容。
 - 抽离 `PlayerTeleportService` 与 `TemporaryReturnService`，并让 `DenseZone` 与 `MenuManager` 改为依赖新服务，同时保持玩家侧菜单行为不变。

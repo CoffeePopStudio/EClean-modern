@@ -44,6 +44,8 @@ class PaperExecutionGatewayTest {
             override fun runLaterForEntity(entity: Entity, delayTicks: Long, task: () -> Unit): SchedulerHandle? = null
 
             override fun scheduleRepeatingGlobal(delayTicks: Long, periodTicks: Long, task: () -> Unit): SchedulerHandle? = null
+
+            override fun cancelPluginTasks() = Unit
         }
         val world = worldProxy("world")
         val playerId = UUID.fromString("00000000-0000-0000-0000-000000000001")

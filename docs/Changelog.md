@@ -27,6 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replaced the legacy `eplugin config`-based configuration layer with the new internal config system.
 - Migrated runtime config access in cleanup, trashcan, commands, listeners, and update checks to the new config facade.
 - Refactored runtime bootstrap to inject platform-aware execution services into `RuntimeServices`.
+- Consolidated cleanup/trashcan runtime lifecycle into `RuntimeServices`, so plugin enable, reload, and disable now reuse the same start/reload/shutdown entrypoints.
+- Simplified `CleanupCoordinator` injection to the dependencies it actually owns, and moved config runtime apply flow away from direct legacy `Clean.schedule()` calls.
+- Switched `FoliaSchedulerFacade` from reflective scheduler lookup to direct Paper/Folia scheduler APIs, while keeping plugin task cancellation centralized behind `SchedulerFacade`.
 - Refactored chunk-density cleanup into planner, snapshotter, policy, cleaner, and report components while keeping the existing entrypoints intact.
 - Refactored drop and living cleanup into planner, collector, policy, executor, and report components while keeping the existing entrypoints intact.
 - Extracted `PlayerTeleportService` and `TemporaryReturnService`, and routed `DenseZone` and `MenuManager` through the new services while preserving existing player-facing menu behavior.
