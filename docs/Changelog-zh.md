@@ -5,6 +5,14 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 版本规范。
 
+## [0.1.5] - 未发布
+
+### 变更
+- 用单个原生 Bukkit `CommandExecutor` + `TabCompleter`（`Commands.kt`）替换 `ECommand`/`ECommandManager` 框架，8 个子命令（debug, reload, clean, stats, entity, trash, players, show）改为内联 private handler 方法。
+- 移除 `SchedulerFacade`/`FoliaSchedulerFacade`/`PaperSchedulerFacade` 抽象层，改为 `Schedulers` 单例——直接封装 Bukkit 的 Folia 兼容调度器 API（`GlobalRegionScheduler`、`RegionScheduler`、`AsyncScheduler`、`EntityScheduler`），Paper 1.21+ 已内置 polyfill。
+- `SchedulerHandle` 全面替换为 `io.papermc.paper.threadedregions.scheduler.ScheduledTask`。
+- `RuntimeServices` 不再创建 scheduler 实例；`isSchedulerReady` 守卫已移除。
+
 ## [0.1.4]
 
 ### 新增

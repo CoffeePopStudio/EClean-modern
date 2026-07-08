@@ -14,8 +14,6 @@ import top.e404.eclean.listener.DespawnListener
 import top.e404.eclean.menu.MenuManager
 import top.e404.eclean.papi.Papi
 import top.e404.eclean.update.Update
-import top.e404.eclean.util.color
-import top.e404.eclean.util.removeColor
 import top.e404.eplugin.EPlugin
 import java.io.File
 

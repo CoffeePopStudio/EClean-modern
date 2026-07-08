@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - Unreleased
+
+### Changed
+- Replaced the `ECommand`/`ECommandManager` framework with a single native Bukkit `CommandExecutor` + `TabCompleter` in `Commands.kt`, inlining all 8 subcommands (debug, reload, clean, stats, entity, trash, players, show) as private handler methods.
+- Removed `SchedulerFacade`/`FoliaSchedulerFacade`/`PaperSchedulerFacade` abstractions and replaced with `Schedulers` singleton — a direct wrapper around Bukkit's Folia-compatible scheduler APIs (`GlobalRegionScheduler`, `RegionScheduler`, `AsyncScheduler`, `EntityScheduler`), which Paper 1.21+ polyfills internally.
+- `SchedulerHandle` replaced with `io.papermc.paper.threadedregions.scheduler.ScheduledTask` throughout.
+- `RuntimeServices` no longer creates scheduler instances; `isSchedulerReady` guard removed.
+
 ## [0.1.4]
 
 ### Added
