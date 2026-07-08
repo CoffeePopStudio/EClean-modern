@@ -64,5 +64,5 @@
 - [最新版](https://github.com/CoffeePopStudio/EClean-modern/releases/latest)
 
 ## 更新记录
-详见 [release](https://github.com/CoffeePopStudio/EClean-modern/releases)
+详见 [ChangeLog](https://github.com/CoffeePopStudio/EClean-modern/blob/modern/docs/Changelog.md)
 
