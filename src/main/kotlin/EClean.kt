@@ -15,6 +15,7 @@ import top.e404.eclean.menu.MenuManager
 import top.e404.eclean.papi.Papi
 import top.e404.eclean.update.Update
 import top.e404.eclean.util.color
+import top.e404.eclean.util.removeColor
 import top.e404.eplugin.EPlugin
 import java.io.File
 
@@ -66,15 +67,15 @@ open class EClean : EPlugin {
         Bukkit.getPluginManager().registerEvents(DespawnListener, this)
         Bukkit.getPluginManager().registerEvents(Trashcan, this)
         if (PapiHook.enable) Papi.register()
-        for (line in logo) info(line)
-        info("&a加载完成, 作者404E, 感谢使用".color)
+        for (line in logo) RuntimeServices.messages.info(line.removeColor())
+        RuntimeServices.messages.info("加载完成, 作者404E, 感谢使用")
     }
 
     override fun onDisable() {
         RuntimeServices.shutdown()
         MenuManager.shutdown()
         if (PapiHook.enable) Papi.unregister()
-        info("&a已卸载, 作者404E, 感谢使用".color)
+        RuntimeServices.messages.info("已卸载, 作者404E, 感谢使用")
     }
 }
 

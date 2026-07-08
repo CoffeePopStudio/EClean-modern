@@ -16,16 +16,20 @@ class MessageService(private val plugin: EPlugin) {
     fun debug(msg: () -> String) {
         if (!plugin.debug && debuggers.isEmpty()) return
         val text = msg()
-        internalSendDebug("&b$text".color)
+        val formatted = "${plugin.debugPrefix} &b$text".color
+        if (plugin.debug) plugin.logger.info(removeColor(formatted))
+        debuggers.forEach { Bukkit.getPlayer(it)?.sendMessage(formatted) }
     }
 
     fun buildDebug(block: StringBuilder.() -> Unit) {
         if (!plugin.debug && debuggers.isEmpty()) return
-        internalSendDebug("&b${buildString(block)}".color)
+        val formatted = "${plugin.debugPrefix} &b${buildString(block)}".color
+        if (plugin.debug) plugin.logger.info(removeColor(formatted))
+        debuggers.forEach { Bukkit.getPlayer(it)?.sendMessage(formatted) }
     }
 
     fun info(message: String) {
-        send(Bukkit.getConsoleSender(), "\u00a7f$message")
+        plugin.logger.info(removeColor(message))
     }
 
     fun warn(message: String, throwable: Throwable? = null) {
@@ -34,17 +38,11 @@ class MessageService(private val plugin: EPlugin) {
     }
 
     fun broadcast(message: String) {
-        val stripped = message.removeColor()
-        internalSendDebug(stripped)
+        val stripped = removeColor(message)
+        plugin.logger.info(stripped)
         Bukkit.getOnlinePlayers().forEach { send(it, stripped) }
     }
 
-    private fun internalSendDebug(message: String) {
-        val formatted = "${plugin.debugPrefix} $message".color
-        if (plugin.debug) Bukkit.getConsoleSender().sendMessage(formatted)
-        debuggers.forEach { Bukkit.getPlayer(it)?.sendMessage(formatted) }
-    }
-
-    private fun String.removeColor(): String =
-        replace(Regex("(?i)[§&][\\da-fk-orx]"), "")
+    private fun removeColor(text: String): String =
+        text.replace(Regex("(?i)[§&][\\da-fk-orx]"), "")
 }
