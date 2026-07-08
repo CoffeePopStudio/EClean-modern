@@ -5,7 +5,7 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 版本规范。
 
-## [0.1.5] - 未发布
+## [0.1.5]
 
 ### 变更
 - 用单个原生 Bukkit `CommandExecutor` + `TabCompleter`（`Commands.kt`）替换 `ECommand`/`ECommandManager` 框架，8 个子命令（debug, reload, clean, stats, entity, trash, players, show）改为内联 private handler 方法。
