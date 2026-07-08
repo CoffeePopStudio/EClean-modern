@@ -23,7 +23,7 @@ var lastChunk = 0
 
 fun cleanDenseEntities(announce: Boolean = true, onComplete: ((Int) -> Unit)? = null) {
     if (!chunkCfg.enabled) {
-        RuntimeServices.messages.debug { "密集实体清理已禁用" }
+        RuntimeServices.messages.debug { "Chunk density cleanup is disabled" }
         onComplete?.invoke(0)
         return
     }
@@ -31,17 +31,17 @@ fun cleanDenseEntities(announce: Boolean = true, onComplete: ((Int) -> Unit)? = 
         onComplete?.invoke(0)
         return
     }
-    RuntimeServices.messages.debug { "开始进行密集实体检查" }
-    RuntimeServices.messages.debug { if (chunkCfg.settings.cleanNamed) "清理被命名的生物" else "不清理被命名的生物" }
-    RuntimeServices.messages.debug { if (chunkCfg.settings.cleanLeashed) "清理拴绳拴住的生物" else "不清理拴绳拴住的生物" }
-    RuntimeServices.messages.debug { if (chunkCfg.settings.cleanMounted) "清理乘骑中的生物" else "不清理乘骑中的生物" }
+    RuntimeServices.messages.debug { "Starting chunk density check" }
+    RuntimeServices.messages.debug { if (chunkCfg.settings.cleanNamed) "Clean named entities" else "Skip named entities" }
+    RuntimeServices.messages.debug { if (chunkCfg.settings.cleanLeashed) "Clean leashed entities" else "Skip leashed entities" }
+    RuntimeServices.messages.debug { if (chunkCfg.settings.cleanMounted) "Clean mounted entities" else "Skip mounted entities" }
 
     val time = System.currentTimeMillis()
     scanner.cleanAllWorlds { result ->
         val elapsed = System.currentTimeMillis() - time
         lastChunk = result.cleaned
         RuntimeServices.statusSnapshots.updateCleanup { it.copy(lastChunk = lastChunk) }
-        RuntimeServices.messages.debug { "密集实体清理共${lastChunk}个, 耗时${elapsed}ms" }
+        RuntimeServices.messages.debug { "Chunk density cleanup finished: ${lastChunk} removed, ${elapsed}ms" }
         chunkAlertService.alert(result.denseEntries)
         if (announce) announceChunk()
         onComplete?.invoke(lastChunk)

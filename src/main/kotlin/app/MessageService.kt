@@ -39,7 +39,6 @@ class MessageService(private val plugin: EPlugin) {
 
     fun broadcast(message: String) {
         val stripped = removeColor(message)
-        plugin.logger.info(stripped)
         Bukkit.getOnlinePlayers().forEach { send(it, stripped) }
     }
 

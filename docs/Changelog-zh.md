@@ -7,8 +7,6 @@
 
 ## [0.1.4] - 未发布
 
-### 新增
-
 ### 变更
 - 将 `parseSecondAsDuration` 从 eplugin 迁移为 `util/Text` 中的独立 `Long` 扩展函数。
 - 移除 `EListener` 依赖：`DespawnListener` 和 `Trashcan` 改为直接实现 `Listener`，由 `EClean.onEnable` 通过 `Bukkit.getPluginManager().registerEvents` 注册。

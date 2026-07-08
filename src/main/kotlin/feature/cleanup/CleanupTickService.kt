@@ -40,7 +40,7 @@ class CleanupTickService(
                 coordinator.cleanNow()
             }
         }
-        messages.info("&f设置 modern 清理任务, 间隔${duration}秒")
+        messages.info("Modern cleanup ticker started (interval=${duration}s)")
     }
 
     fun stop() {

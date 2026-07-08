@@ -13,7 +13,7 @@ object DespawnListener : Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     fun ItemDespawnEvent.onEvent() {
         val item = entity.itemStack
-        RuntimeServices.messages.debug { "物品到时间后销毁: ${item.type.name}, 世界: ${entity.world.name}" }
+        RuntimeServices.messages.debug { "Item despawned: ${item.type.name}, world: ${entity.world.name}" }
         Config.current.trashcan.run {
             if (!enabled
                 || !despawnRecovery.enabled
@@ -21,7 +21,7 @@ object DespawnListener : Listener {
                 || !despawnRecovery.matchers.matches(item.type.name)
             ) return
         }
-        RuntimeServices.messages.debug { "回收匹配物品到垃圾桶: ${item.type.name}, 世界: ${entity.world.name}" }
+        RuntimeServices.messages.debug { "Trashcan recovery: ${item.type.name}, world: ${entity.world.name}" }
         Trashcan.addItem(item.clone())
         entity.remove()
     }

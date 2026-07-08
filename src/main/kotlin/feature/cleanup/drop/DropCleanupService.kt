@@ -57,7 +57,7 @@ class DropCleanupService(
                 total.addAndGet(decision.total)
             },
             onComplete = {
-                RuntimeServices.messages.debug { "世界${worldName}掉落物清理完成(${cleaned.get()}/${total.get()})" }
+                RuntimeServices.messages.debug { "Drop cleanup complete in ${worldName} (${cleaned.get()}/${total.get()})" }
                 onComplete(DropCleanupResult(cleaned.get(), total.get()))
             },
         )

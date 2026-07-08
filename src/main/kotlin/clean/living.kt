@@ -20,7 +20,7 @@ var lastLiving = 0
 
 fun cleanLiving(announce: Boolean = true, onComplete: ((Int) -> Unit)? = null) {
     if (!livingCfg.enabled) {
-        RuntimeServices.messages.debug { "生物清理已禁用" }
+        RuntimeServices.messages.debug { "Living entity cleanup is disabled" }
         onComplete?.invoke(0)
         return
     }
@@ -28,17 +28,17 @@ fun cleanLiving(announce: Boolean = true, onComplete: ((Int) -> Unit)? = null) {
         onComplete?.invoke(0)
         return
     }
-    RuntimeServices.messages.debug { "开始清理生物" }
-    RuntimeServices.messages.debug { if (livingCfg.settings.cleanNamed) "清理被命名的生物" else "不清理被命名的生物" }
-    RuntimeServices.messages.debug { if (livingCfg.settings.cleanLeashed) "清理拴绳拴住的生物" else "不清理拴绳拴住的生物" }
-    RuntimeServices.messages.debug { if (livingCfg.settings.cleanMounted) "清理乘骑中的生物" else "不清理乘骑中的生物" }
+    RuntimeServices.messages.debug { "Starting living entity cleanup" }
+    RuntimeServices.messages.debug { if (livingCfg.settings.cleanNamed) "Clean named entities" else "Skip named entities" }
+    RuntimeServices.messages.debug { if (livingCfg.settings.cleanLeashed) "Clean leashed entities" else "Skip leashed entities" }
+    RuntimeServices.messages.debug { if (livingCfg.settings.cleanMounted) "Clean mounted entities" else "Skip mounted entities" }
 
     val time = System.currentTimeMillis()
     service.cleanAllWorlds { results ->
         val elapsed = System.currentTimeMillis() - time
         lastLiving = results.sumOf { it.cleaned }
         RuntimeServices.statusSnapshots.updateCleanup { it.copy(lastLiving = lastLiving) }
-        RuntimeServices.messages.debug { "生物清理共${lastLiving}个, 耗时${elapsed}ms" }
+        RuntimeServices.messages.debug { "Living entity cleanup finished: ${lastLiving} removed, ${elapsed}ms" }
         if (announce) announceLiving(results)
         onComplete?.invoke(lastLiving)
     }

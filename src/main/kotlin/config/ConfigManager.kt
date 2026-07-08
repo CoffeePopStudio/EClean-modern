@@ -27,18 +27,18 @@ object ConfigManager {
     fun loadAll(sender: CommandSender? = null) {
         snapshot = loadCandidate()
         ConfigRuntimeApplier.apply(snapshot)
-        RuntimeServices.messages.debug { "已加载 modern 配置快照" }
+        RuntimeServices.messages.debug { "Modern config snapshot loaded" }
     }
 
     fun reloadAll(sender: CommandSender? = null) {
         val previous = snapshot
         val candidate = runCatching { loadCandidate() }.getOrElse { error ->
             snapshot = previous
-            throw IllegalStateException("重载配置失败: ${error.message}", error)
+            throw IllegalStateException("Config reload failed: ${error.message}", error)
         }
         snapshot = candidate
         ConfigRuntimeApplier.apply(candidate)
-        RuntimeServices.messages.debug { "已热重载 modern 配置快照" }
+        RuntimeServices.messages.debug { "Modern config snapshot reloaded" }
     }
 
     fun replaceSnapshotForTest(bundle: ConfigBundle) {
@@ -95,7 +95,7 @@ object ConfigManager {
         val backup = File(PL.dataFolder, "config.legacy.yml")
         if (!backup.exists()) globalFile.copyTo(backup, overwrite = false)
         globalFile.delete()
-        RuntimeServices.messages.warn("检测到旧版单文件配置, 已备份为 config.legacy.yml，请手动迁移到新的多文件配置")
+        RuntimeServices.messages.warn("Legacy single-file config detected, backed up to config.legacy.yml, please manually migrate to the new multi-file config")
     }
 
     private fun <T> encode(value: T, serializer: SerializationStrategy<T>): String {

@@ -68,14 +68,14 @@ open class EClean : EPlugin {
         Bukkit.getPluginManager().registerEvents(Trashcan, this)
         if (PapiHook.enable) Papi.register()
         for (line in logo) RuntimeServices.messages.info(line.removeColor())
-        RuntimeServices.messages.info("加载完成, 作者404E, 感谢使用")
+        RuntimeServices.messages.info("EClean-Modern enabled. Author: 404E")
     }
 
     override fun onDisable() {
         RuntimeServices.shutdown()
         MenuManager.shutdown()
         if (PapiHook.enable) Papi.unregister()
-        RuntimeServices.messages.info("已卸载, 作者404E, 感谢使用")
+        RuntimeServices.messages.info("EClean-Modern disabled")
     }
 }
 

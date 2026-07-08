@@ -7,8 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.4] - Unreleased
 
-### Added
-
 ### Changed
 - Migrated `parseSecondAsDuration` from eplugin into a standalone `Long` extension in `util/Text`.
 - Removed `EListener` dependency: `DespawnListener` and `Trashcan` now implement `Listener` directly, registered via `Bukkit.getPluginManager().registerEvents` in `EClean.onEnable`.

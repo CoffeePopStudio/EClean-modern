@@ -59,9 +59,9 @@ class LivingCleanupService(
                 synchronized(remaining) { remaining += decision.remainingCandidates }
             },
             onComplete = {
-                RuntimeServices.messages.debug { "世界${worldName}生物清理完成(${cleaned.get()}/${total.get()})" }
+                RuntimeServices.messages.debug { "Living cleanup complete in ${worldName} (${cleaned.get()}/${total.get()})" }
                 RuntimeServices.messages.buildDebug {
-                    append("世界").append(worldName).append("生物统计: ")
+                    append("Living entity stats for ").append(worldName).append(": ")
                     remaining
                         .groupingBy(LivingCleanupCandidate::type)
                         .eachCount()

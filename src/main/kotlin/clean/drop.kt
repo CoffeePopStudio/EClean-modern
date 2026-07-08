@@ -20,7 +20,7 @@ var lastDrop = 0
 
 fun cleanDrop(announce: Boolean = true, onComplete: ((Int) -> Unit)? = null) {
     if (!dropCfg.enabled) {
-        RuntimeServices.messages.debug { "掉落物清理已禁用" }
+        RuntimeServices.messages.debug { "Drop cleanup is disabled" }
         onComplete?.invoke(0)
         return
     }
@@ -28,16 +28,16 @@ fun cleanDrop(announce: Boolean = true, onComplete: ((Int) -> Unit)? = null) {
         onComplete?.invoke(0)
         return
     }
-    RuntimeServices.messages.debug { "开始清理掉落物" }
-    RuntimeServices.messages.debug { if (dropCfg.protectEnchanted) "不清理附魔的物品" else "清理附魔的物品" }
-    RuntimeServices.messages.debug { if (dropCfg.protectWrittenBook) "不清理成书" else "清理成书" }
+    RuntimeServices.messages.debug { "Starting drop cleanup" }
+    RuntimeServices.messages.debug { if (dropCfg.protectEnchanted) "Protect enchanted items" else "Remove enchanted items" }
+    RuntimeServices.messages.debug { if (dropCfg.protectWrittenBook) "Protect written books" else "Remove written books" }
 
     val time = System.currentTimeMillis()
     service.cleanAllWorlds { results ->
         val elapsed = System.currentTimeMillis() - time
         lastDrop = results.sumOf { it.cleaned }
         RuntimeServices.statusSnapshots.updateCleanup { it.copy(lastDrop = lastDrop) }
-        RuntimeServices.messages.debug { "掉落物清理共${lastDrop}个, 耗时${elapsed}ms" }
+        RuntimeServices.messages.debug { "Drop cleanup finished: ${lastDrop} removed, ${elapsed}ms" }
         if (announce) announceDrop(results)
         onComplete?.invoke(lastDrop)
     }

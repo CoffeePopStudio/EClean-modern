@@ -12,7 +12,7 @@ class CleanupCoordinator(
     private val snapshots: StatusSnapshotService,
 ) {
     fun cleanNow(onComplete: (() -> Unit)? = null) {
-        messages.debug { "通过 CleanupCoordinator 触发一次完整清理" }
+        messages.debug { "Full cleanup triggered via CleanupCoordinator" }
         cleanDrop(announce = true) {
             cleanLiving(announce = true) {
                 cleanDenseEntities(announce = true) {

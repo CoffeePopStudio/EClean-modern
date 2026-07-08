@@ -63,7 +63,7 @@ class ChunkDensityScanner(
                 synchronized(dense) { dense += report.denseEntries }
             },
             onComplete = {
-                RuntimeServices.messages.debug { "世界${worldName}密集实体清理完成(${cleaned.get()})" }
+                RuntimeServices.messages.debug { "Dense entity cleanup complete in ${worldName} (${cleaned.get()} removed)" }
                 onWorldComplete(ChunkDensityResult(cleaned.get(), dense.toList()))
             },
         )
@@ -109,7 +109,7 @@ class ChunkDensityScanner(
         }
         val decision = policy.decide(snapshot, rule)
         val report = cleaner.clean(chunk, decision)
-        RuntimeServices.messages.debug { "区块${chunk.x},${chunk.z}密集清理完成(${report.cleaned})" }
+        RuntimeServices.messages.debug { "Dense cleanup complete in chunk ${chunk.x},${chunk.z} (${report.cleaned} removed)" }
         return report
     }
 }
