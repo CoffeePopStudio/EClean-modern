@@ -35,6 +35,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored chunk-density cleanup into planner, snapshotter, policy, cleaner, and report components while keeping the existing entrypoints intact.
 - Refactored drop and living cleanup into planner, collector, policy, executor, and report components while keeping the existing entrypoints intact.
 - Extracted `PlayerTeleportService` and `TemporaryReturnService`, and routed `DenseZone` and `MenuManager` through the new services while preserving existing player-facing menu behavior.
+- Added `ChunkTaskCoordinator` utility that splits global cleanup flows into region-safe per-chunk dispatch chains, aggregating results after all chunks complete.
+- Changed `Planner` layer (`*Planner.planWorlds`) to return world `String` names or `ChunkRef` lists instead of live `World` / `Chunk` objects, preventing downstream cross-region holding.
+- Added `collectFromChunk(chunk)` to `Collector` layer, shifting entity/item collection from world-wide traversal to single-chunk collection.
+- Changed `DropCleanupService`, `LivingCleanupService`, and `ChunkDensityScanner` to accept `SchedulerFacade` and dispatch region-safe per-chunk cleanup via `ChunkTaskCoordinator`.
+- Rewrote `clean/*.kt` entrypoints: removed duplicate `Bukkit.getWorlds()` logic, delegated to Service layer; kept simple overloads externally but made internal flows async callback-based for Folia chunk-by-chunk model.
+- Made `CleanupCoordinator.cleanNow()` a chained async callback, ensuring drop → living → chunk sequential completion.
+- Wrapped chunk entity iteration and removal inside `DenseZone` with `regionScheduler`, and relocated `getHighestBlockYAt` into the target chunk region.
+- Consolidated `world.entities` / `world.loadedChunks` stats collection and result sending in `command/check.kt` to `globalRegionScheduler`.
+- Changed `command/Players.kt` location reads to per-player entity-scheduler dispatch with async aggregation.
+- Changed `command/Clean.kt` per-world cleanup to create transient Service instances and report results via callbacks.
+- Changed `command/Show.kt` `scanDenseEntries` to an async callback version accepting `SchedulerFacade`.
+- Added `isSchedulerReady` property to `RuntimeServices` for safe `SchedulerFacade` readiness checks at cleanup entrypoints.
 
 ### Notes
 - This version is not released yet.

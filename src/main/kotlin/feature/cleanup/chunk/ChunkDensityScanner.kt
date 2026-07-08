@@ -1,53 +1,111 @@
 package top.e404.eclean.feature.cleanup.chunk
 
-import org.bukkit.Chunk
-import org.bukkit.World
+import org.bukkit.Bukkit
 import top.e404.eclean.PL
 import top.e404.eclean.config.Config
+import top.e404.eclean.feature.cleanup.ChunkTaskCoordinator
+import top.e404.eclean.platform.SchedulerFacade
+import java.util.concurrent.atomic.AtomicInteger
 
 class ChunkDensityScanner(
+    private val scheduler: SchedulerFacade,
     private val planner: ChunkScanPlanner = ChunkScanPlanner(),
     private val snapshotter: ChunkEntitySnapshotter = ChunkEntitySnapshotter(),
     private val policy: ChunkDensityPolicy = ChunkDensityPolicy(),
     private val cleaner: ChunkDensityCleaner = ChunkDensityCleaner(),
+    private val coordinator: ChunkTaskCoordinator = ChunkTaskCoordinator(scheduler),
 ) {
-    fun cleanAllWorlds(): ChunkDensityResult {
+    fun cleanAllWorlds(onComplete: (ChunkDensityResult) -> Unit) {
+        val worldNames = planner.planWorldNames()
         val rule = ChunkDensityRule.fromConfig(Config.current.chunkDensity)
-        var cleaned = 0
-        val dense = mutableListOf<ChunkDensityEntry>()
-        planner.planWorlds().forEach { world ->
-            planner.planChunks(world).forEach { chunk ->
-                val result = cleanChunk(chunk, rule)
-                cleaned += result.cleaned
-                dense += result.denseEntries
-            }
+        if (worldNames.isEmpty()) {
+            onComplete(ChunkDensityResult(0, emptyList()))
+            return
         }
-        return ChunkDensityResult(cleaned = cleaned, denseEntries = dense)
+        val cleaned = AtomicInteger(0)
+        val dense = mutableListOf<ChunkDensityEntry>()
+        val pending = AtomicInteger(worldNames.size)
+        worldNames.forEach { name ->
+            cleanWorld(name, rule, onWorldComplete = { result ->
+                cleaned.addAndGet(result.cleaned)
+                synchronized(dense) { dense += result.denseEntries }
+                if (pending.decrementAndGet() == 0) {
+                    onComplete(ChunkDensityResult(cleaned.get(), dense.toList()))
+                }
+            })
+        }
     }
 
-    fun cleanWorld(world: World): Int {
-        val rule = ChunkDensityRule.fromConfig(Config.current.chunkDensity)
-        return planner.planChunks(world).sumOf { cleanChunk(it, rule).cleaned }
+    fun cleanWorld(
+        worldName: String,
+        rule: ChunkDensityRule = ChunkDensityRule.fromConfig(Config.current.chunkDensity),
+        onWorldComplete: (ChunkDensityResult) -> Unit = {},
+    ) {
+        val world = Bukkit.getWorld(worldName)
+        if (world == null) {
+            onWorldComplete(ChunkDensityResult(0, emptyList()))
+            return
+        }
+        val chunkRefs = planner.planChunks(world)
+        if (chunkRefs.isEmpty()) {
+            onWorldComplete(ChunkDensityResult(0, emptyList()))
+            return
+        }
+        val cleaned = AtomicInteger(0)
+        val dense = mutableListOf<ChunkDensityEntry>()
+        coordinator.dispatchToChunks(
+            chunkRefs = chunkRefs,
+            resolveWorld = { Bukkit.getWorld(it) },
+            perChunk = { w, ref ->
+                val chunk = w.getChunkAt(ref.x, ref.z)
+                val report = cleanChunk(chunk, rule)
+                cleaned.addAndGet(report.cleaned)
+                synchronized(dense) { dense += report.denseEntries }
+            },
+            onComplete = {
+                PL.debug { "世界${worldName}密集实体清理完成(${cleaned.get()})" }
+                onWorldComplete(ChunkDensityResult(cleaned.get(), dense.toList()))
+            },
+        )
     }
 
-    fun scanDenseEntries(): List<ChunkDensityEntry> {
+    fun scanDenseEntries(onComplete: (List<ChunkDensityEntry>) -> Unit) {
+        val worldNames = planner.planWorldNames(includeDisabled = true)
         val rule = ChunkDensityRule.fromConfig(Config.current.chunkDensity)
-        return planner.planWorlds(includeDisabled = true)
-            .flatMap(planner::planChunks)
-            .flatMap { chunk ->
-                val snapshot = snapshotter.snapshot(chunk)
-                policy.decide(snapshot, rule).denseEntries
+        if (worldNames.isEmpty()) {
+            onComplete(emptyList())
+            return
+        }
+        val dense = mutableListOf<ChunkDensityEntry>()
+        val pending = AtomicInteger(worldNames.size)
+        worldNames.forEach { name ->
+            val world = Bukkit.getWorld(name)
+            if (world == null) {
+                if (pending.decrementAndGet() == 0) onComplete(dense.sortedByDescending { it.amount })
+                return@forEach
             }
-            .sortedByDescending { it.amount }
+            val chunkRefs = planner.planChunks(world)
+            coordinator.dispatchToChunks(
+                chunkRefs = chunkRefs,
+                resolveWorld = { Bukkit.getWorld(it) },
+                perChunk = { w, ref ->
+                    val chunk = w.getChunkAt(ref.x, ref.z)
+                    val snapshot = snapshotter.snapshot(chunk)
+                    if (snapshot.entities.isEmpty()) return@dispatchToChunks
+                    val decision = policy.decide(snapshot, rule)
+                    synchronized(dense) { dense += decision.denseEntries }
+                },
+                onComplete = {
+                    if (pending.decrementAndGet() == 0) onComplete(dense.sortedByDescending { it.amount })
+                },
+            )
+        }
     }
 
-    private fun cleanChunk(chunk: Chunk, rule: ChunkDensityRule): ChunkDensityChunkReport {
+    private fun cleanChunk(chunk: org.bukkit.Chunk, rule: ChunkDensityRule): ChunkDensityChunkReport {
         val snapshot = snapshotter.snapshot(chunk)
         if (snapshot.entities.isEmpty()) {
-            return ChunkDensityChunkReport(
-                cleaned = 0,
-                denseEntries = emptyList(),
-            )
+            return ChunkDensityChunkReport(cleaned = 0, denseEntries = emptyList())
         }
         val decision = policy.decide(snapshot, rule)
         val report = cleaner.clean(chunk, decision)

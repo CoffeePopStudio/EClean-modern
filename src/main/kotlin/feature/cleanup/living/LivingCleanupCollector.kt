@@ -1,5 +1,6 @@
 package top.e404.eclean.feature.cleanup.living
 
+import org.bukkit.Chunk
 import org.bukkit.World
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -22,15 +23,22 @@ class LivingCleanupCollector {
     fun collect(world: World): LivingCleanupCollection = LivingCleanupCollection(
         candidates = world.livingEntities
             .filterNot { it is Player }
-            .map { entity ->
-                LivingCleanupCandidate(
-                    id = entity.uniqueId,
-                    type = entity.type.name,
-                    named = entity.customName != null,
-                    leashed = entity.isLeashed,
-                    mounted = entity.isInsideVehicle || entity.passengers.isNotEmpty(),
-                    entity = entity,
-                )
-            }
+            .map { entity -> toCandidate(entity) }
+    )
+
+    fun collectFromChunk(chunk: Chunk): LivingCleanupCollection = LivingCleanupCollection(
+        candidates = chunk.entities
+            .filterIsInstance<LivingEntity>()
+            .filterNot { it is Player }
+            .map { entity -> toCandidate(entity) }
+    )
+
+    private fun toCandidate(entity: LivingEntity) = LivingCleanupCandidate(
+        id = entity.uniqueId,
+        type = entity.type.name,
+        named = entity.customName != null,
+        leashed = entity.isLeashed,
+        mounted = entity.isInsideVehicle || entity.passengers.isNotEmpty(),
+        entity = entity,
     )
 }

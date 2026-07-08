@@ -34,6 +34,8 @@ object RuntimeServices {
     lateinit var scheduler: SchedulerFacade
         private set
 
+    val isSchedulerReady get() = ::scheduler.isInitialized
+
     lateinit var execution: ExecutionGateway
         private set
 

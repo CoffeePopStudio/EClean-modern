@@ -8,6 +8,7 @@ import top.e404.eclean.PL
 import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.clean.info
 import top.e404.eclean.config.Lang
+import top.e404.eclean.platform.execution.ChunkRef
 import top.e404.eplugin.menu.zone.MenuButtonZone
 
 class DenseZone(
@@ -18,36 +19,51 @@ class DenseZone(
     override fun onClick(menuIndex: Int, zoneIndex: Int, itemIndex: Int, event: InventoryClickEvent): Boolean {
         val info = data.getOrNull(itemIndex) ?: return true
         val player = event.whoClicked as Player
-        val world = player.server.getWorld(info.chunk.world) ?: return true
-        val chunk = world.getChunkAt(info.chunk.x, info.chunk.z)
-        // 右键点击清理区块实体
         if (event.isRightClick) {
-            val entities = chunk.entities.filter { it.type == info.type }
+            handleRightClick(player, info.chunk, info.type, itemIndex)
+        } else {
+            handleTeleport(player, info.chunk, menu.temp)
+        }
+        return true
+    }
+
+    private fun handleRightClick(player: Player, chunkRef: ChunkRef, type: org.bukkit.entity.EntityType, itemIndex: Int) {
+        val world = player.server.getWorld(chunkRef.world) ?: return
+        val loc = Location(world, chunkRef.x * 16.0 + 8.0, 64.0, chunkRef.z * 16.0 + 8.0)
+        RuntimeServices.scheduler.runAtLocation(loc) {
+            val chunk = world.getChunkAt(chunkRef.x, chunkRef.z)
+            val entities = chunk.entities.filter { it.type == type }
             PL.sendMsgWithPrefix(
                 player,
                 Lang[
                     "menu.dense.clean",
-                    "chunk" to info.chunk.info(),
-                    "type" to info.type.name,
+                    "chunk" to chunkRef.info(),
+                    "type" to type.name,
                     "count" to entities.size
                 ]
             )
             entities.forEach(Entity::remove)
-            data.removeAt(itemIndex)
+        }
+        data.removeAt(itemIndex)
+        RuntimeServices.scheduler.runGlobal {
             menu.updateIcon()
-            return true
         }
-        // 左键点击传送到区块
-        val x = info.chunk.x * 16 + 8
-        val z = info.chunk.z * 16 + 8
-        val y = world.getHighestBlockYAt(x, z)
-        val target = Location(world, x + 0.5, y + 1.0, z + 0.5)
-        if (!menu.temp) {
-            RuntimeServices.playerTeleportService.teleport(player, target)
-            PL.sendMsgWithPrefix(player, Lang["command.teleport.done"])
-            return true
+    }
+
+    private fun handleTeleport(player: Player, chunkRef: ChunkRef, temp: Boolean) {
+        val world = player.server.getWorld(chunkRef.world) ?: return
+        val x = chunkRef.x * 16 + 8
+        val z = chunkRef.z * 16 + 8
+        val loc = Location(world, x + 0.5, 0.0, z + 0.5)
+        RuntimeServices.scheduler.runAtLocation(loc) {
+            val y = world.getHighestBlockYAt(x, z)
+            val target = Location(world, x + 0.5, y + 1.0, z + 0.5)
+            if (!temp) {
+                RuntimeServices.playerTeleportService.teleport(player, target)
+                PL.sendMsgWithPrefix(player, Lang["command.teleport.done"])
+            } else {
+                RuntimeServices.temporaryReturnService.teleportWithReturn(player, target, 600)
+            }
         }
-        RuntimeServices.temporaryReturnService.teleportWithReturn(player, target, 600)
-        return true
     }
 }

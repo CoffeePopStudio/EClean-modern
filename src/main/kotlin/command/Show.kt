@@ -20,15 +20,17 @@ object Show : ECommand(
     "eclean.admin"
 ) {
     override val usage get() = Lang["command.usage.show"]
-    private val scanner by lazy { ChunkDensityScanner() }
 
     override fun onCommand(sender: CommandSender, args: Array<out String>) {
         sender as Player
-        RuntimeServices.scheduler.runGlobal {
-            val data = scanner.scanDenseEntries()
+        val scanner = ChunkDensityScanner(RuntimeServices.scheduler)
+        scanner.scanDenseEntries { entries ->
+            val data = entries
                 .map { EntityInfo(it.entityType, it.amount, it.chunk) }
                 .toMutableList()
-            MenuManager.openMenu(DenseMenu(data), sender)
+            RuntimeServices.scheduler.runGlobal {
+                MenuManager.openMenu(DenseMenu(data), sender)
+            }
         }
     }
 }

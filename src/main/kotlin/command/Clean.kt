@@ -6,7 +6,11 @@ import top.e404.eclean.PL
 import top.e404.eclean.clean.*
 import top.e404.eclean.clean.Clean
 import top.e404.eclean.clean.Trashcan.cleanTrash
+import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.Lang
+import top.e404.eclean.feature.cleanup.chunk.ChunkDensityScanner
+import top.e404.eclean.feature.cleanup.drop.DropCleanupService
+import top.e404.eclean.feature.cleanup.living.LivingCleanupService
 import top.e404.eplugin.command.ECommand
 
 object Clean : ECommand(
@@ -45,21 +49,26 @@ object Clean : ECommand(
             }
 
             3 -> {
-                val world = Bukkit.getWorld(args[2])
-                if (world == null) {
-                    PL.sendMsgWithPrefix(sender, Lang["message.invalid_world", "world" to args[2]])
-                    return
-                }
-                val count = when (args[1].lowercase()) {
-                    "e", "entity" -> world.cleanLiving().run { "($first/$second)" }
-                    "d", "drop" -> world.cleanDrop().run { "($first/$second)" }
-                    "c", "chunk" -> world.cleanChunkDenseEntities()
-                    else -> {
-                        sender.sendMessage(usage)
-                        return
+                val worldName = args[2]
+                val scheduler = RuntimeServices.scheduler
+                when (args[1].lowercase()) {
+                    "e", "entity" -> {
+                        LivingCleanupService(scheduler).cleanWorld(worldName) { result ->
+                            PL.sendMsgWithPrefix(sender, Lang["command.clean_done", "count" to "(${result.cleaned}/${result.total})"])
+                        }
                     }
+                    "d", "drop" -> {
+                        DropCleanupService(scheduler).cleanWorld(worldName) { result ->
+                            PL.sendMsgWithPrefix(sender, Lang["command.clean_done", "count" to "(${result.cleaned}/${result.total})"])
+                        }
+                    }
+                    "c", "chunk" -> {
+                        ChunkDensityScanner(scheduler).cleanWorld(worldName) { result ->
+                            PL.sendMsgWithPrefix(sender, Lang["command.clean_done", "count" to result.cleaned])
+                        }
+                    }
+                    else -> sender.sendMessage(usage)
                 }
-                PL.sendMsgWithPrefix(sender, Lang["command.clean_done", "count" to count])
             }
 
             else -> sender.sendMessage(usage)

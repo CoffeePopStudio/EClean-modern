@@ -11,16 +11,20 @@ class CleanupCoordinator(
     private val plugin: EPlugin,
     private val snapshots: StatusSnapshotService,
 ) {
-    fun cleanNow() {
+    fun cleanNow(onComplete: (() -> Unit)? = null) {
         plugin.debug { "通过 CleanupCoordinator 触发一次完整清理" }
-        cleanDrop(announce = true)
-        cleanLiving(announce = true)
-        cleanDenseEntities(announce = true)
-        snapshots.updateCleanup {
-            it.copy(
-                elapsedSeconds = 0,
-                remainingSeconds = Config.current.cleanup.intervalSeconds,
-            )
+        cleanDrop(announce = true) {
+            cleanLiving(announce = true) {
+                cleanDenseEntities(announce = true) {
+                    snapshots.updateCleanup {
+                        it.copy(
+                            elapsedSeconds = 0,
+                            remainingSeconds = Config.current.cleanup.intervalSeconds,
+                        )
+                    }
+                    onComplete?.invoke()
+                }
+            }
         }
     }
 }

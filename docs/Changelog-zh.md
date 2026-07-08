@@ -35,6 +35,18 @@
 - 将 `chunk-density` 清理重构为 `planner`、`snapshotter`、`policy`、`cleaner`、`report` 小组件，同时保持现有入口兼容。
 - 将 `drop` 与 `living` 清理重构为 `planner`、`collector`、`policy`、`executor`、`report` 小组件，同时保持现有入口兼容。
 - 抽离 `PlayerTeleportService` 与 `TemporaryReturnService`，并让 `DenseZone` 与 `MenuManager` 改为依赖新服务，同时保持玩家侧菜单行为不变。
+- 新增 `ChunkTaskCoordinator` 工具，将全局清理流拆分为按 chunk 分发到 region scheduler 的安全任务链，并在所有 chunk 完成后回聚结果。
+- 将 `Planner` 层 (`*Planner.planWorlds`) 改为返回世界的 `String` 名称或 `ChunkRef` 列表，不再返回 live `World` / `Chunk` 对象，避免下游跨 region 持有。
+- 为 `Collector` 层新增 `collectFromChunk(chunk)` 方法，使实体/物品收集从「整世界遍历」改为「单 chunk 收集」。
+- 将 `DropCleanupService`、`LivingCleanupService`、`ChunkDensityScanner` 改为注入 `SchedulerFacade`，通过 `ChunkTaskCoordinator` 做 region-safe 的逐 chunk 清理分发。
+- 重写 `clean/*.kt` 清理入口：移除 `Bukkit.getWorlds()` 重复逻辑，改为委托 Service 层；对外保留简单重载但内部为异步回调式，适配 Folia 的 chunk-by-chunk 模型。
+- 将 `CleanupCoordinator.cleanNow()` 改为链式异步回调，确保 drop → living → chunk 顺序完成。
+- 将 `DenseZone` 内的 chunk 实体遍历与 remove 操作包进 `regionScheduler`，并将 `getHighestBlockYAt` 迁入对应 chunk region。
+- 将 `command/check.kt` 中的 `world.entities` / `world.loadedChunks` 统计收集与结果发送收口到 `globalRegionScheduler`。
+- 将 `command/Players.kt` 中的玩家位置读取改为按玩家 entity scheduler 分发收集，使用异步聚合。
+- 将 `command/Clean.kt` 按世界清理改为每次新建 transient Service 实例，并通过回调返回清理结果。
+- 将 `command/Show.kt` 的 `scanDenseEntries` 改为注入 `SchedulerFacade` 的异步回调版本。
+- 向 `RuntimeServices` 增加 `isSchedulerReady` 属性，供各清理入口安全校验 `SchedulerFacade` 是否已注入。
 
 ### 说明
 - 此版本当前尚未发布。
