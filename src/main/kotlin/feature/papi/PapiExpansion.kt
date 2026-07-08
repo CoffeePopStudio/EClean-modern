@@ -5,7 +5,7 @@ import org.bukkit.entity.Player
 import top.e404.eclean.PL
 import top.e404.eclean.app.RuntimeServices
 import top.e404.eplugin.hook.placeholderapi.PapiExpansion
-import top.e404.eplugin.util.parseSecondAsDuration
+import top.e404.eclean.util.parseSecondAsDuration
 
 open class ECleanPapiExpansion : PapiExpansion(PL, "eclean") {
     override fun onPlaceholderRequest(player: Player?, params: String) = onRequest(player, params)

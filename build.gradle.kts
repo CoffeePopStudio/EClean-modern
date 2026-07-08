@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "top.e404"
-version = "0.1.3"
+version = "0.1.4"
 val epluginVer = "1.4.0-SNAPSHOT"
 val paper = "io.papermc.paper:paper-api:26.1.2.build.+"
 

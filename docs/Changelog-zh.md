@@ -5,6 +5,16 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 版本规范。
 
+## [0.1.4] - 未发布
+
+### 新增
+
+### 变更
+- 将 `parseSecondAsDuration` 从 eplugin 迁移为 `util/Text` 中的独立 `Long` 扩展函数。
+- 移除 `EListener` 依赖：`DespawnListener` 和 `Trashcan` 改为直接实现 `Listener`，由 `EClean.onEnable` 通过 `Bukkit.getPluginManager().registerEvents` 注册。
+- 移除 `AbstractDebugCommand` 依赖：`Debug` 改为普通 `ECommand`，内联 debugger 管理逻辑。
+- 移除 `EUpdater` 依赖：`Update` 改为使用 `java.net.http.HttpClient` + `JsonParser` 自实现 GitHub releases API 检查，通过 `AsyncScheduler` 定时调度。
+
 ## [0.1.3]
 
 ### 新增

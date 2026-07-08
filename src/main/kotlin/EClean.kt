@@ -1,5 +1,6 @@
 package top.e404.eclean
 
+import org.bukkit.Bukkit
 import org.bukkit.plugin.PluginDescriptionFile
 import org.bukkit.plugin.java.JavaPluginLoader
 import top.e404.eclean.app.RuntimeServices
@@ -13,6 +14,7 @@ import top.e404.eclean.listener.DespawnListener
 import top.e404.eclean.menu.MenuManager
 import top.e404.eclean.papi.Papi
 import top.e404.eclean.update.Update
+import top.e404.eclean.util.color
 import top.e404.eplugin.EPlugin
 import java.io.File
 
@@ -61,8 +63,8 @@ open class EClean : EPlugin {
         Update.register()
         HookManager.register()
         MenuManager.register()
-        DespawnListener.register()
-        Trashcan.register()
+        Bukkit.getPluginManager().registerEvents(DespawnListener, this)
+        Bukkit.getPluginManager().registerEvents(Trashcan, this)
         if (PapiHook.enable) Papi.register()
         for (line in logo) info(line)
         info("&a加载完成, 作者404E, 感谢使用".color)

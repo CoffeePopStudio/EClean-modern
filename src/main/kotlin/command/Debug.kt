@@ -6,10 +6,13 @@ import top.e404.eclean.PL
 import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.Config
 import top.e404.eclean.config.Lang
-import top.e404.eplugin.command.AbstractDebugCommand
+import top.e404.eplugin.command.ECommand
 
-object Debug : AbstractDebugCommand(
+object Debug : ECommand(
     PL,
+    "debug",
+    "(?i)d|debug",
+    false,
     "eclean.admin"
 ) {
     override val usage get() = Lang["command.usage.debug"]

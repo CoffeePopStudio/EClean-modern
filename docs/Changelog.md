@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - Unreleased
+
+### Added
+
+### Changed
+- Migrated `parseSecondAsDuration` from eplugin into a standalone `Long` extension in `util/Text`.
+- Removed `EListener` dependency: `DespawnListener` and `Trashcan` now implement `Listener` directly, registered via `Bukkit.getPluginManager().registerEvents` in `EClean.onEnable`.
+- Removed `AbstractDebugCommand` dependency: `Debug` is now a regular `ECommand` with inline debugger management.
+- Removed `EUpdater` dependency: `Update` now uses `java.net.http.HttpClient` + `JsonParser` for GitHub releases checks, scheduled via `AsyncScheduler`.
+
 ## [0.1.3]
 
 ### Added
