@@ -11,7 +11,7 @@ class ChunkEntitySnapshotter {
             ChunkEntityState(
                 uuid = entity.uniqueId,
                 type = entity.type.name,
-                named = entity.customName != null,
+                named = entity.customName() != null,
                 leashed = entity is org.bukkit.entity.LivingEntity && entity.isLeashed,
                 mounted = entity.isInsideVehicle || entity.passengers.isNotEmpty(),
             )

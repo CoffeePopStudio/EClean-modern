@@ -36,7 +36,7 @@ class LivingCleanupCollector {
     private fun toCandidate(entity: LivingEntity) = LivingCleanupCandidate(
         id = entity.uniqueId,
         type = entity.type.name,
-        named = entity.customName != null,
+        named = entity.customName() != null,
         leashed = entity.isLeashed,
         mounted = entity.isInsideVehicle || entity.passengers.isNotEmpty(),
         entity = entity,

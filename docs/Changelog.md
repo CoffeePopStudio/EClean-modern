@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added focused `TemporaryReturnService` tests covering delayed return, replacement, and quit handling.
 
 ### Changed
+- Renamed the project and plugin identity from `EClean` to `EClean-Modern` across all Gradle, `plugin.yml`, and documentation surfaces.
 - Updated the plugin to Paper API `26.1.2`.
 - Split default configuration templates into multiple files under `src/main/resources/config/`.
 - Updated tests and Gradle setup for the modernized configuration workflow.

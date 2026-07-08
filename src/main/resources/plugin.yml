@@ -1,4 +1,4 @@
-name: EClean
+name: EClean-Modern
 version: ${version}
 main: top.e404.eclean.EClean
 api-version: '1.21.11'
