@@ -8,8 +8,6 @@ import top.e404.eclean.PL
 import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.clean.info
 import top.e404.eclean.config.Lang
-import top.e404.eclean.menu.MenuManager
-import top.e404.eclean.menu.Temp
 import top.e404.eplugin.menu.zone.MenuButtonZone
 
 class DenseZone(
@@ -43,37 +41,13 @@ class DenseZone(
         val x = info.chunk.x * 16 + 8
         val z = info.chunk.z * 16 + 8
         val y = world.getHighestBlockYAt(x, z)
-        val oldLocation = player.location
-        RuntimeServices.scheduler.runForEntity(player) {
-            player.teleport(Location(world, x + 0.5, y + 1.0, z + 0.5))
-        }
+        val target = Location(world, x + 0.5, y + 1.0, z + 0.5)
         if (!menu.temp) {
+            RuntimeServices.playerTeleportService.teleport(player, target)
             PL.sendMsgWithPrefix(player, Lang["command.teleport.done"])
             return true
         }
-        val exists = MenuManager.temps.remove(player)
-        if (exists != null) {
-            MenuManager.temps[player] = Temp(
-                exists.player,
-                exists.location,
-                RuntimeServices.scheduler.runLaterForEntity(player, 600) {
-                    MenuManager.temps.remove(player)
-                    player.teleport(exists.location)
-                    PL.sendMsgWithPrefix(player, Lang["command.teleport.cover"])
-                }
-            )
-            return true
-        }
-        PL.sendMsgWithPrefix(player, Lang["command.teleport.temp"])
-        MenuManager.temps[player] = Temp(
-            player,
-            oldLocation,
-            RuntimeServices.scheduler.runLaterForEntity(player, 600) {
-                MenuManager.temps.remove(player)
-                player.teleport(oldLocation)
-                PL.sendMsgWithPrefix(player, Lang["command.teleport.back"])
-            }
-        )
+        RuntimeServices.temporaryReturnService.teleportWithReturn(player, target, 600)
         return true
     }
 }

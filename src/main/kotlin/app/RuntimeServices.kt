@@ -15,7 +15,10 @@ import top.e404.eclean.platform.PaperSchedulerFacade
 import top.e404.eclean.platform.SchedulerFacade
 import top.e404.eclean.platform.runtime.RuntimePlatform
 import top.e404.eclean.platform.runtime.RuntimePlatformFactory
+import top.e404.eclean.service.PlayerTeleportService
 import top.e404.eclean.service.StatusSnapshotService
+import top.e404.eclean.service.TemporaryReturnEvent
+import top.e404.eclean.service.TemporaryReturnService
 import top.e404.eplugin.EPlugin
 
 object RuntimeServices {
@@ -32,6 +35,12 @@ object RuntimeServices {
         private set
 
     lateinit var statusSnapshots: StatusSnapshotService
+        private set
+
+    lateinit var playerTeleportService: PlayerTeleportService
+        private set
+
+    lateinit var temporaryReturnService: TemporaryReturnService
         private set
 
     lateinit var cleanupAnnouncementService: CleanupAnnouncementService
@@ -59,6 +68,15 @@ object RuntimeServices {
         scheduler = if (isFolia) FoliaSchedulerFacade(plugin) else PaperSchedulerFacade(plugin)
         execution = if (isFolia) FoliaExecutionGateway(scheduler) else PaperExecutionGateway(scheduler)
         statusSnapshots = StatusSnapshotService()
+        playerTeleportService = PlayerTeleportService(execution)
+        temporaryReturnService = TemporaryReturnService(execution, playerTeleportService) { player, event ->
+            val key = when (event) {
+                TemporaryReturnEvent.Started -> "command.teleport.temp"
+                TemporaryReturnEvent.Returned -> "command.teleport.back"
+                TemporaryReturnEvent.ReturnedAfterReplace -> "command.teleport.cover"
+            }
+            plugin.sendMsgWithPrefix(player, top.e404.eclean.config.Lang[key])
+        }
         trashcanRepository = TrashcanRepository()
         trashcanService = TrashcanService(plugin, scheduler, trashcanRepository, statusSnapshots)
         trashcanTicker = TrashcanTicker(scheduler, trashcanService, statusSnapshots)

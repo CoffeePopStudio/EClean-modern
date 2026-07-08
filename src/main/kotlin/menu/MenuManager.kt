@@ -1,29 +1,14 @@
 package top.e404.eclean.menu
 
-import org.bukkit.Location
-import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerQuitEvent
 import top.e404.eclean.PL
+import top.e404.eclean.app.RuntimeServices
 import top.e404.eplugin.menu.EMenuManager
-import top.e404.eclean.platform.SchedulerHandle
 
 object MenuManager : EMenuManager(PL) {
-    val temps = mutableMapOf<Player, Temp>()
-
     @EventHandler
     fun PlayerQuitEvent.onEvent() {
-        // 30s内退出游戏则传送回之前的位置
-        temps.remove(player)?.run {
-            task?.cancel()
-            player.teleport(location)
-        }
+        RuntimeServices.temporaryReturnService.handleQuit(player)
     }
 }
-
-
-data class Temp(
-    val player: Player,
-    val location: Location,
-    val task: SchedulerHandle?
-)

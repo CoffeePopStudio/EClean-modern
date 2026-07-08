@@ -75,6 +75,7 @@ open class EClean : EPlugin {
     override fun onDisable() {
         RuntimeServices.cleanupTickService.stop()
         RuntimeServices.trashcanTicker.stop()
+        RuntimeServices.temporaryReturnService.shutdown()
         MenuManager.shutdown()
         if (PapiHook.enable) Papi.unregister()
         Bukkit.getScheduler().cancelTasks(this)
