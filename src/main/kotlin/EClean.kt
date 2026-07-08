@@ -1,10 +1,8 @@
 package top.e404.eclean
 
-import org.bukkit.Bukkit
 import org.bukkit.plugin.PluginDescriptionFile
 import org.bukkit.plugin.java.JavaPluginLoader
 import top.e404.eclean.app.RuntimeServices
-import top.e404.eclean.clean.Clean
 import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.command.Commands
 import top.e404.eclean.config.Config
@@ -58,11 +56,9 @@ open class EClean : EPlugin {
     override fun onEnable() {
         if (!unit) bstats()
         RuntimeServices.init(this)
-        Lang.load(null)
-        Config.load(null)
+        RuntimeServices.load()
         Commands.register()
         Update.register()
-        Clean.schedule()
         HookManager.register()
         MenuManager.register()
         DespawnListener.register()
@@ -73,12 +69,9 @@ open class EClean : EPlugin {
     }
 
     override fun onDisable() {
-        RuntimeServices.cleanupTickService.stop()
-        RuntimeServices.trashcanTicker.stop()
-        RuntimeServices.temporaryReturnService.shutdown()
+        RuntimeServices.shutdown()
         MenuManager.shutdown()
         if (PapiHook.enable) Papi.unregister()
-        Bukkit.getScheduler().cancelTasks(this)
         info("&a已卸载, 作者404E, 感谢使用".color)
     }
 }

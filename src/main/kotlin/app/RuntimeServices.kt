@@ -1,11 +1,14 @@
 package top.e404.eclean.app
 
+import org.bukkit.command.CommandSender
 import top.e404.eclean.feature.cleanup.CleanupAnnouncementService
 import top.e404.eclean.feature.cleanup.CleanupCoordinator
 import top.e404.eclean.feature.cleanup.CleanupTickService
 import top.e404.eclean.feature.trashcan.TrashcanRepository
 import top.e404.eclean.feature.trashcan.TrashcanService
 import top.e404.eclean.feature.trashcan.TrashcanTicker
+import top.e404.eclean.config.Config
+import top.e404.eclean.config.Lang
 import top.e404.eclean.platform.FoliaDetector
 import top.e404.eclean.platform.execution.ExecutionGateway
 import top.e404.eclean.platform.execution.FoliaExecutionGateway
@@ -81,7 +84,35 @@ object RuntimeServices {
         trashcanService = TrashcanService(plugin, scheduler, trashcanRepository, statusSnapshots)
         trashcanTicker = TrashcanTicker(scheduler, trashcanService, statusSnapshots)
         cleanupAnnouncementService = CleanupAnnouncementService(plugin, statusSnapshots)
-        cleanupCoordinator = CleanupCoordinator(plugin, scheduler, cleanupAnnouncementService, statusSnapshots)
+        cleanupCoordinator = CleanupCoordinator(plugin, statusSnapshots)
         cleanupTickService = CleanupTickService(plugin, scheduler, cleanupCoordinator, cleanupAnnouncementService, statusSnapshots)
+    }
+
+    fun load(sender: CommandSender? = null) {
+        Lang.load(sender)
+        Config.load(sender)
+    }
+
+    fun reload(sender: CommandSender) {
+        scheduler.runAsync {
+            Lang.load(sender)
+            Config.reload(sender)
+            scheduler.runGlobal {
+                plugin.sendMsgWithPrefix(sender, Lang["command.reload_done"])
+            }
+        }
+    }
+
+    fun applyRuntimeConfig() {
+        if (!::cleanupTickService.isInitialized || !::trashcanTicker.isInitialized) return
+        cleanupTickService.start()
+        trashcanTicker.start()
+    }
+
+    fun shutdown() {
+        if (::cleanupTickService.isInitialized) cleanupTickService.stop()
+        if (::trashcanTicker.isInitialized) trashcanTicker.stop()
+        if (::temporaryReturnService.isInitialized) temporaryReturnService.shutdown()
+        if (::scheduler.isInitialized) scheduler.cancelPluginTasks()
     }
 }
