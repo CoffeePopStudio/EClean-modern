@@ -5,7 +5,7 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 版本规范。
 
-## [0.1.3] - 未发布
+## [0.1.3]
 
 ### 新增
 - 在 `plugin.yml` 中添加了 Folia 支持声明。
@@ -16,10 +16,10 @@
 - 新增 `drop` 与 `living` 清理策略测试，用于锁定拆分后的保护规则与匹配行为。
 - 新增 `WorldStatsService`、`WorldStatsCollector`、`WorldStatsResult` 统计组件，基于 `ChunkTaskCoordinator` 实现 Folia-safe chunk-by-chunk 分布收集与聚合。
 - 新增聚焦 `TemporaryReturnService` 的定向测试，覆盖延时回传、覆盖重置与退出回传场景。
+- 新建独立的 `util/Text`（`color`, `formatAsConst`, `placeholder` 扩展函数）和 `app/MessageService`（消息、广播、debug、日志门面），替换 20+ 个业务文件中对 `EPlugin.Companion.*` 和 `PL.sendMsgWithPrefix/debug/info/warn` 的直接依赖。
 
 ### 变更
 - 将项目与插件标识从 `EClean` 统一更名为 `EClean-Modern`。
-- **P0 eplugin 解耦**: 新建独立的 `util/Text`（`color`, `formatAsConst`, `placeholder` 扩展函数）和 `app/MessageService`（消息、广播、debug、日志门面），替换 20+ 个业务文件中对 `EPlugin.Companion.*` 和 `PL.sendMsgWithPrefix/debug/info/warn` 的直接依赖。
 - 将插件目标 API 更新为 Paper API `26.1.2`。
 - 将默认配置模板拆分为 `src/main/resources/config/` 下的多文件结构。
 - 更新了测试与 Gradle 配置，以适配新的配置工作流。
@@ -51,5 +51,3 @@
 - 将 `command/Show.kt` 的 `scanDenseEntries` 改为注入 `SchedulerFacade` 的异步回调版本。
 - 向 `RuntimeServices` 增加 `isSchedulerReady` 属性，供各清理入口安全校验 `SchedulerFacade` 是否已注入。
 
-### 说明
-- 此版本当前尚未发布。
