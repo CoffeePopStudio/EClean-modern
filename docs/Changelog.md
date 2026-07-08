@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added dedicated configuration models, snapshot loading, runtime apply hooks, and config reload flow.
 - Added initial `RuntimePlatform` and `ExecutionGateway` abstractions for the Folia-first runtime boundary.
 - Added chunk-density snapshot and policy tests to lock the new workflow behavior.
+- Added drop and living cleanup policy tests to lock the protected-entity and matcher behavior after the cleanup split.
 
 ### Changed
 - Updated the plugin to Paper API `26.1.2`.
@@ -26,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Migrated runtime config access in cleanup, trashcan, commands, listeners, and update checks to the new config facade.
 - Refactored runtime bootstrap to inject platform-aware execution services into `RuntimeServices`.
 - Refactored chunk-density cleanup into planner, snapshotter, policy, cleaner, and report components while keeping the existing entrypoints intact.
+- Refactored drop and living cleanup into planner, collector, policy, executor, and report components while keeping the existing entrypoints intact.
 
 ### Notes
 - This version is not released yet.

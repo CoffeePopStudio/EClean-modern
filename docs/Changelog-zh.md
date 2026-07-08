@@ -13,6 +13,7 @@
 - 新增独立的配置模型、配置快照加载、运行时应用入口与重载流程。
 - 新增面向 Folia 优先运行时边界的 `RuntimePlatform` 与 `ExecutionGateway` 初始抽象。
 - 新增 `chunk-density` 快照与策略定向测试，用于锁定新工作流行为。
+- 新增 `drop` 与 `living` 清理策略测试，用于锁定拆分后的保护规则与匹配行为。
 
 ### 变更
 - 将插件目标 API 更新为 Paper API `26.1.2`。
@@ -26,6 +27,7 @@
 - 将清理逻辑、垃圾桶、命令、监听器与更新检查中的运行时配置读取迁移到新的配置门面。
 - 重构运行时启动流程，使 `RuntimeServices` 注入平台感知的执行服务。
 - 将 `chunk-density` 清理重构为 `planner`、`snapshotter`、`policy`、`cleaner`、`report` 小组件，同时保持现有入口兼容。
+- 将 `drop` 与 `living` 清理重构为 `planner`、`collector`、`policy`、`executor`、`report` 小组件，同时保持现有入口兼容。
 
 ### 说明
 - 此版本当前尚未发布。
