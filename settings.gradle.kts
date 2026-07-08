@@ -1,1 +1,1 @@
-rootProject.name = "EClean"
+rootProject.name = "EClean-modern"
