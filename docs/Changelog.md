@@ -15,9 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added chunk-density snapshot and policy tests to lock the new workflow behavior.
 - Added drop and living cleanup policy tests to lock the protected-entity and matcher behavior after the cleanup split.
 - Added focused `TemporaryReturnService` tests covering delayed return, replacement, and quit handling.
+- Added `WorldStatsService`, `WorldStatsCollector`, and `WorldStatsResult` for Folia-safe chunk-by-chunk distributed stats collection and aggregation via `ChunkTaskCoordinator`.
+- Added `util/Text` (standalone `color`, `formatAsConst`, `placeholder` extensions) and `app/MessageService` (message, broadcast, debug, log facade) to decouple the business code from `EPlugin`'s companion object and instance messaging API.
 
 ### Changed
 - Renamed the project and plugin identity from `EClean` to `EClean-Modern` across all Gradle, `plugin.yml`, and documentation surfaces.
+- **P0 eplugin decoupling**: Created standalone `util/Text` (`color`, `formatAsConst`, `placeholder` extensions) and `app/MessageService` (message, broadcast, debug, log facade), replacing direct `EPlugin.Companion.*` and `PL.sendMsgWithPrefix/debug/info/warn` dependencies across 20+ business files.
 - Updated the plugin to Paper API `26.1.2`.
 - Split default configuration templates into multiple files under `src/main/resources/config/`.
 - Updated tests and Gradle setup for the modernized configuration workflow.

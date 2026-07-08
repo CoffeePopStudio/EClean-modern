@@ -7,6 +7,7 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import top.e404.eclean.PL
+import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.clean.Trashcan.sign
 import top.e404.eplugin.menu.zone.MenuButtonZone
@@ -58,7 +59,7 @@ class TrashcanZone(
 
         // 要拿取的物品数量
         var waitForTake = planTake
-        PL.debug { "玩家${player.name}计划从公共垃圾桶中拿取${info.origin.type}x${planTake}, 预计剩余${info.amount - planTake}" }
+        RuntimeServices.messages.debug { "玩家${player.name}计划从公共垃圾桶中拿取${info.origin.type}x${planTake}, 预计剩余${info.amount - planTake}" }
         val maxStackSize = info.origin.type.maxStackSize
         // 遍历背包
         for (i in (0 until 36)) {
@@ -87,7 +88,7 @@ class TrashcanZone(
 
         // 所有拿取的数量
         val totalTake = planTake - waitForTake
-        PL.debug { "玩家${player.name}实际从公共垃圾桶中拿取${info.origin.type}x${totalTake}, 实际剩余${info.amount - totalTake}" }
+        RuntimeServices.messages.debug { "玩家${player.name}实际从公共垃圾桶中拿取${info.origin.type}x${totalTake}, 实际剩余${info.amount - totalTake}" }
 
         // 从垃圾桶中移除拿取的部分
         info.amount -= totalTake
@@ -124,7 +125,7 @@ class TrashcanZone(
                 return
             }
         }
-        PL.debug { "玩家${player.name}向公共垃圾桶中放入${clicked.type}x${count}, 剩余${clicked.amount - count}" }
+        RuntimeServices.messages.debug { "玩家${player.name}向公共垃圾桶中放入${clicked.type}x${count}, 剩余${clicked.amount - count}" }
         // 全部放入
         if (count == clicked.amount) {
             event.currentItem = emptyItem

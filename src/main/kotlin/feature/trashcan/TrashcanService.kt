@@ -7,10 +7,10 @@ import top.e404.eclean.menu.MenuManager
 import top.e404.eclean.menu.trashcan.TrashcanMenu
 import top.e404.eclean.platform.SchedulerFacade
 import top.e404.eclean.service.StatusSnapshotService
-import top.e404.eplugin.EPlugin
+import top.e404.eclean.app.MessageService
 
 class TrashcanService(
-    private val plugin: EPlugin,
+    private val messages: MessageService,
     private val scheduler: SchedulerFacade,
     private val repository: TrashcanRepository,
     private val snapshots: StatusSnapshotService,
@@ -34,9 +34,9 @@ class TrashcanService(
     }
 
     fun clearAll() {
-        plugin.debug { "清空垃圾桶" }
+        messages.debug { "清空垃圾桶" }
         repository.clear()
-        plugin.broadcastMsg(Lang["command.trash_clean_done"])
+        messages.broadcast(Lang["command.trash_clean_done"])
         updateMenus()
     }
 

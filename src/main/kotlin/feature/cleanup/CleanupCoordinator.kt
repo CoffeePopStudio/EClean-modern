@@ -5,14 +5,14 @@ import top.e404.eclean.clean.cleanDrop
 import top.e404.eclean.clean.cleanLiving
 import top.e404.eclean.config.Config
 import top.e404.eclean.service.StatusSnapshotService
-import top.e404.eplugin.EPlugin
+import top.e404.eclean.app.MessageService
 
 class CleanupCoordinator(
-    private val plugin: EPlugin,
+    private val messages: MessageService,
     private val snapshots: StatusSnapshotService,
 ) {
     fun cleanNow(onComplete: (() -> Unit)? = null) {
-        plugin.debug { "通过 CleanupCoordinator 触发一次完整清理" }
+        messages.debug { "通过 CleanupCoordinator 触发一次完整清理" }
         cleanDrop(announce = true) {
             cleanLiving(announce = true) {
                 cleanDenseEntities(announce = true) {

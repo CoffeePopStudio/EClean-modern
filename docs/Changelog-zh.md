@@ -19,6 +19,7 @@
 
 ### 变更
 - 将项目与插件标识从 `EClean` 统一更名为 `EClean-Modern`。
+- **P0 eplugin 解耦**: 新建独立的 `util/Text`（`color`, `formatAsConst`, `placeholder` 扩展函数）和 `app/MessageService`（消息、广播、debug、日志门面），替换 20+ 个业务文件中对 `EPlugin.Companion.*` 和 `PL.sendMsgWithPrefix/debug/info/warn` 的直接依赖。
 - 将插件目标 API 更新为 Paper API `26.1.2`。
 - 将默认配置模板拆分为 `src/main/resources/config/` 下的多文件结构。
 - 更新了测试与 Gradle 配置，以适配新的配置工作流。

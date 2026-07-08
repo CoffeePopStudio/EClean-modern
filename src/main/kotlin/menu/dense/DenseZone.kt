@@ -33,7 +33,7 @@ class DenseZone(
         RuntimeServices.scheduler.runAtLocation(loc) {
             val chunk = world.getChunkAt(chunkRef.x, chunkRef.z)
             val entities = chunk.entities.filter { it.type == type }
-            PL.sendMsgWithPrefix(
+            RuntimeServices.messages.send(
                 player,
                 Lang[
                     "menu.dense.clean",
@@ -60,7 +60,7 @@ class DenseZone(
             val target = Location(world, x + 0.5, y + 1.0, z + 0.5)
             if (!temp) {
                 RuntimeServices.playerTeleportService.teleport(player, target)
-                PL.sendMsgWithPrefix(player, Lang["command.teleport.done"])
+                RuntimeServices.messages.send(player, Lang["command.teleport.done"])
             } else {
                 RuntimeServices.temporaryReturnService.teleportWithReturn(player, target, 600)
             }

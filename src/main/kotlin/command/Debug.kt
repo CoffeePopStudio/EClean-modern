@@ -3,13 +3,11 @@ package top.e404.eclean.command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import top.e404.eclean.PL
+import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.Config
 import top.e404.eclean.config.Lang
 import top.e404.eplugin.command.AbstractDebugCommand
 
-/**
- * debug指令
- */
 object Debug : AbstractDebugCommand(
     PL,
     "eclean.admin"
@@ -23,20 +21,20 @@ object Debug : AbstractDebugCommand(
         if (sender !is Player) {
             if (Config.current.global.debug) {
                 Config.update { it.copy(global = it.global.copy(debug = false)) }
-                plugin.sendMsgWithPrefix(sender, Lang["debug.console_disable"])
+                RuntimeServices.messages.send(sender, Lang["debug.console_disable"])
             } else {
                 Config.update { it.copy(global = it.global.copy(debug = true)) }
-                plugin.sendMsgWithPrefix(sender, Lang["debug.console_enable"])
+                RuntimeServices.messages.send(sender, Lang["debug.console_enable"])
             }
             return
         }
         val senderName = sender.name
-        if (senderName in plugin.debuggers) {
-            plugin.debuggers.remove(senderName)
-            plugin.sendMsgWithPrefix(sender, Lang["debug.player_disable"])
+        if (senderName in RuntimeServices.messages.debuggers) {
+            RuntimeServices.messages.debuggers.remove(senderName)
+            RuntimeServices.messages.send(sender, Lang["debug.player_disable"])
         } else {
-            plugin.debuggers.add(senderName)
-            plugin.sendMsgWithPrefix(sender, Lang["debug.player_enable"])
+            RuntimeServices.messages.debuggers.add(senderName)
+            RuntimeServices.messages.send(sender, Lang["debug.player_enable"])
         }
     }
 }

@@ -1,13 +1,12 @@
 package top.e404.eclean.clean
 
-import top.e404.eclean.PL
 import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.ModernConfig
 import top.e404.eclean.feature.cleanup.drop.DropCleanupResult
 import top.e404.eclean.feature.cleanup.drop.DropCleanupService
 import top.e404.eclean.util.noOnline
 import top.e404.eclean.util.noOnlineMessage
-import top.e404.eplugin.EPlugin.Companion.placeholder
+import top.e404.eclean.util.placeholder
 
 private inline val dropCfg get() = ModernConfig.drop
 
@@ -21,7 +20,7 @@ var lastDrop = 0
 
 fun cleanDrop(announce: Boolean = true, onComplete: ((Int) -> Unit)? = null) {
     if (!dropCfg.enabled) {
-        PL.debug { "掉落物清理已禁用" }
+        RuntimeServices.messages.debug { "掉落物清理已禁用" }
         onComplete?.invoke(0)
         return
     }
@@ -29,16 +28,16 @@ fun cleanDrop(announce: Boolean = true, onComplete: ((Int) -> Unit)? = null) {
         onComplete?.invoke(0)
         return
     }
-    PL.debug { "开始清理掉落物" }
-    PL.debug { if (dropCfg.protectEnchanted) "不清理附魔的物品" else "清理附魔的物品" }
-    PL.debug { if (dropCfg.protectWrittenBook) "不清理成书" else "清理成书" }
+    RuntimeServices.messages.debug { "开始清理掉落物" }
+    RuntimeServices.messages.debug { if (dropCfg.protectEnchanted) "不清理附魔的物品" else "清理附魔的物品" }
+    RuntimeServices.messages.debug { if (dropCfg.protectWrittenBook) "不清理成书" else "清理成书" }
 
     val time = System.currentTimeMillis()
     service.cleanAllWorlds { results ->
         val elapsed = System.currentTimeMillis() - time
         lastDrop = results.sumOf { it.cleaned }
         RuntimeServices.statusSnapshots.updateCleanup { it.copy(lastDrop = lastDrop) }
-        PL.debug { "掉落物清理共${lastDrop}个, 耗时${elapsed}ms" }
+        RuntimeServices.messages.debug { "掉落物清理共${lastDrop}个, 耗时${elapsed}ms" }
         if (announce) announceDrop(results)
         onComplete?.invoke(lastDrop)
     }

@@ -1,6 +1,5 @@
 package top.e404.eclean.clean
 
-import top.e404.eclean.PL
 import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.ModernConfig
 import top.e404.eclean.util.noOnline
@@ -15,7 +14,7 @@ object Clean {
     val count get() = RuntimeServices.statusSnapshots.current().cleanup.elapsedSeconds
 
     fun schedule() {
-        PL.info("&f设置清理任务, 间隔${duration}秒")
+        RuntimeServices.messages.info("&f设置清理任务, 间隔${duration}秒")
         RuntimeServices.cleanupTickService.start()
     }
 

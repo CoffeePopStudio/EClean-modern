@@ -1,9 +1,9 @@
 package top.e404.eclean.feature.cleanup.chunk
 
 import org.bukkit.Bukkit
-import top.e404.eclean.PL
+import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.Config
-import top.e404.eplugin.EPlugin.Companion.placeholder
+import top.e404.eclean.util.placeholder
 
 class ChunkAlertService {
     fun alert(entries: List<ChunkDensityEntry>) {
@@ -16,7 +16,7 @@ class ChunkAlertService {
                 "entity" to entry.entityType.name,
                 "count" to entry.amount,
             )
-            receivers.forEach { PL.sendMsgWithPrefix(it, message) }
+            receivers.forEach { RuntimeServices.messages.send(it, message) }
         }
     }
 }

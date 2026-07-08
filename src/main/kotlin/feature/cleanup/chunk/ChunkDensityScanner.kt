@@ -1,7 +1,7 @@
 package top.e404.eclean.feature.cleanup.chunk
 
 import org.bukkit.Bukkit
-import top.e404.eclean.PL
+import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.Config
 import top.e404.eclean.platform.dispatch.ChunkTaskCoordinator
 import top.e404.eclean.platform.SchedulerFacade
@@ -63,7 +63,7 @@ class ChunkDensityScanner(
                 synchronized(dense) { dense += report.denseEntries }
             },
             onComplete = {
-                PL.debug { "世界${worldName}密集实体清理完成(${cleaned.get()})" }
+                RuntimeServices.messages.debug { "世界${worldName}密集实体清理完成(${cleaned.get()})" }
                 onWorldComplete(ChunkDensityResult(cleaned.get(), dense.toList()))
             },
         )
@@ -109,7 +109,7 @@ class ChunkDensityScanner(
         }
         val decision = policy.decide(snapshot, rule)
         val report = cleaner.clean(chunk, decision)
-        PL.debug { "区块${chunk.x},${chunk.z}密集清理完成(${report.cleaned})" }
+        RuntimeServices.messages.debug { "区块${chunk.x},${chunk.z}密集清理完成(${report.cleaned})" }
         return report
     }
 }

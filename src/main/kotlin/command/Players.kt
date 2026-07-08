@@ -5,7 +5,7 @@ import org.bukkit.command.CommandSender
 import top.e404.eclean.PL
 import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.Lang
-import top.e404.eplugin.EPlugin.Companion.color
+import top.e404.eclean.util.color
 import top.e404.eplugin.command.ECommand
 import java.util.concurrent.atomic.AtomicInteger
 

@@ -1,7 +1,7 @@
 package top.e404.eclean.feature.cleanup.living
 
 import org.bukkit.Bukkit
-import top.e404.eclean.PL
+import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.platform.dispatch.ChunkTaskCoordinator
 import top.e404.eclean.platform.SchedulerFacade
 import java.util.concurrent.atomic.AtomicInteger
@@ -59,8 +59,8 @@ class LivingCleanupService(
                 synchronized(remaining) { remaining += decision.remainingCandidates }
             },
             onComplete = {
-                PL.debug { "世界${worldName}生物清理完成(${cleaned.get()}/${total.get()})" }
-                PL.buildDebug {
+                RuntimeServices.messages.debug { "世界${worldName}生物清理完成(${cleaned.get()}/${total.get()})" }
+                RuntimeServices.messages.buildDebug {
                     append("世界").append(worldName).append("生物统计: ")
                     remaining
                         .groupingBy(LivingCleanupCandidate::type)

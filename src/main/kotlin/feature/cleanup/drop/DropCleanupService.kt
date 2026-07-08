@@ -1,7 +1,7 @@
 package top.e404.eclean.feature.cleanup.drop
 
 import org.bukkit.Bukkit
-import top.e404.eclean.PL
+import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.platform.dispatch.ChunkTaskCoordinator
 import top.e404.eclean.platform.SchedulerFacade
 import java.util.concurrent.atomic.AtomicInteger
@@ -57,7 +57,7 @@ class DropCleanupService(
                 total.addAndGet(decision.total)
             },
             onComplete = {
-                PL.debug { "世界${worldName}掉落物清理完成(${cleaned.get()}/${total.get()})" }
+                RuntimeServices.messages.debug { "世界${worldName}掉落物清理完成(${cleaned.get()}/${total.get()})" }
                 onComplete(DropCleanupResult(cleaned.get(), total.get()))
             },
         )

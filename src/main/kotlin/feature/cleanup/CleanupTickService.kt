@@ -4,10 +4,10 @@ import top.e404.eclean.config.Config
 import top.e404.eclean.platform.SchedulerFacade
 import top.e404.eclean.platform.SchedulerHandle
 import top.e404.eclean.service.StatusSnapshotService
-import top.e404.eplugin.EPlugin
+import top.e404.eclean.app.MessageService
 
 class CleanupTickService(
-    private val plugin: EPlugin,
+    private val messages: MessageService,
     private val scheduler: SchedulerFacade,
     private val coordinator: CleanupCoordinator,
     private val announcements: CleanupAnnouncementService,
@@ -40,7 +40,7 @@ class CleanupTickService(
                 coordinator.cleanNow()
             }
         }
-        plugin.info("&f设置 modern 清理任务, 间隔${duration}秒")
+        messages.info("&f设置 modern 清理任务, 间隔${duration}秒")
     }
 
     fun stop() {

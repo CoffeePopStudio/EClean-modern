@@ -54,17 +54,17 @@ object Clean : ECommand(
                 when (args[1].lowercase()) {
                     "e", "entity" -> {
                         LivingCleanupService(scheduler).cleanWorld(worldName) { result ->
-                            PL.sendMsgWithPrefix(sender, Lang["command.clean_done", "count" to "(${result.cleaned}/${result.total})"])
+                            RuntimeServices.messages.send(sender, Lang["command.clean_done", "count" to "(${result.cleaned}/${result.total})"])
                         }
                     }
                     "d", "drop" -> {
                         DropCleanupService(scheduler).cleanWorld(worldName) { result ->
-                            PL.sendMsgWithPrefix(sender, Lang["command.clean_done", "count" to "(${result.cleaned}/${result.total})"])
+                            RuntimeServices.messages.send(sender, Lang["command.clean_done", "count" to "(${result.cleaned}/${result.total})"])
                         }
                     }
                     "c", "chunk" -> {
                         ChunkDensityScanner(scheduler).cleanWorld(worldName) { result ->
-                            PL.sendMsgWithPrefix(sender, Lang["command.clean_done", "count" to result.cleaned])
+                            RuntimeServices.messages.send(sender, Lang["command.clean_done", "count" to result.cleaned])
                         }
                     }
                     else -> sender.sendMessage(usage)

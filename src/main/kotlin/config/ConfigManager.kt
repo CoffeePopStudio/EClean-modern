@@ -5,6 +5,7 @@ import com.charleskorn.kaml.YamlConfiguration
 import kotlinx.serialization.SerializationStrategy
 import org.bukkit.command.CommandSender
 import top.e404.eclean.PL
+import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.model.ChunkDensityConfig
 import top.e404.eclean.config.model.CleanupConfig
 import top.e404.eclean.config.model.DropConfig
@@ -26,7 +27,7 @@ object ConfigManager {
     fun loadAll(sender: CommandSender? = null) {
         snapshot = loadCandidate()
         ConfigRuntimeApplier.apply(snapshot)
-        PL.debug { "已加载 modern 配置快照" }
+        RuntimeServices.messages.debug { "已加载 modern 配置快照" }
     }
 
     fun reloadAll(sender: CommandSender? = null) {
@@ -37,7 +38,7 @@ object ConfigManager {
         }
         snapshot = candidate
         ConfigRuntimeApplier.apply(candidate)
-        PL.debug { "已热重载 modern 配置快照" }
+        RuntimeServices.messages.debug { "已热重载 modern 配置快照" }
     }
 
     fun replaceSnapshotForTest(bundle: ConfigBundle) {
@@ -94,7 +95,7 @@ object ConfigManager {
         val backup = File(PL.dataFolder, "config.legacy.yml")
         if (!backup.exists()) globalFile.copyTo(backup, overwrite = false)
         globalFile.delete()
-        PL.warn("检测到旧版单文件配置, 已备份为 config.legacy.yml，请手动迁移到新的多文件配置")
+        RuntimeServices.messages.warn("检测到旧版单文件配置, 已备份为 config.legacy.yml，请手动迁移到新的多文件配置")
     }
 
     private fun <T> encode(value: T, serializer: SerializationStrategy<T>): String {

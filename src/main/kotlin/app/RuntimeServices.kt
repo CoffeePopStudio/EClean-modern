@@ -28,6 +28,9 @@ object RuntimeServices {
     lateinit var plugin: EPlugin
         private set
 
+    lateinit var messages: MessageService
+        private set
+
     lateinit var platform: RuntimePlatform
         private set
 
@@ -68,6 +71,7 @@ object RuntimeServices {
 
     fun init(plugin: EPlugin) {
         this.plugin = plugin
+        messages = MessageService(plugin)
         val isFolia = FoliaDetector.isFolia()
         platform = RuntimePlatformFactory.create(isFolia)
         scheduler = if (isFolia) FoliaSchedulerFacade(plugin) else PaperSchedulerFacade(plugin)
@@ -80,14 +84,14 @@ object RuntimeServices {
                 TemporaryReturnEvent.Returned -> "command.teleport.back"
                 TemporaryReturnEvent.ReturnedAfterReplace -> "command.teleport.cover"
             }
-            plugin.sendMsgWithPrefix(player, top.e404.eclean.config.Lang[key])
+            messages.send(player, Lang[key])
         }
         trashcanRepository = TrashcanRepository()
-        trashcanService = TrashcanService(plugin, scheduler, trashcanRepository, statusSnapshots)
+        trashcanService = TrashcanService(messages, scheduler, trashcanRepository, statusSnapshots)
         trashcanTicker = TrashcanTicker(scheduler, trashcanService, statusSnapshots)
-        cleanupAnnouncementService = CleanupAnnouncementService(plugin, statusSnapshots)
-        cleanupCoordinator = CleanupCoordinator(plugin, statusSnapshots)
-        cleanupTickService = CleanupTickService(plugin, scheduler, cleanupCoordinator, cleanupAnnouncementService, statusSnapshots)
+        cleanupAnnouncementService = CleanupAnnouncementService(messages, statusSnapshots)
+        cleanupCoordinator = CleanupCoordinator(messages, statusSnapshots)
+        cleanupTickService = CleanupTickService(messages, scheduler, cleanupCoordinator, cleanupAnnouncementService, statusSnapshots)
     }
 
     fun load(sender: CommandSender? = null) {
@@ -100,7 +104,7 @@ object RuntimeServices {
             Lang.load(sender)
             Config.reload(sender)
             scheduler.runGlobal {
-                plugin.sendMsgWithPrefix(sender, Lang["command.reload_done"])
+                messages.send(sender, Lang["command.reload_done"])
             }
         }
     }

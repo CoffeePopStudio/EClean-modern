@@ -3,6 +3,7 @@ package top.e404.eclean.command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import top.e404.eclean.PL
+import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.config.Config
 import top.e404.eclean.config.Lang
@@ -20,10 +21,10 @@ object Trash : ECommand(
     override fun onCommand(sender: CommandSender, args: Array<out String>) {
         sender as Player
         if (!Config.current.trashcan.enabled) {
-            plugin.sendMsgWithPrefix(sender, Lang["command.trash_disable"])
+            RuntimeServices.messages.send(sender, Lang["command.trash_disable"])
             return
         }
         Trashcan.open(sender)
-        plugin.sendMsgWithPrefix(sender, Lang["command.trash_open"])
+        RuntimeServices.messages.send(sender, Lang["command.trash_open"])
     }
 }

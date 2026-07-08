@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import top.e404.eclean.PL
+import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.Lang
 import top.e404.eplugin.command.ECommand
 
@@ -42,7 +43,7 @@ object EntityStats : ECommand(
             4 -> {
                 val min = args[3].toIntOrNull()
                 if (min == null) {
-                    PL.sendMsgWithPrefix(sender, Lang["message.invalid_number", "number" to args[3]])
+                    RuntimeServices.messages.send(sender, Lang["message.invalid_number", "number" to args[3]])
                     return
                 }
                 sender.sendEntityStats(args[2], args[1], min)
