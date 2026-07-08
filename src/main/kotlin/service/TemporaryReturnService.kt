@@ -1,8 +1,8 @@
 package top.e404.eclean.service
 
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import org.bukkit.Location
 import org.bukkit.entity.Player
-import top.e404.eclean.platform.SchedulerHandle
 import top.e404.eclean.platform.execution.ExecutionGateway
 import top.e404.eclean.platform.execution.PlayerRef
 import java.util.UUID
@@ -69,5 +69,5 @@ class TemporaryReturnService(
 
 private data class PendingReturn(
     val origin: Location,
-    val task: SchedulerHandle?,
+    val task: ScheduledTask?,
 )

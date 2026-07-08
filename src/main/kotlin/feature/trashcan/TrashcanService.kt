@@ -5,13 +5,11 @@ import org.bukkit.inventory.ItemStack
 import top.e404.eclean.config.Lang
 import top.e404.eclean.menu.MenuManager
 import top.e404.eclean.menu.trashcan.TrashcanMenu
-import top.e404.eclean.platform.SchedulerFacade
 import top.e404.eclean.service.StatusSnapshotService
 import top.e404.eclean.app.MessageService
 
 class TrashcanService(
     private val messages: MessageService,
-    private val scheduler: SchedulerFacade,
     private val repository: TrashcanRepository,
     private val snapshots: StatusSnapshotService,
 ) {

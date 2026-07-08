@@ -2,23 +2,22 @@ package top.e404.eclean.feature.stats
 
 import org.bukkit.Bukkit
 import org.bukkit.entity.EntityType
-import top.e404.eclean.platform.SchedulerFacade
+import top.e404.eclean.platform.Schedulers
 import top.e404.eclean.platform.dispatch.ChunkTaskCoordinator
 
 class WorldStatsService(
-    private val scheduler: SchedulerFacade,
-    private val coordinator: ChunkTaskCoordinator = ChunkTaskCoordinator(scheduler),
+    private val coordinator: ChunkTaskCoordinator = ChunkTaskCoordinator(),
     private val collector: WorldStatsCollector = WorldStatsCollector(),
 ) {
     fun collectWorldStats(worldName: String, onComplete: (WorldStatsResult?) -> Unit) {
         val world = Bukkit.getWorld(worldName)
         if (world == null) {
-            scheduler.runGlobal { onComplete(null) }
+            Schedulers.runGlobal { onComplete(null) }
             return
         }
         val chunkRefs = coordinator.getLoadedChunkRefs(world)
         if (chunkRefs.isEmpty()) {
-            scheduler.runGlobal { onComplete(WorldStatsResult(emptyMap(), 0, 0)) }
+            Schedulers.runGlobal { onComplete(WorldStatsResult(emptyMap(), 0, 0)) }
             return
         }
         val snapshots = mutableListOf<ChunkSnapshot>()
@@ -35,7 +34,7 @@ class WorldStatsService(
                 }
             },
             onComplete = {
-                scheduler.runGlobal {
+                Schedulers.runGlobal {
                     val forceLoaded = liveChunks.count { it.isForceLoaded }
                     val result = if (snapshots.isEmpty()) {
                         val empty = ChunkSnapshot(emptyMap(), false)
@@ -57,12 +56,12 @@ class WorldStatsService(
     ) {
         val world = Bukkit.getWorld(worldName)
         if (world == null) {
-            scheduler.runGlobal { onComplete(emptyList()) }
+            Schedulers.runGlobal { onComplete(emptyList()) }
             return
         }
         val chunkRefs = coordinator.getLoadedChunkRefs(world)
         if (chunkRefs.isEmpty()) {
-            scheduler.runGlobal { onComplete(emptyList()) }
+            Schedulers.runGlobal { onComplete(emptyList()) }
             return
         }
         val entries = mutableListOf<Pair<String, Int>>()

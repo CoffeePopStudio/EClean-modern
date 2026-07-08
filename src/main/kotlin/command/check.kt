@@ -14,7 +14,7 @@ fun CommandSender.sendWorldStats(worldName: String) {
         RuntimeServices.messages.send(this, "&c不存在名为&e$worldName&c的世界")
         return
     }
-    val service = WorldStatsService(RuntimeServices.scheduler)
+    val service = WorldStatsService()
     service.collectWorldStats(worldName) { result ->
         if (result == null) {
             RuntimeServices.messages.send(this, "&c收集世界统计信息失败")
@@ -56,7 +56,7 @@ fun CommandSender.sendEntityStats(worldName: String, typeName: String, min: Int 
         RuntimeServices.messages.send(this, Lang["message.invalid_entity_type"])
         return
     }
-    val service = WorldStatsService(RuntimeServices.scheduler)
+    val service = WorldStatsService()
     service.collectEntityStats(worldName, type, min) { entries ->
         if (entries.isEmpty()) {
             RuntimeServices.messages.send(this, Lang["command.stats.empty"])

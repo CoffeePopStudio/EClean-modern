@@ -10,10 +10,7 @@ import top.e404.eclean.util.placeholder
 
 private inline val dropCfg get() = ModernConfig.drop
 
-private fun resolveDropService(): DropCleanupService? {
-    val scheduler = if (RuntimeServices.isSchedulerReady) RuntimeServices.scheduler else null
-    return scheduler?.let { DropCleanupService(it) }
-}
+private fun resolveDropService(): DropCleanupService = DropCleanupService()
 
 var lastDrop = 0
     private set
@@ -24,10 +21,7 @@ fun cleanDrop(announce: Boolean = true, onComplete: ((Int) -> Unit)? = null) {
         onComplete?.invoke(0)
         return
     }
-    val service = resolveDropService() ?: run {
-        onComplete?.invoke(0)
-        return
-    }
+    val service = resolveDropService()
     RuntimeServices.messages.debug { "Starting drop cleanup" }
     RuntimeServices.messages.debug { if (dropCfg.protectEnchanted) "Protect enchanted items" else "Remove enchanted items" }
     RuntimeServices.messages.debug { if (dropCfg.protectWrittenBook) "Protect written books" else "Remove written books" }

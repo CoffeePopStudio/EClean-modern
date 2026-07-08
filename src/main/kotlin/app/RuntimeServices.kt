@@ -10,12 +10,10 @@ import top.e404.eclean.feature.trashcan.TrashcanTicker
 import top.e404.eclean.config.Config
 import top.e404.eclean.config.Lang
 import top.e404.eclean.platform.FoliaDetector
+import top.e404.eclean.platform.Schedulers
 import top.e404.eclean.platform.execution.ExecutionGateway
 import top.e404.eclean.platform.execution.FoliaExecutionGateway
 import top.e404.eclean.platform.execution.PaperExecutionGateway
-import top.e404.eclean.platform.FoliaSchedulerFacade
-import top.e404.eclean.platform.PaperSchedulerFacade
-import top.e404.eclean.platform.SchedulerFacade
 import top.e404.eclean.platform.runtime.RuntimePlatform
 import top.e404.eclean.platform.runtime.RuntimePlatformFactory
 import top.e404.eclean.service.PlayerTeleportService
@@ -33,11 +31,6 @@ object RuntimeServices {
 
     lateinit var platform: RuntimePlatform
         private set
-
-    lateinit var scheduler: SchedulerFacade
-        private set
-
-    val isSchedulerReady get() = ::scheduler.isInitialized
 
     lateinit var execution: ExecutionGateway
         private set
@@ -74,8 +67,7 @@ object RuntimeServices {
         messages = MessageService(plugin)
         val isFolia = FoliaDetector.isFolia()
         platform = RuntimePlatformFactory.create(isFolia)
-        scheduler = if (isFolia) FoliaSchedulerFacade(plugin) else PaperSchedulerFacade(plugin)
-        execution = if (isFolia) FoliaExecutionGateway(scheduler) else PaperExecutionGateway(scheduler)
+        execution = if (isFolia) FoliaExecutionGateway() else PaperExecutionGateway()
         statusSnapshots = StatusSnapshotService()
         playerTeleportService = PlayerTeleportService(execution)
         temporaryReturnService = TemporaryReturnService(execution, playerTeleportService) { player, event ->
@@ -87,11 +79,11 @@ object RuntimeServices {
             messages.send(player, Lang[key])
         }
         trashcanRepository = TrashcanRepository()
-        trashcanService = TrashcanService(messages, scheduler, trashcanRepository, statusSnapshots)
-        trashcanTicker = TrashcanTicker(scheduler, trashcanService, statusSnapshots)
+        trashcanService = TrashcanService(messages, trashcanRepository, statusSnapshots)
+        trashcanTicker = TrashcanTicker(trashcanService, statusSnapshots)
         cleanupAnnouncementService = CleanupAnnouncementService(messages, statusSnapshots)
         cleanupCoordinator = CleanupCoordinator(messages, statusSnapshots)
-        cleanupTickService = CleanupTickService(messages, scheduler, cleanupCoordinator, cleanupAnnouncementService, statusSnapshots)
+        cleanupTickService = CleanupTickService(messages, cleanupCoordinator, cleanupAnnouncementService, statusSnapshots)
     }
 
     fun load(sender: CommandSender? = null) {
@@ -100,10 +92,10 @@ object RuntimeServices {
     }
 
     fun reload(sender: CommandSender) {
-        scheduler.runAsync {
+        Schedulers.runAsync {
             Lang.load(sender)
             Config.reload(sender)
-            scheduler.runGlobal {
+            Schedulers.runGlobal {
                 messages.send(sender, Lang["command.reload_done"])
             }
         }
@@ -119,6 +111,6 @@ object RuntimeServices {
         if (::cleanupTickService.isInitialized) cleanupTickService.stop()
         if (::trashcanTicker.isInitialized) trashcanTicker.stop()
         if (::temporaryReturnService.isInitialized) temporaryReturnService.shutdown()
-        if (::scheduler.isInitialized) scheduler.cancelPluginTasks()
+        Schedulers.cancelPluginTasks()
     }
 }

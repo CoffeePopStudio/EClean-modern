@@ -10,10 +10,7 @@ import top.e404.eclean.util.placeholder
 
 private inline val livingCfg get() = ModernConfig.living
 
-private fun resolveLivingService(): LivingCleanupService? {
-    val scheduler = if (RuntimeServices.isSchedulerReady) RuntimeServices.scheduler else null
-    return scheduler?.let { LivingCleanupService(it) }
-}
+private fun resolveLivingService(): LivingCleanupService = LivingCleanupService()
 
 var lastLiving = 0
     private set
@@ -24,10 +21,7 @@ fun cleanLiving(announce: Boolean = true, onComplete: ((Int) -> Unit)? = null) {
         onComplete?.invoke(0)
         return
     }
-    val service = resolveLivingService() ?: run {
-        onComplete?.invoke(0)
-        return
-    }
+    val service = resolveLivingService()
     RuntimeServices.messages.debug { "Starting living entity cleanup" }
     RuntimeServices.messages.debug { if (livingCfg.settings.cleanNamed) "Clean named entities" else "Skip named entities" }
     RuntimeServices.messages.debug { if (livingCfg.settings.cleanLeashed) "Clean leashed entities" else "Skip leashed entities" }

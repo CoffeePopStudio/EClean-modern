@@ -1,10 +1,10 @@
 package service
 
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
-import top.e404.eclean.platform.SchedulerHandle
 import top.e404.eclean.platform.execution.ChunkRef
 import top.e404.eclean.platform.execution.EntityRef
 import top.e404.eclean.platform.execution.ExecutionGateway
@@ -186,10 +186,10 @@ private class FakeExecutionGateway : ExecutionGateway {
         player: Player,
         delayTicks: Long,
         task: () -> Unit
-    ): SchedulerHandle {
+    ): ScheduledTask {
         val handle = FakeHandle()
         scheduled += ScheduledCall(delayTicks, handle, task)
-        return handle
+        return handle.task
     }
 
     fun runLatest() {
@@ -203,10 +203,42 @@ private data class ScheduledCall(
     val task: () -> Unit,
 )
 
-private class FakeHandle : SchedulerHandle {
+private class FakeHandle {
     var cancelled = false
+        private set
 
-    override fun cancel() {
-        cancelled = true
+    val task: ScheduledTask = proxy(ScheduledTask::class.java) { method, _ ->
+        when (method.name) {
+            "cancel" -> {
+                cancelled = true
+                null
+            }
+            else -> defaultValue(method.returnType)
+        }
     }
+}
+
+private fun <T> proxy(type: Class<T>, handler: (Method, Array<out Any?>?) -> Any?): T {
+    @Suppress("UNCHECKED_CAST")
+    return Proxy.newProxyInstance(type.classLoader, arrayOf(type)) { _, method, args ->
+        when (method.name) {
+            "hashCode" -> System.identityHashCode(type)
+            "equals" -> false
+            "toString" -> "proxy:${type.simpleName}"
+            else -> handler(method, args)
+        }
+    } as T
+}
+
+private fun defaultValue(type: Class<*>): Any? = when {
+    !type.isPrimitive -> null
+    type == Boolean::class.javaPrimitiveType -> false
+    type == Int::class.javaPrimitiveType -> 0
+    type == Long::class.javaPrimitiveType -> 0L
+    type == Double::class.javaPrimitiveType -> 0.0
+    type == Float::class.javaPrimitiveType -> 0f
+    type == Short::class.javaPrimitiveType -> 0.toShort()
+    type == Byte::class.javaPrimitiveType -> 0.toByte()
+    type == Char::class.javaPrimitiveType -> 0.toChar()
+    else -> null
 }

@@ -11,10 +11,7 @@ import top.e404.eclean.util.placeholder
 
 private inline val chunkCfg get() = ModernConfig.chunkDensity
 
-private fun resolveChunkScanner(): ChunkDensityScanner? {
-    val scheduler = if (RuntimeServices.isSchedulerReady) RuntimeServices.scheduler else null
-    return scheduler?.let { ChunkDensityScanner(it) }
-}
+private fun resolveChunkScanner(): ChunkDensityScanner = ChunkDensityScanner()
 
 private val chunkAlertService by lazy { ChunkAlertService() }
 
@@ -27,10 +24,7 @@ fun cleanDenseEntities(announce: Boolean = true, onComplete: ((Int) -> Unit)? = 
         onComplete?.invoke(0)
         return
     }
-    val scanner = resolveChunkScanner() ?: run {
-        onComplete?.invoke(0)
-        return
-    }
+    val scanner = resolveChunkScanner()
     RuntimeServices.messages.debug { "Starting chunk density check" }
     RuntimeServices.messages.debug { if (chunkCfg.settings.cleanNamed) "Clean named entities" else "Skip named entities" }
     RuntimeServices.messages.debug { if (chunkCfg.settings.cleanLeashed) "Clean leashed entities" else "Skip leashed entities" }
@@ -50,7 +44,6 @@ fun cleanDenseEntities(announce: Boolean = true, onComplete: ((Int) -> Unit)? = 
 
 fun scanDenseEntries(onComplete: (List<top.e404.eclean.feature.cleanup.chunk.ChunkDensityEntry>) -> Unit) {
     val scanner = resolveChunkScanner()
-    if (scanner == null) { onComplete(emptyList()); return }
     scanner.scanDenseEntries(onComplete)
 }
 

@@ -3,17 +3,16 @@ package top.e404.eclean.feature.cleanup.chunk
 import org.bukkit.Bukkit
 import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.Config
+import top.e404.eclean.platform.Schedulers
 import top.e404.eclean.platform.dispatch.ChunkTaskCoordinator
-import top.e404.eclean.platform.SchedulerFacade
 import java.util.concurrent.atomic.AtomicInteger
 
 class ChunkDensityScanner(
-    private val scheduler: SchedulerFacade,
     private val planner: ChunkScanPlanner = ChunkScanPlanner(),
     private val snapshotter: ChunkEntitySnapshotter = ChunkEntitySnapshotter(),
     private val policy: ChunkDensityPolicy = ChunkDensityPolicy(),
     private val cleaner: ChunkDensityCleaner = ChunkDensityCleaner(),
-    private val coordinator: ChunkTaskCoordinator = ChunkTaskCoordinator(scheduler),
+    private val coordinator: ChunkTaskCoordinator = ChunkTaskCoordinator(),
 ) {
     fun cleanAllWorlds(onComplete: (ChunkDensityResult) -> Unit) {
         val worldNames = planner.planWorldNames()

@@ -5,7 +5,7 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 版本规范。
 
-## [0.1.4] - 未发布
+## [0.1.4]
 
 ### 新增
 - 新增 `xyz.jpenilla.run-paper` Gradle 插件，提供 `runFolia` 和 `runServer` 任务，一键启动本机集成测试服务器。

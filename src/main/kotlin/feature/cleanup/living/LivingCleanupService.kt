@@ -2,22 +2,21 @@ package top.e404.eclean.feature.cleanup.living
 
 import org.bukkit.Bukkit
 import top.e404.eclean.app.RuntimeServices
+import top.e404.eclean.platform.Schedulers
 import top.e404.eclean.platform.dispatch.ChunkTaskCoordinator
-import top.e404.eclean.platform.SchedulerFacade
 import java.util.concurrent.atomic.AtomicInteger
 
 class LivingCleanupService(
-    private val scheduler: SchedulerFacade,
     private val planner: LivingCleanupPlanner = LivingCleanupPlanner(),
     private val collector: LivingCleanupCollector = LivingCleanupCollector(),
     private val policy: LivingCleanupPolicy = LivingCleanupPolicy(),
     private val executor: LivingCleanupExecutor = LivingCleanupExecutor(),
-    private val coordinator: ChunkTaskCoordinator = ChunkTaskCoordinator(scheduler),
+    private val coordinator: ChunkTaskCoordinator = ChunkTaskCoordinator(),
 ) {
     fun cleanAllWorlds(onComplete: (List<LivingCleanupResult>) -> Unit) {
         val worldNames = planner.planWorldNames()
         if (worldNames.isEmpty()) {
-            scheduler.runGlobal { onComplete(emptyList()) }
+            Schedulers.runGlobal { onComplete(emptyList()) }
             return
         }
         val results = mutableListOf<LivingCleanupResult>()
@@ -33,12 +32,12 @@ class LivingCleanupService(
     fun cleanWorld(worldName: String, onComplete: (LivingCleanupResult) -> Unit) {
         val world = Bukkit.getWorld(worldName)
         if (world == null) {
-            scheduler.runGlobal { onComplete(LivingCleanupResult(0, 0)) }
+            Schedulers.runGlobal { onComplete(LivingCleanupResult(0, 0)) }
             return
         }
         val chunkRefs = coordinator.getLoadedChunkRefs(world)
         if (chunkRefs.isEmpty()) {
-            scheduler.runGlobal { onComplete(LivingCleanupResult(0, 0)) }
+            Schedulers.runGlobal { onComplete(LivingCleanupResult(0, 0)) }
             return
         }
         val rule = LivingCleanupRule.fromConfig()

@@ -1,16 +1,15 @@
 package top.e404.eclean.feature.trashcan
 
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import top.e404.eclean.config.Config
-import top.e404.eclean.platform.SchedulerFacade
-import top.e404.eclean.platform.SchedulerHandle
+import top.e404.eclean.platform.Schedulers
 import top.e404.eclean.service.StatusSnapshotService
 
 class TrashcanTicker(
-    private val scheduler: SchedulerFacade,
     private val service: TrashcanService,
     private val snapshots: StatusSnapshotService,
 ) {
-    private var task: SchedulerHandle? = null
+    private var task: ScheduledTask? = null
 
     fun start() {
         stop()
@@ -21,7 +20,7 @@ class TrashcanTicker(
         }
         if (!trashcanConfig.enabled) return
         service.syncCountdown(duration)
-        task = scheduler.scheduleRepeatingGlobal(20, 20) {
+        task = Schedulers.scheduleRepeatingGlobal(20, 20) {
             val next = (service.countdown - 1).coerceAtLeast(0)
             service.syncCountdown(next)
             if (next <= 0L) {

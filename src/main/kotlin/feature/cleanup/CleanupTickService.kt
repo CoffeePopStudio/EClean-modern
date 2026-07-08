@@ -1,19 +1,18 @@
 package top.e404.eclean.feature.cleanup
 
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import top.e404.eclean.config.Config
-import top.e404.eclean.platform.SchedulerFacade
-import top.e404.eclean.platform.SchedulerHandle
+import top.e404.eclean.platform.Schedulers
 import top.e404.eclean.service.StatusSnapshotService
 import top.e404.eclean.app.MessageService
 
 class CleanupTickService(
     private val messages: MessageService,
-    private val scheduler: SchedulerFacade,
     private val coordinator: CleanupCoordinator,
     private val announcements: CleanupAnnouncementService,
     private val snapshots: StatusSnapshotService,
 ) {
-    private var task: SchedulerHandle? = null
+    private var task: ScheduledTask? = null
 
     var elapsedSeconds = 0L
         private set
@@ -25,7 +24,7 @@ class CleanupTickService(
         snapshots.updateCleanup {
             it.copy(elapsedSeconds = 0, remainingSeconds = duration)
         }
-        task = scheduler.scheduleRepeatingGlobal(20, 20) {
+        task = Schedulers.scheduleRepeatingGlobal(20, 20) {
             elapsedSeconds++
             val remaining = (duration - elapsedSeconds).coerceAtLeast(0)
             snapshots.updateCleanup {
