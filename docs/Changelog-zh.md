@@ -7,11 +7,22 @@
 
 ## [0.1.4] - 未发布
 
+### 新增
+- 新增 `xyz.jpenilla.run-paper` Gradle 插件，提供 `runFolia` 和 `runServer` 任务，一键启动本机集成测试服务器。
+
 ### 变更
 - 将 `parseSecondAsDuration` 从 eplugin 迁移为 `util/Text` 中的独立 `Long` 扩展函数。
 - 移除 `EListener` 依赖：`DespawnListener` 和 `Trashcan` 改为直接实现 `Listener`，由 `EClean.onEnable` 通过 `Bukkit.getPluginManager().registerEvents` 注册。
 - 移除 `AbstractDebugCommand` 依赖：`Debug` 改为普通 `ECommand`，内联 debugger 管理逻辑。
 - 移除 `EUpdater` 依赖：`Update` 改为使用 `java.net.http.HttpClient` + `JsonParser` 自实现 GitHub releases API 检查，通过 `AsyncScheduler` 定时调度。
+- 将 `run/` 目录加入 `.gitignore`（`gradlew runFolia` / `runServer` 生成的测试服务器产物）。
+
+### 修复
+- 修复 Folia 上 `chunk.isForceLoaded` 在 region 线程读取导致的 `IllegalStateException`——强制加载计数现改为在 global tick 线程收集。
+- 修复 Folia 26.1 (`Moonrise`) 下 `Thread failed main thread check: Async chunk retrieval`——改为在 region 线程阶段捕获 live `Chunk` 引用，global 线程不再调用 `getChunkAt`。
+- 将所有控制台输出（`info`、`debug`、`buildDebug`、`warn`）改为通过 `plugin.logger` 发出，使日志正确写入 `logs/latest.log` 并遵循服务器日志级别（替换 `Bukkit.getConsoleSender().sendMessage()`）。
+- 将 `debug`/`info`/`warn` 中所有硬编码中文字符串替换为英文，避免不支持 UTF-8 的终端出现乱码。
+- `broadcast()` 不再将玩家公告同步推送到控制台日志。
 
 ## [0.1.3]
 
