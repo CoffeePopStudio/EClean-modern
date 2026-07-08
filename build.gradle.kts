@@ -38,9 +38,9 @@ dependencies {
 
     // mock bukkit
     testImplementation(kotlin("test", "2.4.0"))
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.21:3.133.2")
+    testImplementation("io.papermc.paper:paper-api:26.1.2.build.+")
+    testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v26.1.2:4.114.0")
     testImplementation("org.slf4j:slf4j-simple:2.0.13")
-    testImplementation("net.kyori:adventure-text-serializer-legacy:4.17.0")
 }
 
 java {

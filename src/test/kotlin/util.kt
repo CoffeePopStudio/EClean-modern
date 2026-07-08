@@ -1,13 +1,11 @@
-package top.e404.eclean.test
-
-import be.seeseemelk.mockbukkit.ServerMock
-import be.seeseemelk.mockbukkit.WorldMock
-import be.seeseemelk.mockbukkit.entity.PlayerMock
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Location
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.inventory.ItemStack
+import org.mockbukkit.mockbukkit.ServerMock
+import org.mockbukkit.mockbukkit.entity.PlayerMock
+import org.mockbukkit.mockbukkit.world.WorldMock
 import top.e404.eclean.EClean
 import top.e404.eclean.config.Config
 import top.e404.eclean.config.ConfigBundle

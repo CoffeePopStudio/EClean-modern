@@ -1,6 +1,7 @@
 package trash
 
-import be.seeseemelk.mockbukkit.inventory.SimpleInventoryViewMock
+import consoleOut
+import org.mockbukkit.mockbukkit.inventory.SimpleInventoryViewMock
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -10,11 +11,15 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.*
+import player
+import resetConfig
 import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.clean.cleanDrop
 import top.e404.eclean.menu.MenuManager
-import top.e404.eclean.test.*
 import top.e404.eplugin.menu.menu.InventoryMenu
+import updateDropConfig
+import updateTrashcanConfig
+import world
 import kotlin.test.assertNotNull
 
 abstract class TrashcanTest {

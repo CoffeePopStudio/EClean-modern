@@ -1,4 +1,4 @@
-package top.e404.eclean.config
+package config
 
 import com.charleskorn.kaml.Yaml
 import kotlin.test.Test

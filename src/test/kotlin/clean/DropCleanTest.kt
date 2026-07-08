@@ -1,4 +1,4 @@
-package top.e404.eclean.test.clean
+package clean
 
 import org.bukkit.Location
 import org.bukkit.Material
@@ -12,11 +12,11 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import top.e404.eclean.clean.cleanDrop
 import top.e404.eclean.clean.lastDrop
-import top.e404.eclean.test.consoleOut
-import top.e404.eclean.test.dropItems
-import top.e404.eclean.test.resetConfig
-import top.e404.eclean.test.updateDropConfig
-import top.e404.eclean.test.world
+import consoleOut
+import dropItems
+import resetConfig
+import updateDropConfig
+import world
 import top.e404.eplugin.util.editItemMeta
 
 abstract class DropCleanTest {

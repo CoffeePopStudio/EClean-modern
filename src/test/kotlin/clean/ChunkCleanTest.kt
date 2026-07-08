@@ -1,6 +1,7 @@
-package top.e404.eclean.test.clean
+package clean
 
-import be.seeseemelk.mockbukkit.entity.LivingEntityMock
+import consoleOut
+import org.mockbukkit.mockbukkit.entity.LivingEntityMock
 import org.bukkit.Location
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
@@ -8,9 +9,13 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import player
+import resetConfig
+import spawnEntities
 import top.e404.eclean.clean.cleanDenseEntities
 import top.e404.eclean.clean.lastChunk
-import top.e404.eclean.test.*
+import updateChunkDensityConfig
+import world
 
 abstract class ChunkCleanTest {
 

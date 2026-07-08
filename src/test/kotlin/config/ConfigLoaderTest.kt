@@ -1,5 +1,6 @@
-package top.e404.eclean.config
+package config
 
+import top.e404.eclean.config.ConfigLoader
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
