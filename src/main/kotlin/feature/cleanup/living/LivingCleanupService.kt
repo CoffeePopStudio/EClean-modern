@@ -2,7 +2,7 @@ package top.e404.eclean.feature.cleanup.living
 
 import org.bukkit.Bukkit
 import top.e404.eclean.PL
-import top.e404.eclean.feature.cleanup.ChunkTaskCoordinator
+import top.e404.eclean.platform.dispatch.ChunkTaskCoordinator
 import top.e404.eclean.platform.SchedulerFacade
 import java.util.concurrent.atomic.AtomicInteger
 

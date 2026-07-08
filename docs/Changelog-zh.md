@@ -14,6 +14,7 @@
 - 新增面向 Folia 优先运行时边界的 `RuntimePlatform` 与 `ExecutionGateway` 初始抽象。
 - 新增 `chunk-density` 快照与策略定向测试，用于锁定新工作流行为。
 - 新增 `drop` 与 `living` 清理策略测试，用于锁定拆分后的保护规则与匹配行为。
+- 新增 `WorldStatsService`、`WorldStatsCollector`、`WorldStatsResult` 统计组件，基于 `ChunkTaskCoordinator` 实现 Folia-safe chunk-by-chunk 分布收集与聚合。
 - 新增聚焦 `TemporaryReturnService` 的定向测试，覆盖延时回传、覆盖重置与退出回传场景。
 
 ### 变更
@@ -36,7 +37,7 @@
 - 将 `chunk-density` 清理重构为 `planner`、`snapshotter`、`policy`、`cleaner`、`report` 小组件，同时保持现有入口兼容。
 - 将 `drop` 与 `living` 清理重构为 `planner`、`collector`、`policy`、`executor`、`report` 小组件，同时保持现有入口兼容。
 - 抽离 `PlayerTeleportService` 与 `TemporaryReturnService`，并让 `DenseZone` 与 `MenuManager` 改为依赖新服务，同时保持玩家侧菜单行为不变。
-- 新增 `ChunkTaskCoordinator` 工具，将全局清理流拆分为按 chunk 分发到 region scheduler 的安全任务链，并在所有 chunk 完成后回聚结果。
+- 将 `ChunkTaskCoordinator` 从 `cleanup` 专属包迁移到 `platform/dispatch/`，供清理与统计功能共用。
 - 将 `Planner` 层 (`*Planner.planWorlds`) 改为返回世界的 `String` 名称或 `ChunkRef` 列表，不再返回 live `World` / `Chunk` 对象，避免下游跨 region 持有。
 - 为 `Collector` 层新增 `collectFromChunk(chunk)` 方法，使实体/物品收集从「整世界遍历」改为「单 chunk 收集」。
 - 将 `DropCleanupService`、`LivingCleanupService`、`ChunkDensityScanner` 改为注入 `SchedulerFacade`，通过 `ChunkTaskCoordinator` 做 region-safe 的逐 chunk 清理分发。

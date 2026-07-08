@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored chunk-density cleanup into planner, snapshotter, policy, cleaner, and report components while keeping the existing entrypoints intact.
 - Refactored drop and living cleanup into planner, collector, policy, executor, and report components while keeping the existing entrypoints intact.
 - Extracted `PlayerTeleportService` and `TemporaryReturnService`, and routed `DenseZone` and `MenuManager` through the new services while preserving existing player-facing menu behavior.
-- Added `ChunkTaskCoordinator` utility that splits global cleanup flows into region-safe per-chunk dispatch chains, aggregating results after all chunks complete.
+- Moved `ChunkTaskCoordinator` from a cleanup-only package to `platform/dispatch/` for shared use by cleanup and stats features.
 - Changed `Planner` layer (`*Planner.planWorlds`) to return world `String` names or `ChunkRef` lists instead of live `World` / `Chunk` objects, preventing downstream cross-region holding.
 - Added `collectFromChunk(chunk)` to `Collector` layer, shifting entity/item collection from world-wide traversal to single-chunk collection.
 - Changed `DropCleanupService`, `LivingCleanupService`, and `ChunkDensityScanner` to accept `SchedulerFacade` and dispatch region-safe per-chunk cleanup via `ChunkTaskCoordinator`.

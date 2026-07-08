@@ -1,4 +1,4 @@
-package top.e404.eclean.feature.cleanup
+package top.e404.eclean.platform.dispatch
 
 import org.bukkit.Location
 import org.bukkit.World

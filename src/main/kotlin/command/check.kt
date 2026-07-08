@@ -5,10 +5,9 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.EntityType
 import top.e404.eclean.PL
 import top.e404.eclean.app.RuntimeServices
-import org.bukkit.Chunk
 import top.e404.eclean.config.Lang
+import top.e404.eclean.feature.stats.WorldStatsService
 import top.e404.eplugin.EPlugin.Companion.formatAsConst
-import top.e404.eplugin.util.mcVer
 
 fun CommandSender.sendWorldStats(worldName: String) {
     val world = Bukkit.getWorld(worldName)
@@ -16,17 +15,17 @@ fun CommandSender.sendWorldStats(worldName: String) {
         PL.sendMsgWithPrefix(this, "&c不存在名为&e$worldName&c的世界")
         return
     }
-    RuntimeServices.scheduler.runGlobal {
-        val list = world
-            .entities
-            .groupBy { it.type }
-            .map { (k, v) -> k to v.size }
-            .sortedByDescending { it.second }
-        if (list.isEmpty()) {
-            PL.sendMsgWithPrefix(this, Lang["command.stats.empty"])
-            return@runGlobal
+    val service = WorldStatsService(RuntimeServices.scheduler)
+    service.collectWorldStats(worldName) { result ->
+        if (result == null) {
+            PL.sendMsgWithPrefix(this, "&c收集世界统计信息失败")
+            return@collectWorldStats
         }
-        val entity = list.joinToString(Lang["command.stats.spacing"]) { (k, v) ->
+        if (result.totalEntities == 0) {
+            PL.sendMsgWithPrefix(this, Lang["command.stats.empty"])
+            return@collectWorldStats
+        }
+        val entity = result.sortedEntries().joinToString(Lang["command.stats.spacing"]) { (k, v) ->
             Lang[
                 "command.stats.content",
                 "type" to k,
@@ -38,8 +37,8 @@ fun CommandSender.sendWorldStats(worldName: String) {
             Lang[
                 "command.stats.world",
                 "world" to worldName,
-                "count" to world.loadedChunks.size,
-                "force" to if (mcVer!!.major < 13) null else world.loadedChunks.count { it.isForceLoaded },
+                "count" to result.loadedChunks,
+                "force" to result.forceLoadedChunks,
                 "entity" to entity
             ]
         )
@@ -58,20 +57,16 @@ fun CommandSender.sendEntityStats(worldName: String, typeName: String, min: Int 
         PL.sendMsgWithPrefix(this, Lang["message.invalid_entity_type"])
         return
     }
-    RuntimeServices.scheduler.runGlobal {
-        val list = world
-            .loadedChunks
-            .map { chunkInfo(it) to it.entities.count { e -> e.type == type } }
-            .filter { it.second > min }
-            .sortedByDescending { e -> e.second }
-        if (list.isEmpty()) {
+    val service = WorldStatsService(RuntimeServices.scheduler)
+    service.collectEntityStats(worldName, type, min) { entries ->
+        if (entries.isEmpty()) {
             PL.sendMsgWithPrefix(this, Lang["command.stats.empty"])
-            return@runGlobal
+            return@collectEntityStats
         }
-        val entity = list.joinToString(Lang["command.stats.spacing"]) { (k, v) ->
+        val entity = entries.joinToString(Lang["command.stats.spacing"]) { (label, v) ->
             Lang[
                 "command.stats.content",
-                "type" to k,
+                "type" to label,
                 "count" to v.withColor()
             ]
         }
@@ -85,9 +80,6 @@ fun CommandSender.sendEntityStats(worldName: String, typeName: String, min: Int 
         )
     }
 }
-
-private fun chunkInfo(chunk: Chunk) =
-    "x: ${chunk.x * 16}..${chunk.x * 16 + 15}, z: ${chunk.z * 16}..${chunk.z * 16 + 15}"
 
 private fun Int.withColor() = when {
     this > 60 -> "&c$this"
