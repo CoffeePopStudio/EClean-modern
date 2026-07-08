@@ -9,6 +9,7 @@ plugins {
 group = "top.e404"
 version = "0.1.3"
 val epluginVer = "1.4.0-SNAPSHOT"
+val paper = "io.papermc.paper:paper-api:26.1.2.build.+"
 
 fun eplugin(module: String, version: String = epluginVer) = "top.e404.eplugin:eplugin-$module:$version"
 
@@ -24,7 +25,7 @@ repositories {
 
 dependencies {
     // paper / folia-compatible api surface
-    compileOnly("io.papermc.paper:paper-api:26.1.2.build.+")
+    compileOnly(paper)
     // eplugin
     implementation(eplugin("core"))
     implementation(eplugin("menu"))
@@ -38,7 +39,7 @@ dependencies {
 
     // mock bukkit
     testImplementation(kotlin("test", "2.4.0"))
-    testImplementation("io.papermc.paper:paper-api:26.1.2.build.+")
+    testImplementation(paper)
     testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v26.1.2:4.114.0")
     testImplementation("org.slf4j:slf4j-simple:2.0.13")
 }
