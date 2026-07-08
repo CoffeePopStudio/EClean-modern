@@ -3,7 +3,7 @@
 > 该插件为`EClean Modern`, 由`CoffeePopStudio`组织维护, 插件旨意完善原版`EClean`插件的功能, 解决原版插件在新版本中存在的兼容性问题, 并增加更多功能和配置选项
 
 ## Why
-> [!INFORMATION]
+> [!NOTE]
 > 原EClean插件[在Folia支持的issue](https://github.com/4o4E/EClean/issues/39)中
 > 
 > 明确说明`没有时间, 现在没有任何对folia的支持计划`, 而且Eplugin框架是基于旧版bukkit api开发, 而并非paper api
