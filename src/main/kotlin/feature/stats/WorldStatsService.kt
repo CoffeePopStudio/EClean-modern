@@ -28,21 +28,29 @@ class WorldStatsService(
             perChunk = { w, ref ->
                 val chunk = w.getChunkAt(ref.x, ref.z)
                 val snap = collector.collectFromChunk(chunk)
-                if (snap.entityCounts.isNotEmpty() || snap.forceLoaded) {
+                if (snap.entityCounts.isNotEmpty()) {
                     synchronized(snapshots) { snapshots += snap }
                 }
             },
             onComplete = {
-                val result = if (snapshots.isEmpty()) {
-                    val empty = ChunkSnapshot(emptyMap(), false)
-                    ChunkSnapshot.merge(listOf(empty).repeat(chunkRefs.size))
-                } else {
-                    ChunkSnapshot.merge(snapshots)
+                scheduler.runGlobal {
+                    val forceLoaded = countForceLoaded(world, chunkRefs)
+                    val result = if (snapshots.isEmpty()) {
+                        val empty = ChunkSnapshot(emptyMap(), false)
+                        ChunkSnapshot.merge(listOf(empty).repeat(chunkRefs.size), forceLoaded)
+                    } else {
+                        ChunkSnapshot.merge(snapshots, forceLoaded)
+                    }
+                    onComplete(result)
                 }
-                onComplete(result)
             },
         )
     }
+
+    private fun countForceLoaded(
+        world: org.bukkit.World,
+        refs: List<top.e404.eclean.platform.execution.ChunkRef>,
+    ): Int = refs.count { world.getChunkAt(it.x, it.z).isForceLoaded }
 
     fun collectEntityStats(
         worldName: String,

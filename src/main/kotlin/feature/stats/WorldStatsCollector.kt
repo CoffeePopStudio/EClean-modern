@@ -9,7 +9,7 @@ class WorldStatsCollector {
             .groupingBy { it.type }
             .eachCount()
             .mapKeys { it.key },
-        forceLoaded = chunk.isForceLoaded,
+        forceLoaded = false,
     )
 
     fun countEntityTypeInChunk(chunk: Chunk, type: EntityType): Int =
@@ -21,19 +21,20 @@ data class ChunkSnapshot(
     val forceLoaded: Boolean,
 ) {
     companion object {
-        fun merge(partials: List<ChunkSnapshot>): WorldStatsResult {
+        fun merge(
+            partials: List<ChunkSnapshot>,
+            forceLoadedCount: Int,
+        ): WorldStatsResult {
             val merged = mutableMapOf<EntityType, Int>()
-            var forceLoaded = 0
             partials.forEach { snap ->
                 snap.entityCounts.forEach { (type, count) ->
                     merged[type] = (merged[type] ?: 0) + count
                 }
-                if (snap.forceLoaded) forceLoaded++
             }
             return WorldStatsResult(
                 entityCounts = merged,
                 loadedChunks = partials.size,
-                forceLoadedChunks = forceLoaded,
+                forceLoadedChunks = forceLoadedCount,
             )
         }
     }
