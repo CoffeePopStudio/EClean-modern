@@ -22,6 +22,8 @@
 - 更新了测试与 Gradle 配置，以适配新的配置工作流。
 - 更新了 `MockBukkit` 与相关测试依赖，使其与当前 Paper API 版本线对齐。
 - 修复了测试套件，使 `gradlew test` 再次通过。
+- 更新了 Shadow 插件与构建生命周期配置，使基于 Java 25 的 `shadowJar` 打包重新通过。
+- 更新了 `README`、Folia 适配设计 spec 与实现计划文档，补充当前 `Folia` 优先运行定位和实现状态说明。
 
 ### 重构
 - 移除了基于 `eplugin config` 的旧配置层，改为项目内部的配置系统。

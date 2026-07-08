@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated tests and Gradle setup for the modernized configuration workflow.
 - Updated MockBukkit and related test dependencies to match the current Paper API line.
 - Restored the test suite so `gradlew test` passes again.
+- Updated the Shadow plugin and build lifecycle so Java 25 `shadowJar` packaging succeeds again.
+- Updated `README`, the Folia adaptation spec, and the implementation plan to document the Folia-first runtime positioning and the current implementation status.
 
 ### Refactored
 - Replaced the legacy `eplugin config`-based configuration layer with the new internal config system.

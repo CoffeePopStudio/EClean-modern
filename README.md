@@ -50,6 +50,16 @@
 
 插件默认配置已拆分到 `src/main/resources/config/` 目录下的多文件模板中，配置项均带注释描述用法和含义
 
+## Folia 支持
+
+当前分支采用 `Folia` 优先、`Paper` 降级兼容的运行定位。
+
+- 启动时会根据运行平台切换 `RuntimePlatform`、`SchedulerFacade` 与 `ExecutionGateway`
+- 清理链路按“计划 -> 采集 -> 规则 -> 执行 -> 汇总”拆分，降低直接耦合调度细节的范围
+- 菜单相关的玩家传送与临时回传已收拢到独立服务，避免把玩家副作用散落在 UI 层
+
+如果后续新增功能需要访问 `world`、`chunk`、`entity`、`player` 等 Bukkit 活对象，应优先通过平台执行网关或对应服务进入合法上下文，而不是直接在异步逻辑中跨上下文访问。
+
 ## 下载
 - [最新版](https://github.com/CoffeePopStudio/EClean-modern/releases/latest)
 

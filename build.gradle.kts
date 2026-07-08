@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "2.4.0"
     kotlin("plugin.serialization") version "2.4.0"
-    id("com.gradleup.shadow") version "9.0.0-beta4"
+    id("com.gradleup.shadow") version "9.4.3"
 }
 
 group = "top.e404"
@@ -55,10 +55,6 @@ kotlin {
 }
 
 tasks {
-    build {
-        finalizedBy(shadowJar)
-    }
-
     shadowJar {
         val archiveName = "${project.name}-${project.version}.jar"
         archiveFileName.set(archiveName)
