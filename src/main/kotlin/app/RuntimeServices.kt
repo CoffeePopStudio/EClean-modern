@@ -64,7 +64,7 @@ object RuntimeServices {
 
     fun init(plugin: EPlugin) {
         this.plugin = plugin
-        messages = MessageService(plugin)
+        messages = MessageService()
         val isFolia = FoliaDetector.isFolia()
         platform = RuntimePlatformFactory.create(isFolia)
         execution = if (isFolia) FoliaExecutionGateway() else PaperExecutionGateway()
