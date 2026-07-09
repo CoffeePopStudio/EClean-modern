@@ -17,7 +17,11 @@ import top.e404.eclean.config.Config
 import top.e404.eclean.feature.cleanup.chunk.ChunkDensityScanner
 import top.e404.eclean.feature.cleanup.drop.DropCleanupService
 import top.e404.eclean.feature.cleanup.living.LivingCleanupService
+import top.e404.eclean.feature.stats.WorldStatsService
 import top.e404.eclean.lang.MLang
+import top.e404.eclean.platform.Schedulers
+import top.e404.eclean.util.formatAsConst
+import java.util.concurrent.atomic.AtomicInteger
 
 object Commands : CommandExecutor, TabCompleter {
     private val subcommands = listOf("debug", "reload", "clean", "stats", "entity", "trash", "players", "show")
@@ -63,7 +67,7 @@ object Commands : CommandExecutor, TabCompleter {
                 if (args.size == 2) return Bukkit.getWorlds().map { it.name }.filter { it.startsWith(args[1].lowercase()) }
             }
             "e", "entity" -> {
-                if (args.size == 2) return EntityType.entries.map { it.name }.filter { it.startsWith(args[1].uppercase()) }
+                if (args.size == 2) return EntityType.values().map { it.name }.filter { it.startsWith(args[1].uppercase()) }
                 if (args.size == 3) return Bukkit.getWorlds().map { it.name }.filter { it.startsWith(args[2].lowercase()) }
             }
         }
@@ -223,5 +227,117 @@ object Commands : CommandExecutor, TabCompleter {
                 top.e404.eclean.menu.dense.DenseMenu(data).open(sender)
             }
         }
+    }
+
+    private fun CommandSender.sendWorldStats(worldName: String) {
+        val world = Bukkit.getWorld(worldName)
+        if (world == null) {
+            RuntimeServices.messages.send(this, "<red>不存在名为<yellow>$worldName</yellow>的世界</red>")
+            return
+        }
+        val service = WorldStatsService()
+        service.collectWorldStats(worldName) { result ->
+            if (result == null) {
+                RuntimeServices.messages.send(this, "<red>收集世界统计信息失败</red>")
+                return@collectWorldStats
+            }
+            if (result.totalEntities == 0) {
+                RuntimeServices.messages.send(this, MLang["command.stats.empty"])
+                return@collectWorldStats
+            }
+            val entity = result.sortedEntries().joinToString(MLang["command.stats.spacing"]) { (k, v) ->
+                MLang[
+                    "command.stats.content",
+                    "type" to k,
+                    "count" to v.withColor()
+                ]
+            }
+            RuntimeServices.messages.send(
+                this,
+                MLang[
+                    "command.stats.world",
+                    "world" to worldName,
+                    "count" to result.loadedChunks,
+                    "force" to result.forceLoadedChunks,
+                    "entity" to entity
+                ]
+            )
+        }
+    }
+
+    private fun CommandSender.sendEntityStats(worldName: String, typeName: String, min: Int = 0) {
+        val world = Bukkit.getWorld(worldName)
+        if (world == null) {
+            RuntimeServices.messages.send(this, "<red>不存在名为<yellow>$worldName</yellow>的世界</red>")
+            return
+        }
+        val type = try {
+            EntityType.valueOf(typeName.formatAsConst())
+        } catch (t: Throwable) {
+            RuntimeServices.messages.send(this, MLang["message.invalid_entity_type"])
+            return
+        }
+        val service = WorldStatsService()
+        service.collectEntityStats(worldName, type, min) { entries ->
+            if (entries.isEmpty()) {
+                RuntimeServices.messages.send(this, MLang["command.stats.empty"])
+                return@collectEntityStats
+            }
+            val entity = entries.joinToString(MLang["command.stats.spacing"]) { (label, v) ->
+                MLang[
+                    "command.stats.content",
+                    "type" to label,
+                    "count" to v.withColor()
+                ]
+            }
+            RuntimeServices.messages.send(
+                this,
+                MLang[
+                    "command.stats.entity",
+                    "type" to typeName,
+                    "entity" to entity
+                ]
+            )
+        }
+    }
+
+    private fun CommandSender.sendPlayersStats() {
+        Schedulers.runGlobal {
+            val players = Bukkit.getOnlinePlayers().toList()
+            if (players.isEmpty()) {
+                RuntimeServices.messages.send(this, MLang["command.stats.empty"])
+                return@runGlobal
+            }
+            val byWorld = players.groupBy { it.world.name to it.world }
+            val pending = AtomicInteger(players.size)
+            val lines = LinkedHashMap<String, MutableList<String>>()
+            byWorld.values.forEach { list ->
+                val worldName = list.first().world.name
+                val worldLines = mutableListOf<String>()
+                synchronized(lines) { lines[worldName] = worldLines }
+                list.forEach { player ->
+                    Schedulers.runForEntity(player) {
+                        val loc = player.location
+                        val entry = "  <aqua>${player.name}</aqua><white>: ${loc.blockX} ${loc.blockY} ${loc.blockZ}</white>"
+                        synchronized(worldLines) { worldLines += entry }
+                        if (pending.decrementAndGet() == 0) sendPlayerResult(this@sendPlayersStats, lines)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun sendPlayerResult(sender: CommandSender, lines: Map<String, List<String>>) {
+        Schedulers.runGlobal {
+            lines.forEach { (worldName, worldLines) ->
+                RuntimeServices.messages.send(sender, "<gold>$worldName</gold>:${worldLines.joinToString("")}")
+            }
+        }
+    }
+
+    private fun Int.withColor() = when {
+        this > 60 -> "<red>$this</red>"
+        this > 30 -> "<yellow>$this</yellow>"
+        else -> "<green>$this</green>"
     }
 }
