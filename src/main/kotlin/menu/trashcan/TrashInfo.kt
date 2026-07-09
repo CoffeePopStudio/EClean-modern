@@ -20,12 +20,19 @@ data class TrashInfo(
     override var needUpdate = false
     override var item = generateItem(placeholders)
 
-    private fun generateItem(placeholders: Array<Pair<String, Any?>>) = origin.clone().editItemMeta {
+    @Suppress("DEPRECATION")
+    private fun generateItem(placeholders: Array<Pair<String, Any?>>): ItemStack {
         val mm = MiniMessage.miniMessage()
-        val lines = MLang.get("menu.trashcan.item.lore", *placeholders)
+        val loreLines = MLang.get("menu.trashcan.item.lore", *placeholders)
             .removeSuffix("\n")
             .lines()
             .map { mm.deserialize(it) }
-        lore(lines)
-    }.apply { amount = 1 }
+        return origin.clone().let { copy ->
+            val meta = copy.itemMeta
+            meta?.lore(loreLines)
+            copy.itemMeta = meta
+            copy.amount = 1
+            copy
+        }
+    }
 }

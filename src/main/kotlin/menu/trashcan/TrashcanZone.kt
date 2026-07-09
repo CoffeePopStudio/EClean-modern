@@ -96,16 +96,21 @@ class TrashcanZone(
                 return
             }
         }
+        val playerSlot = event.rawSlot - 54
+        if (playerSlot < 0 || playerSlot >= 36) return
+
         RuntimeServices.messages.debug { "Player ${player.name} deposited ${clicked.type}x${count} into trashcan (remain: ${clicked.amount - count})" }
-        if (count == clicked.amount) {
-            event.currentItem = emptyItem
-            Trashcan.addItem(clicked)
-            Trashcan.update()
-            return
+
+        val toPut = if (count == clicked.amount) {
+            player.inventory.setItem(playerSlot, emptyItem)
+            clicked.clone()
+        } else {
+            val put = clicked.clone().apply { amount = count }
+            clicked.amount -= count
+            player.inventory.setItem(playerSlot, clicked)
+            put
         }
-        clicked.amount -= count
-        event.currentItem = clicked
-        Trashcan.addItem(clicked.clone().apply { amount = count })
+        Trashcan.addItem(toPut)
         Trashcan.update()
     }
 }
