@@ -19,8 +19,9 @@ object MLang {
         val file = File(PL.dataFolder, "lang.yml")
         if (!file.exists()) PL.saveResource("lang.yml", false)
         val text = file.readText(Charsets.UTF_8)
-        LegacyLangMigrator.migrateIfNeeded(file, text) { migrated ->
-            readIntoCache(migrated)
+        val didMigrate = LegacyLangMigrator.migrateIfNeeded(file, text) { readIntoCache(it) }
+        if (!didMigrate) {
+            readIntoCache(text)
         }
     }
 
