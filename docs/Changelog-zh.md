@@ -5,7 +5,7 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 版本规范。
 
-## [0.1.7] - 未发布
+## [0.1.7]
 
 ### 变更
 - 提取独立 `ui/` 菜单框架（UiMenu、UiButton、UiPager、UiDisplayable、util），替换所有 `eplugin.menu` 依赖。
