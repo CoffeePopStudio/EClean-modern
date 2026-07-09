@@ -1,4 +1,4 @@
-package top.e404.eclean.ui.util
+package top.e404.eclean.ui
 
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Material

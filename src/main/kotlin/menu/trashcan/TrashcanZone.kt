@@ -6,12 +6,10 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
-import top.e404.eclean.PL
 import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.clean.Trashcan.sign
 import top.e404.eclean.ui.UiPager
-import top.e404.eclean.ui.util.emptyItem
 import kotlin.math.max
 import kotlin.math.min
 

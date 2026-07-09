@@ -5,8 +5,6 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import top.e404.eclean.lang.MLang
 import top.e404.eclean.ui.UiButton
-import top.e404.eclean.ui.util.buildItemStack
-import top.e404.eclean.ui.util.emptyItem
 import kotlin.math.max
 
 class PrevButton(viewMenu: TrashcanMenu) {

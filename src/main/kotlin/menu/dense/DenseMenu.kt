@@ -9,7 +9,7 @@ import top.e404.eclean.PL
 import top.e404.eclean.lang.MLang
 import top.e404.eclean.ui.UiButton
 import top.e404.eclean.ui.UiMenu
-import top.e404.eclean.ui.util.buildItemStack
+import top.e404.eclean.ui.buildItemStack
 
 class DenseMenu(data: MutableList<EntityInfo>) : UiMenu(PL, MLang["menu.dense.title"], 6, false) {
     val zone = DenseZone(this, data)

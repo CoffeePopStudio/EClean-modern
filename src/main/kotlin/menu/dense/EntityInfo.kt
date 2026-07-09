@@ -7,7 +7,7 @@ import top.e404.eclean.clean.info
 import top.e404.eclean.lang.MLang
 import top.e404.eclean.platform.execution.ChunkRef
 import top.e404.eclean.ui.UiDisplayable
-import top.e404.eclean.ui.util.buildItemStack
+import top.e404.eclean.ui.buildItemStack
 import top.e404.eclean.util.placeholder
 
 class EntityInfo(
