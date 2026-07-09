@@ -16,16 +16,16 @@ class TrashcanService(
         private set
 
     fun open(player: Player) {
-        TrashcanMenu().open(player)
+        TrashcanMenu(repository).open(player)
     }
 
     fun collectStacks(items: Collection<ItemStack>) {
-        items.forEach(::addItem)
+        repository.addAll(items)
         updateMenus()
     }
 
     fun addItem(item: ItemStack) {
-        repository.upsert(item)
+        repository.addItem(item)
         updateMenus()
     }
 
@@ -44,6 +44,4 @@ class TrashcanService(
     fun updateMenus() {
         TrashcanMenu.updateAllOpen()
     }
-
-    fun values() = repository.trashValues
 }

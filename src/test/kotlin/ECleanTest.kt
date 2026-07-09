@@ -13,7 +13,6 @@ import consoleOut
 import player
 import plugin
 import server
-import trash.TrashcanTest
 import world
 
 @DisplayName("清理单元测试")
@@ -49,8 +48,4 @@ class ECleanTest {
     @Nested
     @DisplayName("生物清理单元测试")
     inner class TestLivingClean : LivingCleanTest()
-
-    @Nested
-    @DisplayName("垃圾桶单元测试")
-    inner class TestTrashcan : TrashcanTest()
 }

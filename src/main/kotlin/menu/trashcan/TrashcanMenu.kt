@@ -3,39 +3,20 @@ package top.e404.eclean.menu.trashcan
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import top.e404.eclean.PL
-import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.lang.MLang
-import top.e404.eclean.feature.trashcan.TrashcanMenuModel
+import top.e404.eclean.feature.trashcan.TrashcanRepository
 import top.e404.eclean.ui.UiMenu
 
-class TrashcanMenu : UiMenu(PL, MLang["menu.trashcan.title"], 6, true) {
-    private val model = TrashcanMenuModel(RuntimeServices.trashcanRepository)
-    val zone = TrashcanZone(this, model.entries())
-    private val prev = PrevButton(this)
-    private val next = NextButton(this)
+class TrashcanMenu(
+    private val repository: TrashcanRepository,
+) : UiMenu(PL, MLang["menu.trashcan.title"], 6, false) {
 
     init {
-        onPlayerInvClick = { event -> zone.onClickSelfInv(event) }
-        initSlots(
-            listOf(
-                "         ",
-                "         ",
-                "         ",
-                "         ",
-                "         ",
-                "  p   n  ",
-            )
-        ) { char ->
-            when (char) {
-                'p' -> prev.button
-                'n' -> next.button
-                else -> null
-            }
-        }
-        addPager(zone.pager)
+        val contents = inventory.contents
+        repository.loadInto(contents)
+        inventory.contents = contents
     }
 
     override fun open(player: Player) {
@@ -44,8 +25,10 @@ class TrashcanMenu : UiMenu(PL, MLang["menu.trashcan.title"], 6, true) {
         ensureCloseListener()
     }
 
-    override fun onInventoryClick(event: InventoryClickEvent) {
-        super.onInventoryClick(event)
+    private fun saveAndClose(event: InventoryCloseEvent) {
+        repository.saveFrom(inventory.contents)
+        unregister()
+        opened.remove(this)
     }
 
     companion object {
@@ -58,15 +41,17 @@ class TrashcanMenu : UiMenu(PL, MLang["menu.trashcan.title"], 6, true) {
             PL.server.pluginManager.registerEvents(object : Listener {
                 @EventHandler
                 fun onClose(event: InventoryCloseEvent) {
-                    val closed = opened.filter { it.inventory == event.inventory }
-                    opened.removeAll(closed)
-                    closed.forEach { it.unregister() }
+                    opened.find { it.inventory == event.inventory }?.saveAndClose(event)
                 }
             }, PL)
         }
 
         fun updateAllOpen() {
-            opened.toSet().forEach { it.updateIcon() }
+            opened.toSet().forEach { menu ->
+                val contents = menu.inventory.contents
+                menu.repository.loadInto(contents)
+                menu.inventory.contents = contents
+            }
         }
     }
 }

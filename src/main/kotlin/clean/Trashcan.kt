@@ -1,16 +1,10 @@
 package top.e404.eclean.clean
 
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
-import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.ItemStack
 import top.e404.eclean.app.RuntimeServices
-import top.e404.eclean.config.Config
 
-object Trashcan : Listener {
-    val trashValues get() = RuntimeServices.trashcanRepository.trashValues
-
-    fun cleanTrash(){
+object Trashcan {
+    fun cleanTrash() {
         RuntimeServices.trashcanService.clearAll()
     }
 
@@ -18,10 +12,6 @@ object Trashcan : Listener {
 
     fun schedule() {
         RuntimeServices.trashcanTicker.start()
-    }
-
-    @EventHandler
-    fun InventoryCloseEvent.onEvent() {
     }
 
     fun open(player: org.bukkit.entity.Player) {
@@ -34,9 +24,5 @@ object Trashcan : Listener {
 
     fun addItem(item: ItemStack) {
         RuntimeServices.trashcanService.addItem(item)
-    }
-
-    fun update() {
-        RuntimeServices.trashcanService.updateMenus()
     }
 }

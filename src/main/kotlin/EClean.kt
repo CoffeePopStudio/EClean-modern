@@ -5,7 +5,6 @@ import org.bukkit.plugin.PluginDescriptionFile
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.plugin.java.JavaPluginLoader
 import top.e404.eclean.app.RuntimeServices
-import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.command.Commands
 import top.e404.eclean.config.Config
 import top.e404.eclean.lang.MLang
@@ -54,7 +53,6 @@ open class EClean : JavaPlugin {
         Commands.register()
         Update.register()
         Bukkit.getPluginManager().registerEvents(DespawnListener, this)
-        Bukkit.getPluginManager().registerEvents(Trashcan, this)
         Bukkit.getPluginManager().registerEvents(MenuManager, this)
         try {
             val clazz = Class.forName("top.e404.eclean.feature.papi.native.ECleanPapiExpansion")
