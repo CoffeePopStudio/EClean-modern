@@ -4,7 +4,7 @@ import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
-import top.e404.eclean.config.Lang
+import top.e404.eclean.lang.MLang
 import top.e404.eplugin.menu.slot.MenuButton
 import top.e404.eplugin.util.buildItemStack
 import top.e404.eplugin.util.emptyItem
@@ -13,7 +13,7 @@ import kotlin.math.max
 class NextButton(val viewMenu: DenseMenu) : MenuButton(viewMenu) {
     val zone get() = viewMenu.zone
     private val btn =
-        buildItemStack(Material.ARROW, 1, Lang["menu.dense.next.name"], Lang["menu.dense.next.lore"].lines())
+        buildItemStack(Material.ARROW, 1, MLang["menu.dense.next.name"], MLang["menu.dense.next.lore"].lines())
 
     override var item = if (zone.hasNext) btn else emptyItem
     override fun onClick(

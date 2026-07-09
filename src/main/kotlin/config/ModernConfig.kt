@@ -7,6 +7,7 @@ object ModernConfig {
     val living get() = Config.current.living
     val chunkDensity get() = Config.current.chunkDensity
     val trashcan get() = Config.current.trashcan
+    val perWorld get() = Config.current.perWorld
 
     val cleanupDuration get() = cleanup.intervalSeconds
 }

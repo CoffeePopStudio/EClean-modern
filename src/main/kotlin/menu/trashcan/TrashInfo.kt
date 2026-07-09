@@ -1,7 +1,7 @@
 package top.e404.eclean.menu.trashcan
 
 import org.bukkit.inventory.ItemStack
-import top.e404.eclean.config.Lang
+import top.e404.eclean.lang.MLang
 import top.e404.eplugin.menu.Displayable
 import top.e404.eplugin.util.editItemMeta
 
@@ -21,7 +21,7 @@ data class TrashInfo(
 
     private fun generateItem(placeholders: Array<Pair<String, *>>) = origin.clone().editItemMeta {
         lore = (lore ?: mutableListOf()).apply {
-            addAll(Lang.get("menu.trashcan.item.lore", *placeholders).removeSuffix("\n").lines())
+            addAll(MLang.get("menu.trashcan.item.lore", *placeholders).removeSuffix("\n").lines())
         }
     }.apply { amount = 1 }
 }

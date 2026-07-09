@@ -9,6 +9,7 @@ import top.e404.eclean.config.model.CleanupConfig
 import top.e404.eclean.config.model.DropConfig
 import top.e404.eclean.config.model.GlobalConfig
 import top.e404.eclean.config.model.LivingConfig
+import top.e404.eclean.config.model.PerWorldConfig
 import top.e404.eclean.config.model.TrashcanConfig
 import java.io.File
 import java.nio.file.Files
@@ -36,6 +37,7 @@ class ConfigLoader(
             living = read(ConfigFiles.LIVING, LivingConfig.serializer()),
             chunkDensity = read(ConfigFiles.CHUNK_DENSITY, ChunkDensityConfig.serializer()),
             trashcan = read(ConfigFiles.TRASHCAN, TrashcanConfig.serializer()),
+            perWorld = read(ConfigFiles.PER_WORLD, PerWorldConfig.serializer()),
         )
     }
 
@@ -46,6 +48,7 @@ class ConfigLoader(
         livingText: String,
         chunkDensityText: String,
         trashcanText: String,
+        perWorldText: String,
     ): ConfigBundle {
         return ConfigBundle(
             global = yaml.decodeFromString(GlobalConfig.serializer(), globalText),
@@ -54,6 +57,7 @@ class ConfigLoader(
             living = yaml.decodeFromString(LivingConfig.serializer(), livingText),
             chunkDensity = yaml.decodeFromString(ChunkDensityConfig.serializer(), chunkDensityText),
             trashcan = yaml.decodeFromString(TrashcanConfig.serializer(), trashcanText),
+            perWorld = yaml.decodeFromString(PerWorldConfig.serializer(), perWorldText),
         )
     }
 

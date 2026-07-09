@@ -1,8 +1,8 @@
 intervalSeconds: 600
 countdownMessages:
-  60: "&f将在1分钟后进行清理"
-  30: "&f将在30秒后进行清理"
-  10: "&f将在10秒后进行清理"
-  0: "&f正在清理"
+  60: "<white>将在1分钟后进行清理</white>"
+  30: "<white>将在30秒后进行清理</white>"
+  10: "<white>将在10秒后进行清理</white>"
+  0: "<white>正在清理</white>"
 cleanWhenNoPlayers: true
 broadcastWhenNoPlayers: true

@@ -1,0 +1,6 @@
+# Per-world cleanup overrides
+# Leave empty to use global defaults from cleanup.yml.
+#
+# world:
+#   enabled: false         # disable cleanup in this world
+#   intervalSeconds: 1800  # override cleanup interval for this world

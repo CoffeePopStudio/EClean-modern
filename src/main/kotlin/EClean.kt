@@ -7,7 +7,7 @@ import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.command.Commands
 import top.e404.eclean.config.Config
-import top.e404.eclean.config.Lang
+import top.e404.eclean.lang.MLang
 import top.e404.eclean.hook.HookManager
 import top.e404.eclean.hook.PapiHook
 import top.e404.eclean.listener.DespawnListener
@@ -20,11 +20,11 @@ import java.io.File
 open class EClean : EPlugin {
     companion object {
         val logo = listOf(
-            """&6 ______     ______     __         ______     ______     __   __   """.color,
-            """&6/\  ___\   /\  ___\   /\ \       /\  ___\   /\  __ \   /\ "-.\ \  """.color,
-            """&6\ \  __\   \ \ \____  \ \ \____  \ \  __\   \ \  __ \  \ \ \-.  \ """.color,
-            """&6 \ \_____\  \ \_____\  \ \_____\  \ \_____\  \ \_\ \_\  \ \_\\"\_\""".color,
-            """&6  \/_____/   \/_____/   \/_____/   \/_____/   \/_/\/_/   \/_/ \/_/""".color
+            "<gold> ______     ______     __         ______     ______     __   __   ",
+            "<gold>/\\  ___\\   /\\  ___\\   /\\ \\       /\\  ___\\   /\\  __ \\   /\\ \"-.\\ \\  ",
+            "<gold>\\ \\  __\\   \\ \\ \\____  \\ \\ \\____  \\ \\  __\\   \\ \\  __ \\  \\ \\ \\-.  \\ ",
+            "<gold> \\ \\_____\\  \\ \\_____\\  \\ \\_____\\  \\ \\_____\\  \\ \\_\\ \\_\\  \\ \\_\\\\\"\\_\\\"",
+            "<gold>  \\/_____/   \\/_____/   \\/_____/   \\/_____/   \\/_/\\/_/   \\/_/ \\/_/",
         )
     }
 
@@ -48,7 +48,7 @@ open class EClean : EPlugin {
         set(value) {
             Config.update { it.copy(global = it.global.copy(debug = value)) }
         }
-    override val langManager by lazy { Lang }
+    override val langManager by lazy { MLang }
 
     init {
         PL = this
@@ -65,7 +65,7 @@ open class EClean : EPlugin {
         Bukkit.getPluginManager().registerEvents(DespawnListener, this)
         Bukkit.getPluginManager().registerEvents(Trashcan, this)
         if (PapiHook.enable) Papi.register()
-        for (line in logo) RuntimeServices.messages.info(line.removeColor())
+        for (line in logo) RuntimeServices.messages.info(line.replace(Regex("<[^>]+>"), ""))
         RuntimeServices.messages.info("EClean-Modern enabled. Author: 404E")
     }
 

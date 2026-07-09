@@ -1,7 +1,7 @@
 enabled: true
 disabledWorlds:
   - "not_cleaned_world"
-finishMessage: "&a密集实体清理完成, 清理{clean}个"
+finishMessage: "<green>密集实体清理完成, 清理{clean}个</green>"
 settings:
   cleanNamed: false
   cleanLeashed: false

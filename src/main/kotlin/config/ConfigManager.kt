@@ -11,6 +11,7 @@ import top.e404.eclean.config.model.CleanupConfig
 import top.e404.eclean.config.model.DropConfig
 import top.e404.eclean.config.model.GlobalConfig
 import top.e404.eclean.config.model.LivingConfig
+import top.e404.eclean.config.model.PerWorldConfig
 import top.e404.eclean.config.model.TrashcanConfig
 import java.io.File
 
@@ -56,6 +57,7 @@ object ConfigManager {
         livingText: String = "",
         chunkDensityText: String = "",
         trashcanText: String = "",
+        perWorldText: String = "",
     ) {
         val previous = snapshot
         val candidate = runCatching {
@@ -66,6 +68,7 @@ object ConfigManager {
                 livingText = if (livingText.isBlank()) encode(previous.living, LivingConfig.serializer()) else livingText,
                 chunkDensityText = if (chunkDensityText.isBlank()) encode(previous.chunkDensity, ChunkDensityConfig.serializer()) else chunkDensityText,
                 trashcanText = if (trashcanText.isBlank()) encode(previous.trashcan, TrashcanConfig.serializer()) else trashcanText,
+                perWorldText = if (perWorldText.isBlank()) encode(previous.perWorld, PerWorldConfig.serializer()) else perWorldText,
             )
         }.getOrElse {
             snapshot = previous

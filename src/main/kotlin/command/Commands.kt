@@ -14,11 +14,10 @@ import top.e404.eclean.clean.cleanDenseEntities
 import top.e404.eclean.clean.cleanDrop
 import top.e404.eclean.clean.cleanLiving
 import top.e404.eclean.config.Config
-import top.e404.eclean.config.Lang
 import top.e404.eclean.feature.cleanup.chunk.ChunkDensityScanner
 import top.e404.eclean.feature.cleanup.drop.DropCleanupService
 import top.e404.eclean.feature.cleanup.living.LivingCleanupService
-import top.e404.eclean.util.color
+import top.e404.eclean.lang.MLang
 
 object Commands : CommandExecutor, TabCompleter {
     private val subcommands = listOf("debug", "reload", "clean", "stats", "entity", "trash", "players", "show")
@@ -72,7 +71,7 @@ object Commands : CommandExecutor, TabCompleter {
     }
 
     private fun sendUsage(sender: CommandSender) {
-        sender.sendMessage(Lang["command.usage.stats"].color)
+        sender.sendMessage(MLang["command.usage.stats"])
     }
 
     private fun handleDebug(sender: CommandSender) {
@@ -80,20 +79,20 @@ object Commands : CommandExecutor, TabCompleter {
         if (sender !is Player) {
             if (Config.current.global.debug) {
                 Config.update { it.copy(global = it.global.copy(debug = false)) }
-                RuntimeServices.messages.send(sender, Lang["debug.console_disable"])
+                RuntimeServices.messages.send(sender, MLang["debug.console_disable"])
             } else {
                 Config.update { it.copy(global = it.global.copy(debug = true)) }
-                RuntimeServices.messages.send(sender, Lang["debug.console_enable"])
+                RuntimeServices.messages.send(sender, MLang["debug.console_enable"])
             }
             return
         }
         val senderName = sender.name
         if (senderName in RuntimeServices.messages.debuggers) {
             RuntimeServices.messages.debuggers.remove(senderName)
-            RuntimeServices.messages.send(sender, Lang["debug.player_disable"])
+            RuntimeServices.messages.send(sender, MLang["debug.player_disable"])
         } else {
             RuntimeServices.messages.debuggers.add(senderName)
-            RuntimeServices.messages.send(sender, Lang["debug.player_enable"])
+            RuntimeServices.messages.send(sender, MLang["debug.player_enable"])
         }
     }
 
@@ -115,13 +114,13 @@ object Commands : CommandExecutor, TabCompleter {
                 val worldName = args[2]
                 when (args[1].lowercase()) {
                     "e", "entity" -> LivingCleanupService().cleanWorld(worldName) { result ->
-                        RuntimeServices.messages.send(sender, Lang["command.clean_done", "count" to "(${result.cleaned}/${result.total})"])
+                        RuntimeServices.messages.send(sender, MLang["command.clean_done", "count" to "(${result.cleaned}/${result.total})"])
                     }
                     "d", "drop" -> DropCleanupService().cleanWorld(worldName) { result ->
-                        RuntimeServices.messages.send(sender, Lang["command.clean_done", "count" to "(${result.cleaned}/${result.total})"])
+                        RuntimeServices.messages.send(sender, MLang["command.clean_done", "count" to "(${result.cleaned}/${result.total})"])
                     }
                     "c", "chunk" -> ChunkDensityScanner().cleanWorld(worldName) { result ->
-                        RuntimeServices.messages.send(sender, Lang["command.clean_done", "count" to result.cleaned])
+                        RuntimeServices.messages.send(sender, MLang["command.clean_done", "count" to result.cleaned])
                     }
                     else -> sendUsage(sender)
                 }
@@ -151,7 +150,7 @@ object Commands : CommandExecutor, TabCompleter {
             4 -> {
                 val min = args[3].toIntOrNull()
                 if (min == null) {
-                    RuntimeServices.messages.send(sender, Lang["message.invalid_number", "number" to args[3]])
+                    RuntimeServices.messages.send(sender, MLang["message.invalid_number", "number" to args[3]])
                     return
                 }
                 sender.sendEntityStats(args[2], args[1], min)
@@ -164,11 +163,11 @@ object Commands : CommandExecutor, TabCompleter {
         if (sender !is Player) return
         if (!sender.hasPermission("eclean.trash")) return
         if (!Config.current.trashcan.enabled) {
-            RuntimeServices.messages.send(sender, Lang["command.trash_disable"])
+            RuntimeServices.messages.send(sender, MLang["command.trash_disable"])
             return
         }
         top.e404.eclean.clean.Trashcan.open(sender)
-        RuntimeServices.messages.send(sender, Lang["command.trash_open"])
+        RuntimeServices.messages.send(sender, MLang["command.trash_open"])
     }
 
     private fun handlePlayers(sender: CommandSender) {

@@ -7,7 +7,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import top.e404.eclean.PL
 import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.clean.info
-import top.e404.eclean.config.Lang
+import top.e404.eclean.lang.MLang
 import top.e404.eclean.platform.Schedulers
 import top.e404.eclean.platform.execution.ChunkRef
 import top.e404.eplugin.menu.zone.MenuButtonZone
@@ -36,7 +36,7 @@ class DenseZone(
             val entities = chunk.entities.filter { it.type == type }
             RuntimeServices.messages.send(
                 player,
-                Lang[
+                MLang[
                     "menu.dense.clean",
                     "chunk" to chunkRef.info(),
                     "type" to type.name,
@@ -61,7 +61,7 @@ class DenseZone(
             val target = Location(world, x + 0.5, y + 1.0, z + 0.5)
             if (!temp) {
                 RuntimeServices.playerTeleportService.teleport(player, target)
-                RuntimeServices.messages.send(player, Lang["command.teleport.done"])
+                RuntimeServices.messages.send(player, MLang["command.teleport.done"])
             } else {
                 RuntimeServices.temporaryReturnService.teleportWithReturn(player, target, 600)
             }

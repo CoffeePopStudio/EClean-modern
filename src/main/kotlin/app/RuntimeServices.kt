@@ -8,7 +8,7 @@ import top.e404.eclean.feature.trashcan.TrashcanRepository
 import top.e404.eclean.feature.trashcan.TrashcanService
 import top.e404.eclean.feature.trashcan.TrashcanTicker
 import top.e404.eclean.config.Config
-import top.e404.eclean.config.Lang
+import top.e404.eclean.lang.MLang
 import top.e404.eclean.platform.FoliaDetector
 import top.e404.eclean.platform.Schedulers
 import top.e404.eclean.platform.execution.ExecutionGateway
@@ -76,7 +76,7 @@ object RuntimeServices {
                 TemporaryReturnEvent.Returned -> "command.teleport.back"
                 TemporaryReturnEvent.ReturnedAfterReplace -> "command.teleport.cover"
             }
-            messages.send(player, Lang[key])
+            messages.send(player, MLang[key])
         }
         trashcanRepository = TrashcanRepository()
         trashcanService = TrashcanService(messages, trashcanRepository, statusSnapshots)
@@ -87,16 +87,16 @@ object RuntimeServices {
     }
 
     fun load(sender: CommandSender? = null) {
-        Lang.load(sender)
+        MLang.load(sender)
         Config.load(sender)
     }
 
     fun reload(sender: CommandSender) {
         Schedulers.runAsync {
-            Lang.load(sender)
+            MLang.load(sender)
             Config.reload(sender)
             Schedulers.runGlobal {
-                messages.send(sender, Lang["command.reload_done"])
+                messages.send(sender, MLang["command.reload_done"])
             }
         }
     }

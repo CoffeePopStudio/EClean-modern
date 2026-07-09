@@ -7,12 +7,12 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemFlag
 import top.e404.eclean.PL
-import top.e404.eclean.config.Lang
+import top.e404.eclean.lang.MLang
 import top.e404.eplugin.menu.menu.ChestMenu
 import top.e404.eplugin.menu.slot.MenuButton
 import top.e404.eplugin.util.buildItemStack
 
-class DenseMenu(data: MutableList<EntityInfo>) : ChestMenu(PL, 6, Lang["menu.dense.title"], false) {
+class DenseMenu(data: MutableList<EntityInfo>) : ChestMenu(PL, 6, MLang["menu.dense.title"], false) {
     val zone = DenseZone(this, data)
     var temp = false
     private val prev = PrevButton(this)
@@ -36,8 +36,8 @@ class DenseMenu(data: MutableList<EntityInfo>) : ChestMenu(PL, 6, Lang["menu.den
                     private fun create() = buildItemStack(
                         Material.PAPER,
                         1,
-                        Lang["menu.dense.temp.name"],
-                        Lang["menu.dense.temp.lore", "status" to Lang["menu.dense.temp.status.$temp"]].lines()
+                        MLang["menu.dense.temp.name"],
+                        MLang["menu.dense.temp.lore", "status" to MLang["menu.dense.temp.status.$temp"]].lines()
                     ) {
                         if (temp) {
                             addEnchant(Enchantment.UNBREAKING, 1, true)

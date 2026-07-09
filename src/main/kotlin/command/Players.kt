@@ -2,16 +2,15 @@ package top.e404.eclean.command
 
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
-import top.e404.eclean.config.Lang
+import top.e404.eclean.lang.MLang
 import top.e404.eclean.platform.Schedulers
-import top.e404.eclean.util.color
 import java.util.concurrent.atomic.AtomicInteger
 
 fun CommandSender.sendPlayersStats() {
     Schedulers.runGlobal {
         val players = Bukkit.getOnlinePlayers().toList()
         if (players.isEmpty()) {
-            sendMessage(Lang["command.stats.empty"].color)
+            sendMessage(MLang["command.stats.empty"])
             return@runGlobal
         }
         val byWorld = players.groupBy { it.world.name to it.world }
@@ -36,7 +35,7 @@ fun CommandSender.sendPlayersStats() {
 private fun sendPlayerResult(sender: CommandSender, lines: Map<String, List<String>>) {
     Schedulers.runGlobal {
         lines.forEach { (worldName, worldLines) ->
-            sender.sendMessage("&6${worldName}:${worldLines.joinToString("")}".color)
+            sender.sendMessage("&6${worldName}:${worldLines.joinToString("")}")
         }
     }
 }

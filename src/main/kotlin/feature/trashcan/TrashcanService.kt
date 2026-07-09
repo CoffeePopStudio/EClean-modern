@@ -2,7 +2,7 @@ package top.e404.eclean.feature.trashcan
 
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import top.e404.eclean.config.Lang
+import top.e404.eclean.lang.MLang
 import top.e404.eclean.menu.MenuManager
 import top.e404.eclean.menu.trashcan.TrashcanMenu
 import top.e404.eclean.service.StatusSnapshotService
@@ -34,7 +34,7 @@ class TrashcanService(
     fun clearAll() {
         messages.debug { "清空垃圾桶" }
         repository.clear()
-        messages.broadcast(Lang["command.trash_clean_done"])
+        messages.broadcast(MLang["command.trash_clean_done"])
         updateMenus()
     }
 

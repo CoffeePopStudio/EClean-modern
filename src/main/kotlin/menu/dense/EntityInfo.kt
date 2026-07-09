@@ -3,7 +3,7 @@ package top.e404.eclean.menu.dense
 import org.bukkit.Material
 import org.bukkit.entity.EntityType
 import top.e404.eclean.clean.info
-import top.e404.eclean.config.Lang
+import top.e404.eclean.lang.MLang
 import top.e404.eclean.platform.execution.ChunkRef
 import top.e404.eclean.util.placeholder
 import top.e404.eplugin.menu.Displayable
@@ -29,8 +29,8 @@ class EntityInfo(
         buildItemStack(
             materials.random(),
             1,
-            Lang.get("menu.dense.item.name", *placeholder),
-            Lang["menu.dense.item.lore"].placeholder(*placeholder).lines()
+            MLang.get("menu.dense.item.name", *placeholder),
+            MLang["menu.dense.item.lore"].placeholder(*placeholder).lines()
         )
     }
 }

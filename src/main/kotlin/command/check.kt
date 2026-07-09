@@ -4,7 +4,7 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.EntityType
 import top.e404.eclean.app.RuntimeServices
-import top.e404.eclean.config.Lang
+import top.e404.eclean.lang.MLang
 import top.e404.eclean.feature.stats.WorldStatsService
 import top.e404.eclean.util.formatAsConst
 
@@ -21,11 +21,11 @@ fun CommandSender.sendWorldStats(worldName: String) {
             return@collectWorldStats
         }
         if (result.totalEntities == 0) {
-            RuntimeServices.messages.send(this, Lang["command.stats.empty"])
+            RuntimeServices.messages.send(this, MLang["command.stats.empty"])
             return@collectWorldStats
         }
-        val entity = result.sortedEntries().joinToString(Lang["command.stats.spacing"]) { (k, v) ->
-            Lang[
+        val entity = result.sortedEntries().joinToString(MLang["command.stats.spacing"]) { (k, v) ->
+            MLang[
                 "command.stats.content",
                 "type" to k,
                 "count" to v.withColor()
@@ -33,7 +33,7 @@ fun CommandSender.sendWorldStats(worldName: String) {
         }
         RuntimeServices.messages.send(
             this,
-            Lang[
+            MLang[
                 "command.stats.world",
                 "world" to worldName,
                 "count" to result.loadedChunks,
@@ -53,17 +53,17 @@ fun CommandSender.sendEntityStats(worldName: String, typeName: String, min: Int 
     val type = try {
         EntityType.valueOf(typeName.formatAsConst())
     } catch (t: Throwable) {
-        RuntimeServices.messages.send(this, Lang["message.invalid_entity_type"])
+        RuntimeServices.messages.send(this, MLang["message.invalid_entity_type"])
         return
     }
     val service = WorldStatsService()
     service.collectEntityStats(worldName, type, min) { entries ->
         if (entries.isEmpty()) {
-            RuntimeServices.messages.send(this, Lang["command.stats.empty"])
+            RuntimeServices.messages.send(this, MLang["command.stats.empty"])
             return@collectEntityStats
         }
-        val entity = entries.joinToString(Lang["command.stats.spacing"]) { (label, v) ->
-            Lang[
+        val entity = entries.joinToString(MLang["command.stats.spacing"]) { (label, v) ->
+            MLang[
                 "command.stats.content",
                 "type" to label,
                 "count" to v.withColor()
@@ -71,7 +71,7 @@ fun CommandSender.sendEntityStats(worldName: String, typeName: String, min: Int 
         }
         RuntimeServices.messages.send(
             this,
-            Lang[
+            MLang[
                 "command.stats.entity",
                 "type" to typeName,
                 "entity" to entity

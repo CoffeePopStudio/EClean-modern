@@ -1,7 +1,7 @@
 enabled: true
 disabledWorlds:
   - "not_cleaned_world"
-finishMessage: "&a掉落物清理完成, 已清理{clean}/{all}"
+finishMessage: "<green>掉落物清理完成, 已清理{clean}/{all}</green>"
 blacklistMode: false
 protectEnchanted: false
 protectLore: false

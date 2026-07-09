@@ -10,4 +10,5 @@ enum class ConfigFiles(
     LIVING("living.yml", "config/living.yml"),
     CHUNK_DENSITY("chunk-density.yml", "config/chunk-density.yml"),
     TRASHCAN("trashcan.yml", "config/trashcan.yml"),
+    PER_WORLD("per-world.yml", "config/per-world.yml");
 }
