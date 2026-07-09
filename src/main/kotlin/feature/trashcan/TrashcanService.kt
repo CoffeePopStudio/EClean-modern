@@ -46,5 +46,4 @@ class TrashcanService(
     }
 
     fun values() = repository.trashValues
-    fun data() = repository.trashData
 }

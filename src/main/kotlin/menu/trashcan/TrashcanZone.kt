@@ -7,7 +7,6 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.clean.Trashcan
-import top.e404.eclean.clean.Trashcan.sign
 import top.e404.eclean.ui.UiPager
 import top.e404.eclean.ui.emptyItem
 import kotlin.math.max
@@ -62,7 +61,7 @@ class TrashcanZone(
             require(info.amount >= 0)
 
             if (info.amount == 0) {
-                RuntimeServices.trashcanRepository.removeBySign(info.origin.sign())
+                RuntimeServices.trashcanRepository.removeByItem(info.origin)
             }
 
             Trashcan.update()

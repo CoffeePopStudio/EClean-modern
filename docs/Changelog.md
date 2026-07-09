@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.8]
 
+### Fixed
+- **Trashcan storage now uses `isSimilar` linear scan** instead of `HashMap<ItemSign, TrashInfo>` with custom `hashCode`. `ItemSign.hashCode` cannot faithfully replicate Paper `ItemStack.isSimilar`'s internal comparison across all `DataComponent`s, causing identical items to scatter into different hash buckets and never stack. Switched to a `CopyOnWriteArrayList<TrashInfo>` with `isSimilar` linear lookup on `upsert` — O(n) is negligible at the expected cap of a few hundred unique entries, and correctly matches Paper's component-aware equality.
+- **Repository now clones `ItemStack` on `upsert` to isolate external references**: `DropCleanupExecutor` passes live entity `ItemStack` references; after `item.remove()`, Paper may reclaim the underlying NBT, corrupting the stored `origin` and polluting retrieved items with stray lore/NBT. The clone in `upsert` ensures data isolation.
+- **`TrashInfo` lore now deserializes via `MiniMessage.deserialize()` to native `Component`**: the deprecated `List<String>` lore API treated MiniMessage tags as legacy `§` codes, rendering `<white>共64个</white>` literally. Switched to the modern `lore(List<Component>)` API so lore displays with proper formatting.
+- **Removed defunct `Trashcan.cleanTrash()` logic referencing removed `trashData` field**.
+- **Added `@Synchronized` to all Repository write methods** (`upsert`, `removeByItem`, `clear`) to guard against concurrent Folia multi-region access that would cause `ArrayIndexOutOfBoundsException` or silent data loss.
+- **`TrashcanTicker` now resets countdown to 0 when disabled**: previously returned without clearing, causing PAPI `%eclean_trashcan_countdown%` to leak stale values.
+- **`TrashcanMenu` now calls `unregister()` on close**: each `/ecl trash` opened a new `TrashcanMenu` registered as a Bukkit `Listener`, but closing only removed it from the `opened` set — leaking listeners indefinitely.
+
 ### Changed
 - Replaced `EPlugin` base class with direct `JavaPlugin` extension — all EPlugin features (debugPrefix, prefix, debug, debuggers, bstats) self-implemented in EClean.
 - Deleted `MLangHost` — now that EPlugin's `langManager` type constraint is gone, the last eplugin import in lang is eliminated.

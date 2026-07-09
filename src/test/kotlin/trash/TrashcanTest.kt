@@ -34,7 +34,6 @@ abstract class TrashcanTest {
             )
         }
 
-        Trashcan.trashData.clear()
         Trashcan.trashValues.clear()
     }
 
@@ -42,7 +41,6 @@ abstract class TrashcanTest {
     fun cleanUp() {
         player.inventory.clear()
         MenuManager.closeMenus()
-        Trashcan.trashData.clear()
         Trashcan.trashValues.clear()
     }
 

@@ -1,46 +1,31 @@
 package top.e404.eclean.feature.trashcan
 
 import org.bukkit.inventory.ItemStack
-import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.menu.trashcan.TrashInfo
+import java.util.concurrent.CopyOnWriteArrayList
 
 class TrashcanRepository {
-    val trashData: MutableMap<Trashcan.ItemSign, TrashInfo> = mutableMapOf()
-    val trashValues: MutableList<TrashInfo> = mutableListOf()
+    private val entries = CopyOnWriteArrayList<TrashInfo>()
+    val trashValues: MutableList<TrashInfo> = entries
 
     @Synchronized
     fun upsert(item: ItemStack) {
         val cloned = item.clone()
-        val sign = Trashcan.ItemSign(cloned)
-        val exists = trashData[sign]
-        if (exists != null) {
-            exists.amount += cloned.amount
+        val existing = entries.find { it.origin.isSimilar(cloned) }
+        if (existing != null) {
+            existing.amount += cloned.amount
         } else {
-            trashData[sign] = TrashInfo(cloned, cloned.amount)
+            entries.add(TrashInfo(cloned, cloned.amount))
         }
-        syncValues()
     }
 
     @Synchronized
-    fun removeBySign(sign: Trashcan.ItemSign) {
-        trashData.remove(sign)
-        syncValues()
-    }
-
-    @Synchronized
-    fun removeEmpty() {
-        trashData.entries.removeIf { it.value.amount <= 0 }
-        syncValues()
+    fun removeByItem(item: ItemStack) {
+        entries.removeAll { it.origin.isSimilar(item) }
     }
 
     @Synchronized
     fun clear() {
-        trashData.clear()
-        trashValues.clear()
-    }
-
-    private fun syncValues() {
-        trashValues.clear()
-        trashValues.addAll(trashData.values)
+        entries.clear()
     }
 }

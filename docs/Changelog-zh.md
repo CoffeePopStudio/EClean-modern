@@ -7,6 +7,15 @@
 
 ## [0.1.8]
 
+### 修复
+- **垃圾桶存储对比改为 `isSimilar` 线性查找**：移除 `HashMap<ItemSign, TrashInfo>` + 自定义 `hashCode` 方案。`ItemSign.hashCode` 不可能完整复制 Paper `ItemStack.isSimilar` 的内部比较逻辑，导致相同物品分散至不同 hash bucket 无法正确堆叠。改为 `CopyOnWriteArrayList<TrashInfo>` + `upsert` 时 `isSimilar` 线性查找合并——虽 O(n) 但在数百条目上限下可忽略，且正确匹配 Paper 的完整 `DataComponent` 比较。
+- **Repository 入口 `ItemStack.clone()` 隔离外部引用**：`DropCleanupExecutor` 传入清理实体的 live `ItemStack`，`item.remove()` 后 Paper 可能回收底层 NBT，导致 trashcan 中存储的 `origin` 被连带污染——取出的物品带有残留 lore/NBT。现在 `upsert` 入参即 clone，保障数据隔离。
+- **`TrashInfo` lore 现在通过 `MiniMessage.deserialize()` 生成 `Component`**：原来使用废弃的 `List<String>` lore API，Paper 1.21+ 视为 legacy `§` 码不会解析 MiniMessage 标签，导致 `<white>共64个</white>` 原样显示。改后 lore 正确渲染为格式化文本。
+- **移除 `Trashcan.cleanTrash()` 中因 `trashData` 不可变未解压的错误逻辑**。
+- **`@Synchronized` 保护所有 Repository 写方法**：`upsert`、`removeByItem`、`clear` 加锁，防止 Folia 多 Region 并发写入导致 `ArrayIndexOutOfBoundsException` / 丢数据。
+- **`TrashcanTicker` 禁用时清零 countdown**：`enabled=false` 时原来直接 return 不重置倒计时，PAPI `%eclean_trashcan_countdown%` 持续暴露旧值。
+- **关闭 TrashcanMenu 时调用 `unregister()` 释放 Listener**：每次 `TrashcanService.open()` 都 new 一个 `TrashcanMenu` 并注册为 Bukkit Listener，但关闭时只从 `opened` 集合移除，导致 listener 泄漏。
+
 ### 变更
 - 用直接 `JavaPlugin` 继承替换 `EPlugin` 基类——所有 EPlugin 功能（debugPrefix、prefix、debug、debuggers、bstats）在 EClean 中自实现。
 - 删除 `MLangHost`——EPlugin 的 `langManager` 类型要求已不存在，lang 模块中最后一个 eplugin import 消除。
