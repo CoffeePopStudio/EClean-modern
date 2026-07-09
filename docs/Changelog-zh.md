@@ -5,6 +5,20 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 版本规范。
 
+## [0.1.6]
+
+### 新增
+- 新增 Adventure MiniMessage 消息系统，支持从旧版 `&c` 颜色代码自动迁移——`LegacyLangMigrator` 在首次载入时检测 `&` 代码，重命名为 `lang.old.yml`，转换为 MiniMessage 格式后删除备份文件。
+- 新增 `/ecl clean --preview` dry-run 预览模式——仅汇报将清理的内容，不实际移除任何实体。
+- 新增按世界独立 `per-world.yml` 配置——每个世界可覆盖 `intervalSeconds` 或设置 `enabled: false` 禁用该世界清理。
+
+### 变更
+- 用独立 `MLang` 单例替换基于 `ELangManager` 的 `Lang.kt`（消息加载零 eplugin 依赖）。
+- `MessageService.send()` 和 `.broadcast()` 改为通过 `MiniMessage.deserialize()` 输出 Adventure `Component`。
+- `CleanupTickService` 从单个全局 ticker 扩展为按世界 `Map<String, ScheduledTask>`。
+- 配置消息默认值（倒计时、完成提示）转为 MiniMessage 格式。
+- 移除 `String.color` 和 `String.removeColor()` 扩展函数——MiniMessage 不再使用 `§` 颜色代码。
+
 ## [0.1.5]
 
 ### 变更

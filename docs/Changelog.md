@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.6]
+
+### Added
+- Added Adventure MiniMessage messaging with automatic migration from legacy `&c` color codes — `LegacyLangMigrator` detects `&` codes on first load, renames to `lang.old.yml`, converts to MiniMessage, and deletes the backup.
+- Added `/ecl clean --preview` dry-run mode — reports what would be cleaned without removing any entities.
+- Added per-world cleanup configuration via `per-world.yml` — each world can override `intervalSeconds` or set `enabled: false`.
+
+### Changed
+- Replaced `ELangManager`-based `Lang.kt` with standalone `MLang` singleton (zero eplugin dependency in message loading).
+- `MessageService.send()` and `.broadcast()` now output Adventure `Component` via `MiniMessage.deserialize()`.
+- `CleanupTickService` expanded from a single global ticker to a per-world `Map<String, ScheduledTask>`.
+- Config message defaults (countdown, finish) converted to MiniMessage format.
+- Removed `String.color` and `String.removeColor()` extensions — MiniMessage eliminates `§` code usage.
+
 ## [0.1.5]
 
 ### Changed
