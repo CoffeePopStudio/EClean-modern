@@ -67,7 +67,9 @@ open class EClean : EPlugin {
             if (canRegister) {
                 clazz.getMethod("register").invoke(papi)
             }
-        } catch (_: ClassNotFoundException) {
+        } catch (_: ReflectiveOperationException) {
+            logger.info("PlaceholderAPI not found, skipping PAPI expansion registration")
+        } catch (_: NoClassDefFoundError) {
             logger.info("PlaceholderAPI not found, skipping PAPI expansion registration")
         }
         for (line in logo) RuntimeServices.messages.info(line.replace(Regex("<[^>]+>"), ""))
