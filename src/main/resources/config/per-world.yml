@@ -1,6 +1,9 @@
 # Per-world cleanup overrides
 # Leave empty to use global defaults from cleanup.yml.
 #
+# Example:
 # world:
 #   enabled: false         # disable cleanup in this world
+# world_nether:
 #   intervalSeconds: 1800  # override cleanup interval for this world
+worlds: {}
