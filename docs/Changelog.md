@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.8] - Unreleased
+
+### Changed
+- Replaced `EPlugin` base class with direct `JavaPlugin` extension — all EPlugin features (debugPrefix, prefix, debug, debuggers, bstats) self-implemented in EClean.
+- Deleted `MLangHost` — now that EPlugin's `langManager` type constraint is gone, the last eplugin import in lang is eliminated.
+- Optimized config reload to use section-level diff — only restarts affected services (cleanup ticker on `cleanup`/`perWorld` change, trashcan ticker on `trashcan` change) instead of full pipeline rebuild.
+
+### Added
+- Integration tests for DropCleanupService, LivingCleanupService, and ChunkDensityScanner using MockBukkit (end-to-end pipeline validation).
+
+#### Zero eplugin dependencies
+The plugin now has **zero** `import top.e404.eplugin` statements in `src/main/kotlin/`.
+
 ## [0.1.7]
 
 ### Changed

@@ -1,6 +1,5 @@
 package top.e404.eclean
 
-import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.plugin.PluginDescriptionFile
 import org.bukkit.plugin.java.JavaPlugin
@@ -15,7 +14,7 @@ import top.e404.eclean.menu.MenuManager
 import top.e404.eclean.update.Update
 import java.io.File
 
-class EClean : JavaPlugin {
+open class EClean : JavaPlugin {
     companion object {
         @Volatile
         var unit = false

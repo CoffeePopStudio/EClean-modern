@@ -10,6 +10,7 @@ import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.clean.Trashcan.sign
 import top.e404.eclean.ui.UiPager
+import top.e404.eclean.ui.emptyItem
 import kotlin.math.max
 import kotlin.math.min
 
@@ -26,8 +27,8 @@ class TrashcanZone(
             val info = data.getOrNull(itemIndex) ?: return@handler true
             val planTake = when (event.click) {
                 ClickType.LEFT, ClickType.DOUBLE_CLICK -> 1
-                ClickType.SHIFT_LEFT -> info.item.maxStackSize
-                ClickType.RIGHT -> max(min(info.item.maxStackSize / 2, info.amount / 2), 1)
+                ClickType.SHIFT_LEFT -> info.origin.type.maxStackSize
+                ClickType.RIGHT -> max(min(info.origin.type.maxStackSize / 2, info.amount / 2), 1)
                 else -> {
                     player.playSound(player.location, Sound.ENTITY_BLAZE_DEATH, 1F, 1F)
                     return@handler true

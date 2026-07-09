@@ -3,7 +3,6 @@ package top.e404.eclean.ui
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
-import top.e404.eclean.ui.util.emptyItem
 
 interface UiDisplayable {
     fun update()

@@ -2,7 +2,9 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Location
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.entity.PlayerMock
 import org.mockbukkit.mockbukkit.world.WorldMock
@@ -78,8 +80,22 @@ fun updateTrashcanConfig(transform: (TrashcanConfig) -> TrashcanConfig) {
     updateConfig { it.copy(trashcan = transform(it.trashcan)) }
 }
 
+fun setupMockBukkit() {
+    if (::server.isInitialized) return
+    EClean.unit = true
+    server = MockBukkit.mock()
+    plugin = MockBukkit.load(EClean::class.java)
+    world = server.addSimpleWorld("world")
+    player = server.addPlayer("mock")
+    consoleOut
+}
+
+fun removeNonPlayerEntities() {
+    world.entities.filterNot { it is Player }.forEach(Entity::remove)
+}
+
 fun resetConfig() {
-    world.entities.forEach(Entity::remove)
+    removeNonPlayerEntities()
     Config.replaceForTest(
         ConfigBundle(
             global = GlobalConfig(

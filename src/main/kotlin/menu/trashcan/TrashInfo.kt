@@ -3,6 +3,7 @@ package top.e404.eclean.menu.trashcan
 import org.bukkit.inventory.ItemStack
 import top.e404.eclean.lang.MLang
 import top.e404.eclean.ui.UiDisplayable
+import top.e404.eclean.ui.editItemMeta
 
 data class TrashInfo(
     val origin: ItemStack,

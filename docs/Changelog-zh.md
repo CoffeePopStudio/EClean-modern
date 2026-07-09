@@ -5,6 +5,19 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 版本规范。
 
+## [0.1.8] - 未发布
+
+### 变更
+- 用直接 `JavaPlugin` 继承替换 `EPlugin` 基类——所有 EPlugin 功能（debugPrefix、prefix、debug、debuggers、bstats）在 EClean 中自实现。
+- 删除 `MLangHost`——EPlugin 的 `langManager` 类型要求已不存在，lang 模块中最后一个 eplugin import 消除。
+- 优化配置重载为 section 级 diff——仅在 `cleanup`/`perWorld` 变更时重启清理 ticker，在 `trashcan` 变更时重启垃圾桶 ticker，不再全量重建。
+
+### 新增
+- DropCleanupService、LivingCleanupService、ChunkDensityScanner 集成测试（MockBukkit，端到端流水线验证）。
+
+#### 零 eplugin 依赖
+插件 `src/main/kotlin/` 中已无任何 `import top.e404.eplugin` 语句。
+
 ## [0.1.7]
 
 ### 变更
