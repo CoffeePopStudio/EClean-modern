@@ -63,9 +63,20 @@ open class UiMenu(
         for (pager in pagers) pager.render(inventory)
     }
 
+    var onPlayerInvClick: ((InventoryClickEvent) -> Unit)? = null
+
     @EventHandler
     open fun onInventoryClick(event: InventoryClickEvent) {
         if (event.inventory != inventory) return
+
+        val clickedInventory = event.clickedInventory ?: return
+
+        if (clickedInventory != inventory) {
+            event.isCancelled = true
+            onPlayerInvClick?.invoke(event)
+            return
+        }
+
         event.isCancelled = cancelUnmappedClicks
         val slot = event.slot
         val button = buttons[slot]

@@ -5,7 +5,6 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.inventory.ItemStack
 import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.clean.Trashcan.sign
@@ -110,12 +109,5 @@ class TrashcanZone(
         event.currentItem = clicked
         Trashcan.addItem(clicked.clone().apply { amount = count })
         Trashcan.update()
-    }
-
-    fun onShiftPutin(clicked: ItemStack, event: InventoryClickEvent) {
-        if (clicked.type == Material.AIR) return
-        Trashcan.addItem(clicked)
-        Trashcan.update()
-        event.whoClicked.inventory.setItem(event.slot, emptyItem)
     }
 }

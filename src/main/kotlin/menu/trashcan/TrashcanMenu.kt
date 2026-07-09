@@ -5,7 +5,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
-import org.bukkit.inventory.ItemStack
 import top.e404.eclean.PL
 import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.lang.MLang
@@ -19,6 +18,7 @@ class TrashcanMenu : UiMenu(PL, MLang["menu.trashcan.title"], 6, true) {
     private val next = NextButton(this)
 
     init {
+        onPlayerInvClick = { event -> zone.onClickSelfInv(event) }
         initSlots(
             listOf(
                 "         ",
@@ -46,11 +46,6 @@ class TrashcanMenu : UiMenu(PL, MLang["menu.trashcan.title"], 6, true) {
 
     override fun onInventoryClick(event: InventoryClickEvent) {
         super.onInventoryClick(event)
-        zone.onClickSelfInv(event)
-    }
-
-    fun onShiftPutin(clicked: ItemStack, event: InventoryClickEvent) {
-        zone.onShiftPutin(clicked, event)
     }
 
     companion object {
