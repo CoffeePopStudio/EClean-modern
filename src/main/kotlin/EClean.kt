@@ -8,7 +8,6 @@ import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.command.Commands
 import top.e404.eclean.config.Config
 import top.e404.eclean.lang.MLangHost
-import top.e404.eclean.feature.papi.native.ECleanPapiExpansion
 import top.e404.eclean.listener.DespawnListener
 import top.e404.eclean.menu.MenuManager
 import top.e404.eclean.update.Update
@@ -61,8 +60,16 @@ open class EClean : EPlugin {
         Bukkit.getPluginManager().registerEvents(DespawnListener, this)
         Bukkit.getPluginManager().registerEvents(Trashcan, this)
         Bukkit.getPluginManager().registerEvents(MenuManager, this)
-        val papi = ECleanPapiExpansion()
-        if (papi.canRegister()) papi.register()
+        try {
+            val clazz = Class.forName("top.e404.eclean.feature.papi.native.ECleanPapiExpansion")
+            val papi = clazz.getDeclaredConstructor().newInstance()
+            val canRegister = clazz.getMethod("canRegister").invoke(papi) as Boolean
+            if (canRegister) {
+                clazz.getMethod("register").invoke(papi)
+            }
+        } catch (_: ClassNotFoundException) {
+            logger.info("PlaceholderAPI not found, skipping PAPI expansion registration")
+        }
         for (line in logo) RuntimeServices.messages.info(line.replace(Regex("<[^>]+>"), ""))
         RuntimeServices.messages.info("EClean-Modern enabled. Author: 404E")
     }
