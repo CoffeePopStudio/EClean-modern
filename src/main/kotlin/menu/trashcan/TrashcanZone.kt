@@ -62,8 +62,7 @@ class TrashcanZone(
             require(info.amount >= 0)
 
             if (info.amount == 0) {
-                Trashcan.trashData.remove(info.origin.sign())
-                Trashcan.trashValues.removeAt(itemIndex)
+                RuntimeServices.trashcanRepository.removeBySign(info.origin.sign())
             }
 
             Trashcan.update()

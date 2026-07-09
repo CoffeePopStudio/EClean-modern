@@ -18,7 +18,10 @@ class TrashcanTicker(
             service.syncCountdown(0)
             return
         }
-        if (!trashcanConfig.enabled) return
+        if (!trashcanConfig.enabled) {
+            service.syncCountdown(0)
+            return
+        }
         service.syncCountdown(duration)
         task = Schedulers.scheduleRepeatingGlobal(20, 20) {
             val next = (service.countdown - 1).coerceAtLeast(0)

@@ -58,7 +58,9 @@ class TrashcanMenu : UiMenu(PL, MLang["menu.trashcan.title"], 6, true) {
             PL.server.pluginManager.registerEvents(object : Listener {
                 @EventHandler
                 fun onClose(event: InventoryCloseEvent) {
-                    opened.removeAll { it.inventory == event.inventory }
+                    val closed = opened.filter { it.inventory == event.inventory }
+                    opened.removeAll(closed)
+                    closed.forEach { it.unregister() }
                 }
             }, PL)
         }

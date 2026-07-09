@@ -8,28 +8,38 @@ class TrashcanRepository {
     val trashData: MutableMap<Trashcan.ItemSign, TrashInfo> = mutableMapOf()
     val trashValues: MutableList<TrashInfo> = mutableListOf()
 
+    @Synchronized
     fun upsert(item: ItemStack) {
-        val sign = Trashcan.ItemSign(item)
+        val cloned = item.clone()
+        val sign = Trashcan.ItemSign(cloned)
         val exists = trashData[sign]
         if (exists != null) {
-            exists.amount += item.amount
+            exists.amount += cloned.amount
         } else {
-            trashData[sign] = TrashInfo(item, item.amount)
+            trashData[sign] = TrashInfo(cloned, cloned.amount)
         }
         syncValues()
     }
 
+    @Synchronized
+    fun removeBySign(sign: Trashcan.ItemSign) {
+        trashData.remove(sign)
+        syncValues()
+    }
+
+    @Synchronized
     fun removeEmpty() {
         trashData.entries.removeIf { it.value.amount <= 0 }
         syncValues()
     }
 
+    @Synchronized
     fun clear() {
         trashData.clear()
         trashValues.clear()
     }
 
-    fun syncValues() {
+    private fun syncValues() {
         trashValues.clear()
         trashValues.addAll(trashData.values)
     }
