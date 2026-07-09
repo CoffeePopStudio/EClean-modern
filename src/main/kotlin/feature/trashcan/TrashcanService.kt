@@ -3,7 +3,6 @@ package top.e404.eclean.feature.trashcan
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import top.e404.eclean.lang.MLang
-import top.e404.eclean.menu.MenuManager
 import top.e404.eclean.menu.trashcan.TrashcanMenu
 import top.e404.eclean.service.StatusSnapshotService
 import top.e404.eclean.app.MessageService
@@ -17,8 +16,7 @@ class TrashcanService(
         private set
 
     fun open(player: Player) {
-        val menu = TrashcanMenu()
-        MenuManager.openMenu(menu, player)
+        TrashcanMenu().open(player)
     }
 
     fun collectStacks(items: Collection<ItemStack>) {
@@ -44,9 +42,7 @@ class TrashcanService(
     }
 
     fun updateMenus() {
-        MenuManager.menus.entries
-            .filter { (_, menu) -> menu is TrashcanMenu }
-            .forEach { (_, menu) -> (menu as TrashcanMenu).updateIcon() }
+        TrashcanMenu.updateAllOpen()
     }
 
     fun values() = repository.trashValues

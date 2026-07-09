@@ -10,7 +10,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.plugin.Plugin
 
-class UiMenu(
+open class UiMenu(
     private val plugin: Plugin,
     title: String,
     rows: Int,
@@ -36,7 +36,7 @@ class UiMenu(
         registered = false
     }
 
-    fun open(player: Player) {
+    open fun open(player: Player) {
         register()
         render()
         player.openInventory(inventory)
@@ -64,7 +64,7 @@ class UiMenu(
     }
 
     @EventHandler
-    fun onInventoryClick(event: InventoryClickEvent) {
+    open fun onInventoryClick(event: InventoryClickEvent) {
         if (event.inventory != inventory) return
         event.isCancelled = cancelUnmappedClicks
         val slot = event.slot

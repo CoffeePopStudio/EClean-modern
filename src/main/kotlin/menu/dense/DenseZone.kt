@@ -10,23 +10,35 @@ import top.e404.eclean.clean.info
 import top.e404.eclean.lang.MLang
 import top.e404.eclean.platform.Schedulers
 import top.e404.eclean.platform.execution.ChunkRef
-import top.e404.eplugin.menu.zone.MenuButtonZone
+import top.e404.eclean.ui.UiPager
 
 class DenseZone(
-    override val menu: DenseMenu,
-    override val data: MutableList<EntityInfo>
-) : MenuButtonZone<EntityInfo>(menu, 0, 0, 9, 5, data) {
-    override val inv = menu.inv
-    override fun onClick(menuIndex: Int, zoneIndex: Int, itemIndex: Int, event: InventoryClickEvent): Boolean {
-        val info = data.getOrNull(itemIndex) ?: return true
-        val player = event.whoClicked as Player
-        if (event.isRightClick) {
-            handleRightClick(player, info.chunk, info.type, itemIndex)
-        } else {
-            handleTeleport(player, info.chunk, menu.temp)
-        }
-        return true
-    }
+    val menu: DenseMenu,
+    data: MutableList<EntityInfo>,
+) {
+    val pager = UiPager(
+        data = data,
+        pageSize = 45,
+        startSlot = 0,
+        onClickHandler = { itemIndex, event ->
+            val info = data.getOrNull(itemIndex) ?: return@UiPager true
+            val player = event.whoClicked as Player
+            if (event.isRightClick) {
+                handleRightClick(player, info.chunk, info.type, itemIndex)
+            } else {
+                handleTeleport(player, info.chunk, menu.temp)
+            }
+            true
+        },
+    )
+
+    val hasPrev get() = pager.hasPrev
+    val hasNext get() = pager.hasNext
+    val page get() = pager.page
+
+    fun prevPage() = pager.prevPage()
+    fun nextPage() = pager.nextPage()
+    fun render(inv: org.bukkit.inventory.Inventory) = pager.render(inv)
 
     private fun handleRightClick(player: Player, chunkRef: ChunkRef, type: org.bukkit.entity.EntityType, itemIndex: Int) {
         val world = player.server.getWorld(chunkRef.world) ?: return
@@ -45,7 +57,7 @@ class DenseZone(
             )
             entities.forEach(Entity::remove)
         }
-        data.removeAt(itemIndex)
+        pager.removeAt(itemIndex)
         Schedulers.runGlobal {
             menu.updateIcon()
         }

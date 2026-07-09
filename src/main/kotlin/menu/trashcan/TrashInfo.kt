@@ -2,14 +2,14 @@ package top.e404.eclean.menu.trashcan
 
 import org.bukkit.inventory.ItemStack
 import top.e404.eclean.lang.MLang
-import top.e404.eplugin.menu.Displayable
-import top.e404.eplugin.util.editItemMeta
+import top.e404.eclean.ui.UiDisplayable
+import top.e404.eclean.ui.util.editItemMeta
 
 data class TrashInfo(
     val origin: ItemStack,
     var amount: Int,
-) : Displayable {
-    private val placeholders = arrayOf<Pair<String, *>>("amount" to amount)
+) : UiDisplayable {
+    private val placeholders = arrayOf<Pair<String, Any?>>("amount" to amount)
 
     override fun update() {
         placeholders[0] = "amount" to amount
@@ -19,7 +19,7 @@ data class TrashInfo(
     override var needUpdate = false
     override var item = generateItem(placeholders)
 
-    private fun generateItem(placeholders: Array<Pair<String, *>>) = origin.clone().editItemMeta {
+    private fun generateItem(placeholders: Array<Pair<String, Any?>>) = origin.clone().editItemMeta {
         lore = (lore ?: mutableListOf()).apply {
             addAll(MLang.get("menu.trashcan.item.lore", *placeholders).removeSuffix("\n").lines())
         }

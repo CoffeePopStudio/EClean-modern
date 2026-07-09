@@ -210,7 +210,7 @@ object Commands : CommandExecutor, TabCompleter {
                 .map { top.e404.eclean.menu.dense.EntityInfo(it.entityType, it.amount, it.chunk) }
                 .toMutableList()
             top.e404.eclean.platform.Schedulers.runGlobal {
-                top.e404.eclean.menu.MenuManager.openMenu(top.e404.eclean.menu.dense.DenseMenu(data), sender)
+                top.e404.eclean.menu.dense.DenseMenu(data).open(sender)
             }
         }
     }

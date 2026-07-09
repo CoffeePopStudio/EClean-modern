@@ -10,99 +10,79 @@ import top.e404.eclean.PL
 import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.clean.Trashcan.sign
-import top.e404.eplugin.menu.zone.MenuButtonZone
-import top.e404.eplugin.util.emptyItem
-import top.e404.eplugin.util.splitByPage
+import top.e404.eclean.ui.UiPager
+import top.e404.eclean.ui.util.emptyItem
 import kotlin.math.max
 import kotlin.math.min
 
 class TrashcanZone(
-    override val menu: TrashcanMenu,
-    override val data: MutableList<TrashInfo>
-) : MenuButtonZone<TrashInfo>(menu, 0, 0, 9, 5, data) {
-    override val inv = menu.inv
+    val menu: TrashcanMenu,
+    private val data: MutableList<TrashInfo>,
+) {
+    val pager = UiPager(
+        data = data,
+        pageSize = 45,
+        startSlot = 0,
+        onClickHandler = handler@{ itemIndex, event ->
+            val player = event.whoClicked as Player
+            val info = data.getOrNull(itemIndex) ?: return@handler true
+            val planTake = when (event.click) {
+                ClickType.LEFT, ClickType.DOUBLE_CLICK -> 1
+                ClickType.SHIFT_LEFT -> info.item.maxStackSize
+                ClickType.RIGHT -> max(min(info.item.maxStackSize / 2, info.amount / 2), 1)
+                else -> {
+                    player.playSound(player.location, Sound.ENTITY_BLAZE_DEATH, 1F, 1F)
+                    return@handler true
+                }
+            }.let { min(it, info.amount) }
 
-    override fun update() {
-        if (page != 0 && page * pageSize >= data.size) page--
-        val byPage = data.splitByPage(pageSize, page)
-        for (i in 0 until pageSize) {
-            val displayable = byPage.getOrNull(i)
-            // 不在列表中的设置为空
-            if (displayable == null) {
-                menu.inv.setItem(zone2menu(i)!!, emptyItem)
-                continue
-            }
-            // 更新图标
-            displayable.update()
-            // 更新菜单物品
-            menu.inv.setItem(zone2menu(i)!!, displayable.item)
-        }
-    }
+            var waitForTake = planTake
+            RuntimeServices.messages.debug { "Player ${player.name} plans to take ${info.origin.type}x${planTake} from trashcan (remain: ${info.amount - planTake})" }
+            val maxStackSize = info.origin.type.maxStackSize
+            for (i in (0 until 36)) {
+                if (waitForTake == 0) break
+                require(waitForTake > 0)
 
-    override fun onClick(menuIndex: Int, zoneIndex: Int, itemIndex: Int, event: InventoryClickEvent): Boolean {
-        val player = event.whoClicked as Player
-        val info = data.getOrNull(itemIndex) ?: return true
-        // 计划拿取的物品数量
-        val planTake = when (event.click) {
-            // 左键 拿一个
-            ClickType.LEFT, ClickType.DOUBLE_CLICK -> 1
-            // shift + 左键 拿一组
-            ClickType.SHIFT_LEFT -> info.item.maxStackSize
-            // 右键 拿一半
-            ClickType.RIGHT -> max(min(info.item.maxStackSize / 2, info.amount / 2), 1)
-            // 其他点击方式 不拿
-            else -> {
-                player.playSound(player.location, Sound.ENTITY_BLAZE_DEATH, 1F, 1F)
-                return true
-            }
-        }.let { min(it, info.amount) }
-
-        // 要拿取的物品数量
-        var waitForTake = planTake
-        RuntimeServices.messages.debug { "Player ${player.name} plans to take ${info.origin.type}x${planTake} from trashcan (remain: ${info.amount - planTake})" }
-        val maxStackSize = info.origin.type.maxStackSize
-        // 遍历背包
-        for (i in (0 until 36)) {
-            if (waitForTake == 0) break
-            require(waitForTake > 0)
-
-            val item = player.inventory.getItem(i)
-            // 空槽位
-            if (item == null || item.type == Material.AIR) {
-                val count = min(waitForTake, maxStackSize)
+                val item = player.inventory.getItem(i)
+                if (item == null || item.type == Material.AIR) {
+                    val count = min(waitForTake, maxStackSize)
+                    waitForTake -= count
+                    player.inventory.setItem(i, info.origin.clone().apply { amount = count })
+                    continue
+                }
+                if (!item.isSimilar(info.origin)) continue
+                if (item.amount >= maxStackSize) continue
+                val count = min(waitForTake, maxStackSize - item.amount)
                 waitForTake -= count
-                player.inventory.setItem(i, info.origin.clone().apply { amount = count })
-                continue
+                player.inventory.setItem(i, item.clone().apply { amount += count })
             }
-            // 类型不一致
-            if (!item.isSimilar(info.origin)) continue
-            // full stack
-            if (item.amount >= maxStackSize) continue
-            // 同类型合并
-            val count = min(waitForTake, maxStackSize - item.amount)
-            waitForTake -= count
-            player.inventory.setItem(i, item.clone().apply { amount += count })
-        }
 
-        // 此时total的数量是info中剩余物品的数量
+            val totalTake = planTake - waitForTake
+            RuntimeServices.messages.debug { "Player ${player.name} took ${info.origin.type}x${totalTake} from trashcan (remain: ${info.amount - totalTake})" }
 
-        // 所有拿取的数量
-        val totalTake = planTake - waitForTake
-        RuntimeServices.messages.debug { "Player ${player.name} took ${info.origin.type}x${totalTake} from trashcan (remain: ${info.amount - totalTake})" }
+            info.amount -= totalTake
+            require(info.amount >= 0)
 
-        // 从垃圾桶中移除拿取的部分
-        info.amount -= totalTake
-        require(info.amount >= 0)
+            if (info.amount == 0) {
+                Trashcan.trashData.remove(info.origin.sign())
+                Trashcan.trashValues.removeAt(itemIndex)
+            }
 
-        // 拿取了全部物品
-        if (info.amount == 0) {
-            Trashcan.trashData.remove(info.origin.sign())
-            Trashcan.trashValues.removeAt(itemIndex)
-        }
+            Trashcan.update()
+            true
+        },
+    )
 
-        // 更新垃圾桶
-        Trashcan.update()
-        return true
+    val hasPrev get() = pager.hasPrev
+    val hasNext get() = pager.hasNext
+    val page get() = pager.page
+
+    fun prevPage() = pager.prevPage()
+    fun nextPage() = pager.nextPage()
+
+    fun update() {
+        if (pager.page != 0 && pager.page * 45 >= data.size) pager.prevPage()
+        pager.render(menu.inventory)
     }
 
     fun onClickSelfInv(event: InventoryClickEvent) {
@@ -110,42 +90,29 @@ class TrashcanZone(
         event.isCancelled = true
         val clicked = event.currentItem
         if (clicked == null || clicked.type == Material.AIR) return
-        // 放入的物品数量
         val count = when (event.click) {
-            // 左键 放入一个
             ClickType.LEFT, ClickType.DOUBLE_CLICK -> 1
-            // shift + 左键 放入全部
             ClickType.SHIFT_LEFT -> clicked.amount
-            // 右键 放入一半
             ClickType.RIGHT -> max(clicked.amount / 2, 1)
 
-            // 其他点击方式 不放
             else -> {
                 player.playSound(player.location, Sound.ENTITY_BLAZE_DEATH, 1F, 1F)
                 return
             }
         }
         RuntimeServices.messages.debug { "Player ${player.name} deposited ${clicked.type}x${count} into trashcan (remain: ${clicked.amount - count})" }
-        // 全部放入
         if (count == clicked.amount) {
             event.currentItem = emptyItem
             Trashcan.addItem(clicked)
             Trashcan.update()
             return
         }
-        // 放入指定数量的
         clicked.amount -= count
         event.currentItem = clicked
         Trashcan.addItem(clicked.clone().apply { amount = count })
         Trashcan.update()
     }
 
-    /**
-     * shift将选择的ItemStack全部放入垃圾桶
-     *
-     * @param clicked 点击的物品
-     * @return
-     */
     fun onShiftPutin(clicked: ItemStack, event: InventoryClickEvent) {
         if (clicked.type == Material.AIR) return
         Trashcan.addItem(clicked)
