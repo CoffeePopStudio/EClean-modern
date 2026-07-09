@@ -1,6 +1,7 @@
 package top.e404.eclean.lang
 
 import org.bukkit.command.CommandSender
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import top.e404.eclean.PL
 import java.io.File
@@ -41,11 +42,11 @@ object MLang {
         flatten(yaml, "")
     }
 
-    private fun flatten(section: YamlConfiguration, prefix: String) {
+    private fun flatten(section: ConfigurationSection, prefix: String) {
         for (key in section.getKeys(false)) {
             val fullKey = if (prefix.isEmpty()) key else "$prefix.$key"
             val value = section.get(key)
-            if (value is YamlConfiguration) {
+            if (value is ConfigurationSection) {
                 flatten(value, fullKey)
             } else {
                 cache[fullKey] = value.toString()
