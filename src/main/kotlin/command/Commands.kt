@@ -71,7 +71,17 @@ object Commands : CommandExecutor, TabCompleter {
     }
 
     private fun sendUsage(sender: CommandSender) {
-        sender.sendMessage(MLang["command.usage.stats"])
+        val keys = listOf(
+            "command.usage.debug",
+            "command.usage.reload",
+            "command.usage.trash",
+            "command.usage.players",
+            "command.usage.show",
+            "command.usage.stats",
+            "command.usage.entity",
+            "command.usage.clean",
+        )
+        for (key in keys) RuntimeServices.messages.send(sender, MLang[key])
     }
 
     private fun handleDebug(sender: CommandSender) {
@@ -106,7 +116,7 @@ object Commands : CommandExecutor, TabCompleter {
 
         when (filteredArgs.size) {
             1 -> RuntimeServices.cleanupCoordinator.cleanNow(dryRun = dryRun) {
-                if (dryRun) RuntimeServices.messages.send(sender, "&aPreview complete — no entities were removed")
+                if (dryRun) RuntimeServices.messages.send(sender, "<green>Preview complete — no entities were removed</green>")
             }
             2 -> when (filteredArgs[1].lowercase()) {
                 "e", "entity" -> {
@@ -114,7 +124,7 @@ object Commands : CommandExecutor, TabCompleter {
                         LivingCleanupService().cleanAllWorlds(dryRun = true) { results ->
                             val total = results.sumOf { it.total }
                             val cleaned = results.sumOf { it.cleaned }
-                            RuntimeServices.messages.send(sender, "&aPreview — Living: &6$cleaned&a/$total entities across &6${results.size}&a worlds")
+                            RuntimeServices.messages.send(sender, "<green>Preview — Living: <gold>$cleaned</gold>/<gold>$total</gold> entities across <gold>${results.size}</gold> worlds</green>")
                         }
                     } else { cleanLiving() }
                 }
@@ -123,14 +133,14 @@ object Commands : CommandExecutor, TabCompleter {
                         DropCleanupService().cleanAllWorlds(dryRun = true) { results ->
                             val total = results.sumOf { it.total }
                             val cleaned = results.sumOf { it.cleaned }
-                            RuntimeServices.messages.send(sender, "&aPreview — Drop: &6$cleaned&a/$total items across &6${results.size}&a worlds")
+                            RuntimeServices.messages.send(sender, "<green>Preview — Drop: <gold>$cleaned</gold>/<gold>$total</gold> items across <gold>${results.size}</gold> worlds</green>")
                         }
                     } else { cleanDrop() }
                 }
                 "c", "chunk" -> {
                     if (dryRun) {
                         ChunkDensityScanner().cleanAllWorlds(dryRun = true) { result ->
-                            RuntimeServices.messages.send(sender, "&aPreview — Chunk density: &6${result.cleaned}&a entities across &6${result.denseEntries.size}&a dense regions")
+                            RuntimeServices.messages.send(sender, "<green>Preview — Chunk density: <gold>${result.cleaned}</gold> entities across <gold>${result.denseEntries.size}</gold> dense regions</green>")
                         }
                     } else { cleanDenseEntities() }
                 }

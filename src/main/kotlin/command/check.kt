@@ -11,13 +11,13 @@ import top.e404.eclean.util.formatAsConst
 fun CommandSender.sendWorldStats(worldName: String) {
     val world = Bukkit.getWorld(worldName)
     if (world == null) {
-        RuntimeServices.messages.send(this, "&c不存在名为&e$worldName&c的世界")
+        RuntimeServices.messages.send(this, "<red>不存在名为<yellow>$worldName</yellow>的世界</red>")
         return
     }
     val service = WorldStatsService()
     service.collectWorldStats(worldName) { result ->
         if (result == null) {
-            RuntimeServices.messages.send(this, "&c收集世界统计信息失败")
+            RuntimeServices.messages.send(this, "<red>收集世界统计信息失败</red>")
             return@collectWorldStats
         }
         if (result.totalEntities == 0) {
@@ -47,7 +47,7 @@ fun CommandSender.sendWorldStats(worldName: String) {
 fun CommandSender.sendEntityStats(worldName: String, typeName: String, min: Int = 0) {
     val world = Bukkit.getWorld(worldName)
     if (world == null) {
-        RuntimeServices.messages.send(this, "&c不存在名为&e${worldName}&c的世界")
+        RuntimeServices.messages.send(this, "<red>不存在名为<yellow>$worldName</yellow>的世界</red>")
         return
     }
     val type = try {
@@ -81,7 +81,7 @@ fun CommandSender.sendEntityStats(worldName: String, typeName: String, min: Int 
 }
 
 private fun Int.withColor() = when {
-    this > 60 -> "&c$this"
-    this > 30 -> "&e$this"
-    else -> "&a$this"
+    this > 60 -> "<red>$this</red>"
+    this > 30 -> "<yellow>$this</yellow>"
+    else -> "<green>$this</green>"
 }
