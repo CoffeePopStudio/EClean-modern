@@ -4,6 +4,9 @@ import top.e404.eclean.clean.cleanDenseEntities
 import top.e404.eclean.clean.cleanDrop
 import top.e404.eclean.clean.cleanLiving
 import top.e404.eclean.config.Config
+import top.e404.eclean.feature.cleanup.chunk.ChunkDensityScanner
+import top.e404.eclean.feature.cleanup.drop.DropCleanupService
+import top.e404.eclean.feature.cleanup.living.LivingCleanupService
 import top.e404.eclean.service.StatusSnapshotService
 import top.e404.eclean.app.MessageService
 
@@ -11,18 +14,34 @@ class CleanupCoordinator(
     private val messages: MessageService,
     private val snapshots: StatusSnapshotService,
 ) {
-    fun cleanNow(onComplete: (() -> Unit)? = null) {
-        messages.debug { "Full cleanup triggered via CleanupCoordinator" }
-        cleanDrop(announce = true) {
-            cleanLiving(announce = true) {
-                cleanDenseEntities(announce = true) {
-                    snapshots.updateCleanup {
-                        it.copy(
-                            elapsedSeconds = 0,
-                            remainingSeconds = Config.current.cleanup.intervalSeconds,
-                        )
+    fun cleanNow(
+        dryRun: Boolean = false,
+        worldName: String? = null,
+        onComplete: (() -> Unit)? = null,
+    ) {
+        messages.debug {
+            if (dryRun) "Dry-run cleanup triggered via CleanupCoordinator" else "Full cleanup triggered via CleanupCoordinator"
+        }
+        if (worldName != null) {
+            DropCleanupService().cleanWorld(worldName, dryRun = dryRun) { _ ->
+                LivingCleanupService().cleanWorld(worldName, dryRun = dryRun) { _ ->
+                    ChunkDensityScanner().cleanWorld(worldName, dryRun = dryRun) { _ ->
+                        onComplete?.invoke()
                     }
-                    onComplete?.invoke()
+                }
+            }
+        } else {
+            cleanDrop(announce = !dryRun, dryRun = dryRun) {
+                cleanLiving(announce = !dryRun, dryRun = dryRun) {
+                    cleanDenseEntities(announce = !dryRun, dryRun = dryRun) {
+                        snapshots.updateCleanup {
+                            it.copy(
+                                elapsedSeconds = 0,
+                                remainingSeconds = Config.current.cleanup.intervalSeconds,
+                            )
+                        }
+                        onComplete?.invoke()
+                    }
                 }
             }
         }

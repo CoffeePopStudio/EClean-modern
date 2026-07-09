@@ -15,7 +15,7 @@ private fun resolveLivingService(): LivingCleanupService = LivingCleanupService(
 var lastLiving = 0
     private set
 
-fun cleanLiving(announce: Boolean = true, onComplete: ((Int) -> Unit)? = null) {
+fun cleanLiving(announce: Boolean = true, dryRun: Boolean = false, onComplete: ((Int) -> Unit)? = null) {
     if (!livingCfg.enabled) {
         RuntimeServices.messages.debug { "Living entity cleanup is disabled" }
         onComplete?.invoke(0)
@@ -28,7 +28,7 @@ fun cleanLiving(announce: Boolean = true, onComplete: ((Int) -> Unit)? = null) {
     RuntimeServices.messages.debug { if (livingCfg.settings.cleanMounted) "Clean mounted entities" else "Skip mounted entities" }
 
     val time = System.currentTimeMillis()
-    service.cleanAllWorlds { results ->
+    service.cleanAllWorlds(dryRun = dryRun) { results ->
         val elapsed = System.currentTimeMillis() - time
         lastLiving = results.sumOf { it.cleaned }
         RuntimeServices.statusSnapshots.updateCleanup { it.copy(lastLiving = lastLiving) }

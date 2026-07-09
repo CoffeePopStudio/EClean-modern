@@ -15,7 +15,7 @@ private fun resolveDropService(): DropCleanupService = DropCleanupService()
 var lastDrop = 0
     private set
 
-fun cleanDrop(announce: Boolean = true, onComplete: ((Int) -> Unit)? = null) {
+fun cleanDrop(announce: Boolean = true, dryRun: Boolean = false, onComplete: ((Int) -> Unit)? = null) {
     if (!dropCfg.enabled) {
         RuntimeServices.messages.debug { "Drop cleanup is disabled" }
         onComplete?.invoke(0)
@@ -27,7 +27,7 @@ fun cleanDrop(announce: Boolean = true, onComplete: ((Int) -> Unit)? = null) {
     RuntimeServices.messages.debug { if (dropCfg.protectWrittenBook) "Protect written books" else "Remove written books" }
 
     val time = System.currentTimeMillis()
-    service.cleanAllWorlds { results ->
+    service.cleanAllWorlds(dryRun = dryRun) { results ->
         val elapsed = System.currentTimeMillis() - time
         lastDrop = results.sumOf { it.cleaned }
         RuntimeServices.statusSnapshots.updateCleanup { it.copy(lastDrop = lastDrop) }

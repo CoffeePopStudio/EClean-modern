@@ -14,7 +14,7 @@ class ChunkDensityScanner(
     private val cleaner: ChunkDensityCleaner = ChunkDensityCleaner(),
     private val coordinator: ChunkTaskCoordinator = ChunkTaskCoordinator(),
 ) {
-    fun cleanAllWorlds(onComplete: (ChunkDensityResult) -> Unit) {
+    fun cleanAllWorlds(dryRun: Boolean = false, onComplete: (ChunkDensityResult) -> Unit) {
         val worldNames = planner.planWorldNames()
         val rule = ChunkDensityRule.fromConfig(Config.current.chunkDensity)
         if (worldNames.isEmpty()) {
@@ -25,7 +25,7 @@ class ChunkDensityScanner(
         val dense = mutableListOf<ChunkDensityEntry>()
         val pending = AtomicInteger(worldNames.size)
         worldNames.forEach { name ->
-            cleanWorld(name, rule, onWorldComplete = { result ->
+            cleanWorld(name, rule, dryRun = dryRun, onWorldComplete = { result ->
                 cleaned.addAndGet(result.cleaned)
                 synchronized(dense) { dense += result.denseEntries }
                 if (pending.decrementAndGet() == 0) {
@@ -38,6 +38,7 @@ class ChunkDensityScanner(
     fun cleanWorld(
         worldName: String,
         rule: ChunkDensityRule = ChunkDensityRule.fromConfig(Config.current.chunkDensity),
+        dryRun: Boolean = false,
         onWorldComplete: (ChunkDensityResult) -> Unit = {},
     ) {
         val world = Bukkit.getWorld(worldName)
@@ -57,7 +58,7 @@ class ChunkDensityScanner(
             resolveWorld = { Bukkit.getWorld(it) },
             perChunk = { w, ref ->
                 val chunk = w.getChunkAt(ref.x, ref.z)
-                val report = cleanChunk(chunk, rule)
+                val report = cleanChunk(chunk, rule, dryRun)
                 cleaned.addAndGet(report.cleaned)
                 synchronized(dense) { dense += report.denseEntries }
             },
@@ -101,14 +102,20 @@ class ChunkDensityScanner(
         }
     }
 
-    private fun cleanChunk(chunk: org.bukkit.Chunk, rule: ChunkDensityRule): ChunkDensityChunkReport {
+    private fun cleanChunk(chunk: org.bukkit.Chunk, rule: ChunkDensityRule, dryRun: Boolean = false): ChunkDensityChunkReport {
         val snapshot = snapshotter.snapshot(chunk)
         if (snapshot.entities.isEmpty()) {
             return ChunkDensityChunkReport(cleaned = 0, denseEntries = emptyList())
         }
         val decision = policy.decide(snapshot, rule)
-        val report = cleaner.clean(chunk, decision)
-        RuntimeServices.messages.debug { "Dense cleanup complete in chunk ${chunk.x},${chunk.z} (${report.cleaned} removed)" }
-        return report
+        if (!dryRun) {
+            val report = cleaner.clean(chunk, decision)
+            RuntimeServices.messages.debug { "Dense cleanup complete in chunk ${chunk.x},${chunk.z} (${report.cleaned} removed)" }
+            return report
+        } else {
+            val wouldClean = decision.denseEntries.sumOf { it.amount }
+            RuntimeServices.messages.debug { "Dry-run dense cleanup in chunk ${chunk.x},${chunk.z} (${wouldClean} would be removed)" }
+            return ChunkDensityChunkReport(cleaned = wouldClean, denseEntries = decision.denseEntries)
+        }
     }
 }

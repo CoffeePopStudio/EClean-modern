@@ -7,6 +7,7 @@ class DropCleanupPlanner {
     fun planWorldNames(): List<String> {
         val disabledWorlds = Config.current.drop.disabledWorlds
         return Bukkit.getWorlds()
+            .filterNot { Config.current.perWorld.worlds[it.name]?.enabled == false }
             .filterNot { world -> disabledWorlds.any { regex -> world.name matches regex } }
             .map { it.name }
     }

@@ -101,26 +101,53 @@ object Commands : CommandExecutor, TabCompleter {
     }
 
     private fun handleClean(sender: CommandSender, args: Array<out String>) {
-        when (args.size) {
-            1 -> Clean.clean()
-            2 -> when (args[1].lowercase()) {
-                "e", "entity" -> cleanLiving()
-                "d", "drop" -> cleanDrop()
-                "c", "chunk" -> cleanDenseEntities()
+        val dryRun = args.contains("--preview")
+        val filteredArgs = args.filter { it != "--preview" }.toTypedArray()
+
+        when (filteredArgs.size) {
+            1 -> RuntimeServices.cleanupCoordinator.cleanNow(dryRun = dryRun) {
+                if (dryRun) RuntimeServices.messages.send(sender, "&aPreview complete — no entities were removed")
+            }
+            2 -> when (filteredArgs[1].lowercase()) {
+                "e", "entity" -> {
+                    if (dryRun) {
+                        LivingCleanupService().cleanAllWorlds(dryRun = true) { results ->
+                            val total = results.sumOf { it.total }
+                            val cleaned = results.sumOf { it.cleaned }
+                            RuntimeServices.messages.send(sender, "&aPreview — Living: &6$cleaned&a/$total entities across &6${results.size}&a worlds")
+                        }
+                    } else { cleanLiving() }
+                }
+                "d", "drop" -> {
+                    if (dryRun) {
+                        DropCleanupService().cleanAllWorlds(dryRun = true) { results ->
+                            val total = results.sumOf { it.total }
+                            val cleaned = results.sumOf { it.cleaned }
+                            RuntimeServices.messages.send(sender, "&aPreview — Drop: &6$cleaned&a/$total items across &6${results.size}&a worlds")
+                        }
+                    } else { cleanDrop() }
+                }
+                "c", "chunk" -> {
+                    if (dryRun) {
+                        ChunkDensityScanner().cleanAllWorlds(dryRun = true) { result ->
+                            RuntimeServices.messages.send(sender, "&aPreview — Chunk density: &6${result.cleaned}&a entities across &6${result.denseEntries.size}&a dense regions")
+                        }
+                    } else { cleanDenseEntities() }
+                }
                 "t", "trash" -> cleanTrash()
                 else -> sendUsage(sender)
             }
             3 -> {
-                val worldName = args[2]
-                when (args[1].lowercase()) {
-                    "e", "entity" -> LivingCleanupService().cleanWorld(worldName) { result ->
-                        RuntimeServices.messages.send(sender, MLang["command.clean_done", "count" to "(${result.cleaned}/${result.total})"])
+                val worldName = filteredArgs[2]
+                when (filteredArgs[1].lowercase()) {
+                    "e", "entity" -> LivingCleanupService().cleanWorld(worldName, dryRun = dryRun) { result ->
+                        RuntimeServices.messages.send(sender, "Cleanup: ${result.cleaned}/${result.total}")
                     }
-                    "d", "drop" -> DropCleanupService().cleanWorld(worldName) { result ->
-                        RuntimeServices.messages.send(sender, MLang["command.clean_done", "count" to "(${result.cleaned}/${result.total})"])
+                    "d", "drop" -> DropCleanupService().cleanWorld(worldName, dryRun = dryRun) { result ->
+                        RuntimeServices.messages.send(sender, "Cleanup: ${result.cleaned}/${result.total}")
                     }
-                    "c", "chunk" -> ChunkDensityScanner().cleanWorld(worldName) { result ->
-                        RuntimeServices.messages.send(sender, MLang["command.clean_done", "count" to result.cleaned])
+                    "c", "chunk" -> ChunkDensityScanner().cleanWorld(worldName, dryRun = dryRun) { result ->
+                        RuntimeServices.messages.send(sender, "Cleanup: ${result.cleaned}")
                     }
                     else -> sendUsage(sender)
                 }

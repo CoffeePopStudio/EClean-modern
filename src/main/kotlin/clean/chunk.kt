@@ -18,7 +18,7 @@ private val chunkAlertService by lazy { ChunkAlertService() }
 var lastChunk = 0
     private set
 
-fun cleanDenseEntities(announce: Boolean = true, onComplete: ((Int) -> Unit)? = null) {
+fun cleanDenseEntities(announce: Boolean = true, dryRun: Boolean = false, onComplete: ((Int) -> Unit)? = null) {
     if (!chunkCfg.enabled) {
         RuntimeServices.messages.debug { "Chunk density cleanup is disabled" }
         onComplete?.invoke(0)
@@ -31,7 +31,7 @@ fun cleanDenseEntities(announce: Boolean = true, onComplete: ((Int) -> Unit)? = 
     RuntimeServices.messages.debug { if (chunkCfg.settings.cleanMounted) "Clean mounted entities" else "Skip mounted entities" }
 
     val time = System.currentTimeMillis()
-    scanner.cleanAllWorlds { result ->
+    scanner.cleanAllWorlds(dryRun = dryRun) { result ->
         val elapsed = System.currentTimeMillis() - time
         lastChunk = result.cleaned
         RuntimeServices.statusSnapshots.updateCleanup { it.copy(lastChunk = lastChunk) }

@@ -11,6 +11,7 @@ class ChunkScanPlanner {
         if (includeDisabled) return worlds.map { it.name }
         val disabledWorlds = Config.current.chunkDensity.disabledWorlds
         return worlds
+            .filterNot { Config.current.perWorld.worlds[it.name]?.enabled == false }
             .filterNot { world -> disabledWorlds.any { regex -> world.name matches regex } }
             .map { it.name }
     }

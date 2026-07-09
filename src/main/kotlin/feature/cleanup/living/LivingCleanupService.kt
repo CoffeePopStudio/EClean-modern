@@ -13,7 +13,7 @@ class LivingCleanupService(
     private val executor: LivingCleanupExecutor = LivingCleanupExecutor(),
     private val coordinator: ChunkTaskCoordinator = ChunkTaskCoordinator(),
 ) {
-    fun cleanAllWorlds(onComplete: (List<LivingCleanupResult>) -> Unit) {
+    fun cleanAllWorlds(dryRun: Boolean = false, onComplete: (List<LivingCleanupResult>) -> Unit) {
         val worldNames = planner.planWorldNames()
         if (worldNames.isEmpty()) {
             Schedulers.runGlobal { onComplete(emptyList()) }
@@ -22,14 +22,14 @@ class LivingCleanupService(
         val results = mutableListOf<LivingCleanupResult>()
         val pending = AtomicInteger(worldNames.size)
         worldNames.forEach { name ->
-            cleanWorld(name) { result ->
+            cleanWorld(name, dryRun = dryRun) { result ->
                 synchronized(results) { results += result }
                 if (pending.decrementAndGet() == 0) onComplete(results.toList())
             }
         }
     }
 
-    fun cleanWorld(worldName: String, onComplete: (LivingCleanupResult) -> Unit) {
+    fun cleanWorld(worldName: String, dryRun: Boolean = false, onComplete: (LivingCleanupResult) -> Unit) {
         val world = Bukkit.getWorld(worldName)
         if (world == null) {
             Schedulers.runGlobal { onComplete(LivingCleanupResult(0, 0)) }
@@ -53,7 +53,8 @@ class LivingCleanupService(
                 val collection = collector.collectFromChunk(chunk)
                 if (collection.candidates.isEmpty()) return@dispatchToChunks
                 val decision = policy.decide(collection, rule, matchers)
-                cleaned.addAndGet(executor.execute(collection, decision))
+                if (!dryRun) cleaned.addAndGet(executor.execute(collection, decision))
+                else cleaned.addAndGet(decision.total)
                 total.addAndGet(decision.total)
                 synchronized(remaining) { remaining += decision.remainingCandidates }
             },

@@ -15,7 +15,8 @@ class ConfigLoaderTest {
             dropText = "enabled: true",
             livingText = "enabled: true",
             chunkDensityText = "enabled: true",
-            trashcanText = "enabled: true"
+            trashcanText = "enabled: true",
+            perWorldText = "worlds: {}"
         )
 
         assertTrue(bundle.global.debug)
