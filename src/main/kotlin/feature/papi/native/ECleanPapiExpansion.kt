@@ -1,14 +1,18 @@
-package top.e404.eclean.feature.papi
+package top.e404.eclean.feature.papi.native
 
+import me.clip.placeholderapi.expansion.PlaceholderExpansion
+import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
-import org.bukkit.entity.Player
-import top.e404.eclean.PL
 import top.e404.eclean.app.RuntimeServices
-import top.e404.eplugin.hook.placeholderapi.PapiExpansion
 import top.e404.eclean.util.parseSecondAsDuration
 
-open class ECleanPapiExpansion : PapiExpansion(PL, "eclean") {
-    override fun onPlaceholderRequest(player: Player?, params: String) = onRequest(player, params)
+class ECleanPapiExpansion : PlaceholderExpansion() {
+    override fun getIdentifier(): String = "eclean"
+    override fun getAuthor(): String = "404E"
+    override fun getVersion(): String = "0.1.7"
+
+    override fun canRegister(): Boolean =
+        Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")
 
     override fun onRequest(player: OfflinePlayer?, params: String): String? {
         val snapshot = RuntimeServices.statusSnapshots.current()
@@ -23,16 +27,4 @@ open class ECleanPapiExpansion : PapiExpansion(PL, "eclean") {
             else -> null
         }
     }
-
-    private val placeholders = mutableListOf(
-        "%eclean_before_next%",
-        "%eclean_before_next_formatted%",
-        "%eclean_last_drop%",
-        "%eclean_last_living%",
-        "%eclean_last_chunk%",
-        "%eclean_trashcan_countdown%",
-        "%eclean_trashcan_countdown_formatted%",
-    )
-
-    override fun getPlaceholders() = placeholders
 }

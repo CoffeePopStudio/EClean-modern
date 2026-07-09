@@ -7,12 +7,10 @@ import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.command.Commands
 import top.e404.eclean.config.Config
-import top.e404.eclean.lang.MLang
-import top.e404.eclean.hook.HookManager
-import top.e404.eclean.hook.PapiHook
+import top.e404.eclean.lang.MLangHost
+import top.e404.eclean.feature.papi.native.ECleanPapiExpansion
 import top.e404.eclean.listener.DespawnListener
 import top.e404.eclean.menu.MenuManager
-import top.e404.eclean.papi.Papi
 import top.e404.eclean.update.Update
 import top.e404.eplugin.EPlugin
 import java.io.File
@@ -48,7 +46,7 @@ open class EClean : EPlugin {
         set(value) {
             Config.update { it.copy(global = it.global.copy(debug = value)) }
         }
-    override val langManager by lazy { MLang }
+    override val langManager get() = MLangHost
 
     init {
         PL = this
@@ -60,11 +58,11 @@ open class EClean : EPlugin {
         RuntimeServices.load()
         Commands.register()
         Update.register()
-        HookManager.register()
         MenuManager.register()
         Bukkit.getPluginManager().registerEvents(DespawnListener, this)
         Bukkit.getPluginManager().registerEvents(Trashcan, this)
-        if (PapiHook.enable) Papi.register()
+        val papi = ECleanPapiExpansion()
+        if (papi.canRegister()) papi.register()
         for (line in logo) RuntimeServices.messages.info(line.replace(Regex("<[^>]+>"), ""))
         RuntimeServices.messages.info("EClean-Modern enabled. Author: 404E")
     }
@@ -72,7 +70,6 @@ open class EClean : EPlugin {
     override fun onDisable() {
         RuntimeServices.shutdown()
         MenuManager.shutdown()
-        if (PapiHook.enable) Papi.unregister()
         RuntimeServices.messages.info("EClean-Modern disabled")
     }
 }
