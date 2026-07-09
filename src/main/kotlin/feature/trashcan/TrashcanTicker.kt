@@ -34,4 +34,9 @@ class TrashcanTicker(
         task?.cancel()
         task = null
     }
+
+    fun restart() {
+        stop()
+        start()
+    }
 }

@@ -20,10 +20,10 @@ import top.e404.eclean.service.PlayerTeleportService
 import top.e404.eclean.service.StatusSnapshotService
 import top.e404.eclean.service.TemporaryReturnEvent
 import top.e404.eclean.service.TemporaryReturnService
-import top.e404.eplugin.EPlugin
+import top.e404.eclean.EClean
 
 object RuntimeServices {
-    lateinit var plugin: EPlugin
+    lateinit var plugin: EClean
         private set
 
     lateinit var messages: MessageService
@@ -62,7 +62,7 @@ object RuntimeServices {
     lateinit var trashcanTicker: TrashcanTicker
         private set
 
-    fun init(plugin: EPlugin) {
+    fun init(plugin: EClean) {
         this.plugin = plugin
         messages = MessageService()
         val isFolia = FoliaDetector.isFolia()

@@ -8,11 +8,8 @@ plugins {
 }
 
 group = "top.e404"
-version = "0.1.7"
-val epluginVer = "1.4.0-SNAPSHOT"
+version = "0.1.8"
 val paper = "io.papermc.paper:paper-api:26.1.2.build.+"
-
-fun eplugin(module: String, version: String = epluginVer) = "top.e404.eplugin:eplugin-$module:$version"
 
 repositories {
     mavenLocal()
@@ -27,10 +24,6 @@ repositories {
 dependencies {
     // paper / folia-compatible api surface
     compileOnly(paper)
-    // eplugin
-    implementation(eplugin("core"))
-    implementation(eplugin("menu"))
-    implementation(eplugin("hook-placeholderapi"))
     implementation("com.charleskorn.kaml:kaml:0.104.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.11.0")
     // placeholderAPI
@@ -62,7 +55,6 @@ tasks {
 
         relocate("org.bstats", "top.e404.eclean.relocate.bstats")
         relocate("kotlin", "top.e404.eclean.relocate.kotlin")
-        relocate("top.e404.eplugin", "top.e404.eclean.relocate.eplugin")
         relocate("com.charleskorn.kaml", "top.e404.eclean.relocate.kaml")
         exclude("META-INF/**")
 

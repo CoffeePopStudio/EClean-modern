@@ -1,29 +1,35 @@
 package top.e404.eclean
 
+import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.plugin.PluginDescriptionFile
+import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.plugin.java.JavaPluginLoader
 import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.command.Commands
 import top.e404.eclean.config.Config
-import top.e404.eclean.lang.MLangHost
+import top.e404.eclean.lang.MLang
 import top.e404.eclean.listener.DespawnListener
 import top.e404.eclean.menu.MenuManager
 import top.e404.eclean.update.Update
-import top.e404.eplugin.EPlugin
 import java.io.File
 
-open class EClean : EPlugin {
+class EClean : JavaPlugin {
     companion object {
-        val logo = listOf(
-            "<gold> ______     ______     __         ______     ______     __   __   ",
-            "<gold>/\\  ___\\   /\\  ___\\   /\\ \\       /\\  ___\\   /\\  __ \\   /\\ \"-.\\ \\  ",
-            "<gold>\\ \\  __\\   \\ \\ \\____  \\ \\ \\____  \\ \\  __\\   \\ \\  __ \\  \\ \\ \\-.  \\ ",
-            "<gold> \\ \\_____\\  \\ \\_____\\  \\ \\_____\\  \\ \\_____\\  \\ \\_\\ \\_\\  \\ \\_\\\\\"\\_\\\"",
-            "<gold>  \\/_____/   \\/_____/   \\/_____/   \\/_____/   \\/_/\\/_/   \\/_/ \\/_/",
-        )
+        @Volatile
+        var unit = false
     }
+
+    val debugPrefix get() = MLang["debug_prefix"]
+    val prefix get() = MLang["prefix"]
+    val debuggers = mutableSetOf<String>()
+
+    var debug: Boolean
+        get() = Config.current.global.debug
+        set(value) {
+            Config.update { it.copy(global = it.global.copy(debug = value)) }
+        }
 
     @Suppress("UNUSED")
     constructor() : super()
@@ -33,26 +39,17 @@ open class EClean : EPlugin {
         loader: JavaPluginLoader,
         description: PluginDescriptionFile,
         dataFolder: File,
-        file: File
+        file: File,
     ) : super(loader, description, dataFolder, file)
-
-    override val debugPrefix get() = langManager["debug_prefix"]
-    override val prefix get() = langManager["prefix"]
-
-    override val bstatsId = 14312
-    override var debug: Boolean
-        get() = Config.current.global.debug
-        set(value) {
-            Config.update { it.copy(global = it.global.copy(debug = value)) }
-        }
-    override val langManager get() = MLangHost
 
     init {
         PL = this
     }
 
     override fun onEnable() {
-        if (!unit) bstats()
+        if (!unit) {
+            org.bstats.bukkit.Metrics(this, 14312)
+        }
         RuntimeServices.init(this)
         RuntimeServices.load()
         Commands.register()
@@ -72,7 +69,6 @@ open class EClean : EPlugin {
         } catch (_: NoClassDefFoundError) {
             logger.info("PlaceholderAPI not found, skipping PAPI expansion registration")
         }
-        for (line in logo) RuntimeServices.messages.info(line.replace(Regex("<[^>]+>"), ""))
         RuntimeServices.messages.info("EClean-Modern enabled. Author: 404E")
     }
 
@@ -83,7 +79,5 @@ open class EClean : EPlugin {
     }
 }
 
-lateinit var PL: EPlugin
+lateinit var PL: EClean
     private set
-
-internal var unit = false

@@ -17,7 +17,7 @@ import dropItems
 import resetConfig
 import updateDropConfig
 import world
-import top.e404.eplugin.util.editItemMeta
+import top.e404.eclean.ui.util.editItemMeta
 
 abstract class DropCleanTest {
 

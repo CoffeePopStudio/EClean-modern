@@ -27,7 +27,7 @@ object ConfigManager {
 
     fun loadAll(sender: CommandSender? = null) {
         snapshot = loadCandidate()
-        ConfigRuntimeApplier.apply(snapshot)
+        ConfigRuntimeApplier.apply(snapshot) // first load: apply all
         RuntimeServices.messages.debug { "Modern config snapshot loaded" }
     }
 

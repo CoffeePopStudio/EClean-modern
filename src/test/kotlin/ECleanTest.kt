@@ -24,7 +24,7 @@ class ECleanTest {
         @JvmStatic
         @BeforeAll
         fun init() {
-            unit = true
+            EClean.unit = true
             server = MockBukkit.mock()
             plugin = MockBukkit.load(EClean::class.java)
             world = server.addSimpleWorld("world")
