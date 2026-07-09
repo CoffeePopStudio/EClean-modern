@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.7] - Unreleased
+
+### Changed
+- Extracted standalone `ui/` menu framework (UiMenu, UiButton, UiPager, UiDisplayable, util) to replace all `eplugin.menu` dependencies.
+- Migrated DenseMenu and TrashcanMenu from ChestMenu/MenuButton/MenuButtonZone to UiMenu/UiButton/UiPager.
+- Replaced `EMenuManager`-based MenuManager with standalone Bukkit `Listener` registration — `List enable/disable` no longer depends on eplugin.
+- Replaced eplugin PlaceholderAPI hook (EHookManager, PlaceholderAPIHook, PapiExpansion) with native `me.clip.placeholderapi.expansion.PlaceholderExpansion`.
+- Decoupled `MLang` from `ELangManager` — now uses independent YAML loading with thin `MLangHost` shim for EPlugin compatibility only.
+- Reduced eplugin imports from 31 to 3 (`EPlugin` in EClean/RuntimeServices, `ELangManager` in MLangHost).
+
 ## [0.1.6]
 
 ### Added

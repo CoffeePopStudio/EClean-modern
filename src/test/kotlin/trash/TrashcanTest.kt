@@ -16,7 +16,7 @@ import resetConfig
 import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.clean.cleanDrop
 import top.e404.eclean.menu.MenuManager
-import top.e404.eplugin.menu.menu.InventoryMenu
+import top.e404.eclean.menu.trashcan.TrashcanMenu
 import updateDropConfig
 import updateTrashcanConfig
 import world
@@ -41,7 +41,7 @@ abstract class TrashcanTest {
     @AfterEach
     fun cleanUp() {
         player.inventory.clear()
-        MenuManager.closeMenu(player)
+        MenuManager.closeMenus()
         Trashcan.trashData.clear()
         Trashcan.trashValues.clear()
     }
@@ -97,13 +97,13 @@ abstract class TrashcanTest {
         }
     }
 
-    private fun leftClick(slot: Int): Pair<InventoryMenu, InventoryClickEvent> {
+    private fun leftClick(slot: Int): Pair<TrashcanMenu, InventoryClickEvent> {
         Trashcan.open(player)
-        val menu = MenuManager.menus[player]!!
+        val menu = MenuManager.getOpenMenu(player) as TrashcanMenu
         val inventoryClickEvent = InventoryClickEvent(
             SimpleInventoryViewMock(
                 player,
-                menu.inv,
+                menu.inventory,
                 player.inventory,
                 InventoryType.CHEST
             ),
@@ -116,13 +116,13 @@ abstract class TrashcanTest {
         return menu to inventoryClickEvent
     }
 
-    private fun rightClick(slot: Int): Pair<InventoryMenu, InventoryClickEvent> {
+    private fun rightClick(slot: Int): Pair<TrashcanMenu, InventoryClickEvent> {
         Trashcan.open(player)
-        val menu = MenuManager.menus[player]!!
+        val menu = MenuManager.getOpenMenu(player) as TrashcanMenu
         val inventoryClickEvent = InventoryClickEvent(
             SimpleInventoryViewMock(
                 player,
-                menu.inv,
+                menu.inventory,
                 player.inventory,
                 InventoryType.CHEST
             ),
@@ -135,13 +135,13 @@ abstract class TrashcanTest {
         return menu to inventoryClickEvent
     }
 
-    private fun shiftLeftClick(slot: Int): Pair<InventoryMenu, InventoryClickEvent> {
+    private fun shiftLeftClick(slot: Int): Pair<TrashcanMenu, InventoryClickEvent> {
         Trashcan.open(player)
-        val menu = MenuManager.menus[player]!!
+        val menu = MenuManager.getOpenMenu(player) as TrashcanMenu
         val inventoryClickEvent = InventoryClickEvent(
             SimpleInventoryViewMock(
                 player,
-                menu.inv,
+                menu.inventory,
                 player.inventory,
                 InventoryType.CHEST
             ),
@@ -164,7 +164,7 @@ abstract class TrashcanTest {
 
             val (menu, event) = leftClick(0)
             assert(event.isCancelled) { "玩家点击菜单时的操作应被取消\n$consoleOut" }
-            val item = menu.inv.getItem(0)
+            val item = menu.inventory.getItem(0)
             assertNotNull(item) { "拿取后菜单中应还有1个物品\n$consoleOut" }
             assert(item.type != Material.AIR) { "物品不应为空\n$consoleOut" }
             assert(Trashcan.trashValues.size == 1) { "垃圾桶中应有1种物品\n$consoleOut" }
@@ -184,7 +184,7 @@ abstract class TrashcanTest {
 
             val (menu, event) = rightClick(0)
             assert(event.isCancelled) { "玩家点击菜单时的操作应被取消\n$consoleOut" }
-            val item = menu.inv.getItem(0)
+            val item = menu.inventory.getItem(0)
             assertNotNull(item) { "菜单中物品应不为空\n$consoleOut" }
             assert(item.type == Material.STONE) { "菜单中物品应类型不变\n$consoleOut" }
             assert(Trashcan.trashValues.size == 1) { "垃圾桶中应剩余1种\n$consoleOut" }
@@ -202,7 +202,7 @@ abstract class TrashcanTest {
 
             val (menu, event) = shiftLeftClick(0)
             assert(event.isCancelled) { "玩家点击菜单时的操作应被取消\n$consoleOut" }
-            val item = menu.inv.getItem(0)
+            val item = menu.inventory.getItem(0)
             assertNotNull(item) { "菜单中物品应不为空\n$consoleOut" }
             assert(item.type == Material.STONE) { "菜单中物品应类型不变\n${Trashcan.trashValues[0]}\\n$consoleOut" }
             assert(Trashcan.trashValues.size == 1) { "垃圾桶中应剩余1种\n${Trashcan.trashValues[0]}\\n$consoleOut" }
@@ -220,7 +220,7 @@ abstract class TrashcanTest {
 
             val (menu, event) = shiftLeftClick(0)
             assert(event.isCancelled) { "玩家点击菜单时的操作应被取消\n$consoleOut" }
-            val item = menu.inv.getItem(0)
+            val item = menu.inventory.getItem(0)
             assert(item == null || item.type == Material.AIR) { "垃圾桶菜单中应没有物品\n$consoleOut" }
             assert(Trashcan.trashValues.isEmpty()) { "垃圾桶中应没有物品\n$consoleOut" }
             val playerItem = player.inventory.getItem(0)
@@ -240,7 +240,7 @@ abstract class TrashcanTest {
 
             val (menu, event) = leftClick(81)
             assert(event.isCancelled) { "玩家点击菜单时的操作应被取消\n$consoleOut" }
-            val item = menu.inv.getItem(0)
+            val item = menu.inventory.getItem(0)
             assertNotNull(item) { "菜单中物品应不为空\n$consoleOut" }
             assert(item.type == Material.STONE) { "菜单中物品应类型不变\n${Trashcan.trashValues[0]}\\n$consoleOut" }
             assert(Trashcan.trashValues.size == 1) { "垃圾桶中应剩余1种\n${Trashcan.trashValues[0]}\\n$consoleOut" }
@@ -258,7 +258,7 @@ abstract class TrashcanTest {
 
             val (menu, event) = rightClick(81)
             assert(event.isCancelled) { "玩家点击菜单时的操作应被取消\n$consoleOut" }
-            val item = menu.inv.getItem(0)
+            val item = menu.inventory.getItem(0)
             assertNotNull(item) { "菜单中物品应不为空\n$consoleOut" }
             assert(item.type == Material.STONE) { "菜单中物品应类型不变\n${Trashcan.trashValues[0]}\\n$consoleOut" }
             assert(Trashcan.trashValues.size == 1) { "垃圾桶中应剩余1种\n${Trashcan.trashValues[0]}\\n$consoleOut" }
@@ -277,7 +277,7 @@ abstract class TrashcanTest {
 
             val (menu, event) = shiftLeftClick(81)
             assert(event.isCancelled) { "玩家点击菜单时的操作应被取消\n$consoleOut" }
-            val item = menu.inv.getItem(0)
+            val item = menu.inventory.getItem(0)
             assertNotNull(item) { "菜单中物品应不为空\n$consoleOut" }
             assert(item.type == Material.STONE) { "菜单中物品应类型不变\n${Trashcan.trashValues[0]}\\n$consoleOut" }
             assert(Trashcan.trashValues.size == 1) { "垃圾桶中应剩余1种\n${Trashcan.trashValues[0]}\\n$consoleOut" }

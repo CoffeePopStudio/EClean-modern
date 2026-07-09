@@ -5,6 +5,16 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 版本规范。
 
+## [0.1.7] - 未发布
+
+### 变更
+- 提取独立 `ui/` 菜单框架（UiMenu、UiButton、UiPager、UiDisplayable、util），替换所有 `eplugin.menu` 依赖。
+- 将 DenseMenu 和 TrashcanMenu 从 ChestMenu/MenuButton/MenuButtonZone 迁移至 UiMenu/UiButton/UiPager。
+- 用独立 Bukkit `Listener` 注册替换基于 `EMenuManager` 的 MenuManager。
+- 用原生 `me.clip.placeholderapi.expansion.PlaceholderExpansion` 替换 eplugin PlaceholderAPI Hook（EHookManager、PlaceholderAPIHook、PapiExpansion）。
+- 将 `MLang` 与 `ELangManager` 解耦——现使用独立 YAML 加载，通过薄层 `MLangHost` shim 仅保证 EPlugin 兼容性。
+- eplugin import 从 31 条减至 3 条（EPlugin ×2、ELangManager ×1）。
+
 ## [0.1.6]
 
 ### 新增
