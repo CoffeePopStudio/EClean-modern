@@ -6,29 +6,32 @@ import top.e404.eclean.platform.Schedulers
 import top.e404.eclean.service.StatusSnapshotService
 
 class TrashcanTicker(
-    private val service: TrashcanService,
+    private val manager: TrashcanManager,
     private val snapshots: StatusSnapshotService,
 ) {
     private var task: ScheduledTask? = null
+
+    var countdown: Long = 0
+        private set
 
     fun start() {
         stop()
         val trashcanConfig = Config.current.trashcan
         val duration = trashcanConfig.clearIntervalSeconds ?: run {
-            service.syncCountdown(0)
+            updateCountdown(0)
             return
         }
         if (!trashcanConfig.enabled) {
-            service.syncCountdown(0)
+            updateCountdown(0)
             return
         }
-        service.syncCountdown(duration)
+        updateCountdown(duration)
         task = Schedulers.scheduleRepeatingGlobal(20, 20) {
-            val next = (service.countdown - 1).coerceAtLeast(0)
-            service.syncCountdown(next)
+            val next = (countdown - 1).coerceAtLeast(0)
+            updateCountdown(next)
             if (next <= 0L) {
-                service.syncCountdown(duration)
-                service.clearAll()
+                updateCountdown(duration)
+                manager.clearAll()
             }
         }
     }
@@ -41,5 +44,10 @@ class TrashcanTicker(
     fun restart() {
         stop()
         start()
+    }
+
+    private fun updateCountdown(value: Long) {
+        countdown = value
+        snapshots.updateTrashcanCountdown(value)
     }
 }
