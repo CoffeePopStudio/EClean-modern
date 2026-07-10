@@ -2,6 +2,7 @@ package top.e404.eclean.config
 
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
+import com.charleskorn.kaml.YamlException
 import kotlinx.serialization.DeserializationStrategy
 import top.e404.eclean.PL
 import top.e404.eclean.config.model.ChunkDensityConfig
@@ -64,6 +65,17 @@ class ConfigLoader(
     private fun <T> read(spec: ConfigFiles, serializer: DeserializationStrategy<T>): T {
         val file = File(PL.dataFolder, spec.diskName)
         val text = file.readText(Charsets.UTF_8)
-        return yaml.decodeFromString(serializer, text)
+        return try {
+            yaml.decodeFromString(serializer, text)
+        } catch (e: YamlException) {
+            PL.logger.warning { "配置文件 `${spec.diskName}` 解析失败: ${e.message}，将使用默认配置" }
+            readDefault(spec, serializer)
+        }
+    }
+
+    private fun <T> readDefault(spec: ConfigFiles, serializer: DeserializationStrategy<T>): T {
+        val defaultText = PL.getResource(spec.resourcePath)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
+            ?: error("缺少默认配置资源: ${spec.resourcePath}")
+        return yaml.decodeFromString(serializer, defaultText)
     }
 }
