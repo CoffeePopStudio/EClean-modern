@@ -1,9 +1,7 @@
 package top.e404.eclean
 
 import org.bukkit.Bukkit
-import org.bukkit.plugin.PluginDescriptionFile
 import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.plugin.java.JavaPluginLoader
 import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.command.Commands
 import top.e404.eclean.config.Config
@@ -11,7 +9,6 @@ import top.e404.eclean.lang.MLang
 import top.e404.eclean.listener.DespawnListener
 import top.e404.eclean.menu.MenuManager
 import top.e404.eclean.update.Update
-import java.io.File
 
 open class EClean : JavaPlugin {
     companion object {
@@ -31,14 +28,6 @@ open class EClean : JavaPlugin {
 
     @Suppress("UNUSED")
     constructor() : super()
-
-    @Suppress("UNUSED")
-    constructor(
-        loader: JavaPluginLoader,
-        description: PluginDescriptionFile,
-        dataFolder: File,
-        file: File,
-    ) : super(loader, description, dataFolder, file)
 
     init {
         PL = this
