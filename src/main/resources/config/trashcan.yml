@@ -1,6 +1,7 @@
 enabled: true
 collectFromDropCleanup: true
-clearIntervalSeconds: 6000
+clearIntervalSeconds: 600
+maxSlots: 54
 despawnRecovery:
   enabled: false
   disabledWorlds:

@@ -14,6 +14,7 @@ data class DespawnRecoveryConfig(
 data class TrashcanConfig(
     val enabled: Boolean = true,
     val collectFromDropCleanup: Boolean = true,
-    val clearIntervalSeconds: Long? = 6000,
+    val clearIntervalSeconds: Long? = 600,
+    val maxSlots: Int = 54,
     val despawnRecovery: DespawnRecoveryConfig = DespawnRecoveryConfig(),
 )

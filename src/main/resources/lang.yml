@@ -71,13 +71,14 @@ menu:
         <white>点击前往下一页</white>
 
 trash:
-  title: "<gold>垃圾桶, <dark_red>关闭后垃圾桶内物品无法找回</dark_red></gold>"
+  title: "<gold>共享垃圾桶 - 先到先得, 定期清空</gold>"
 
 command:
   reload_done: "<green>重载完成</green>"
   trash_disable: "<green>垃圾桶功能已被禁用</green>"
   trash_open: "<green>已打开垃圾桶</green>"
-  trash_clean_done: "<green>垃圾桶清理完成</green>"
+  trash_clean_done: "<green>垃圾桶已清空</green>"
+  trash_full: "<yellow>垃圾桶已满, 部分物品无法放入</yellow>"
   clean_done: "<green>共清理<gold>{count}</gold>个实体</green>"
   teleport:
     done: "<green>传送完成</green>"
