@@ -31,7 +31,7 @@ class TrashcanMenu(
                 TrashcanItemButton.create(store, item, ::rebuildButtons)
             )
         }
-        inventory.contents = contents
+        updateIcon()
     }
 
     override fun open(player: Player) {
@@ -61,11 +61,12 @@ class TrashcanMenu(
     }
 
     private fun saveAndClose(event: InventoryCloseEvent) {
-        val cleaned = inventory.contents.map { slot ->
-            if (slot == null || slot.type.isAir) slot
-            else TrashcanItemButton.stripLore(slot)
-        }.toTypedArray()
-        store.saveFrom(cleaned)
+        for (slot in 0 until 54) {
+            if (buttons[slot] != null) continue
+            val item = inventory.getItem(slot) ?: continue
+            if (item.type.isAir) continue
+            store.addItem(item)
+        }
         unregister()
         opened.remove(this)
     }
