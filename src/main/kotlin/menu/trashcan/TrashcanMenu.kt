@@ -8,61 +8,120 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import top.e404.eclean.PL
+import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.feature.trashcan.TrashcanItemStore
 import top.e404.eclean.feature.trashcan.TrashcanManager
 import top.e404.eclean.lang.MLang
 import top.e404.eclean.ui.UiMenu
+import top.e404.eclean.ui.UiPager
 
 class TrashcanMenu(
     private val store: TrashcanItemStore,
     private val manager: TrashcanManager,
 ) : UiMenu(PL, MLang["trash.title"], 6, false) {
 
+    private var displayData = mutableListOf<TrashcanDisplayItem>()
+    private lateinit var pager: UiPager<TrashcanDisplayItem>
+    private lateinit var prevBtn: TrashcanPrevButton
+    private lateinit var nextBtn: TrashcanNextButton
+
+    val hasPrev get() = pager.hasPrev
+    val hasNext get() = pager.hasNext
+    val currentPage get() = pager.page
+
+    fun prevPage() = pager.prevPage()
+    fun nextPage() = pager.nextPage()
+
     init {
-        rebuildButtons()
+        rebuildDisplayData()
+        pager = UiPager(
+            data = displayData,
+            pageSize = ITEM_PAGE_SIZE,
+            startSlot = 0,
+            onClickHandler = { index, event -> handleItemClick(index, event) },
+        )
+        prevBtn = TrashcanPrevButton(this)
+        nextBtn = TrashcanNextButton(this)
+        addPager(pager)
+
+        initSlots(
+            listOf(
+                "         ",
+                "         ",
+                "         ",
+                "         ",
+                "         ",
+                "  p   n  ",
+            )
+        ) { char ->
+            when (char) {
+                'p' -> prevBtn.button
+                'n' -> nextBtn.button
+                else -> null
+            }
+        }
+
+        onPlayerInvClick = { event -> handlePlayerInvClick(event) }
     }
 
-    private fun rebuildButtons() {
-        for (slot in 0 until 54) setButton(slot, null)
-        val contents = inventory.contents
-        store.loadInto(contents)
-        for ((slot, item) in contents.withIndex()) {
-            if (item == null || item.type.isAir) continue
-            setButton(
-                slot,
-                TrashcanItemButton.create(store, item, ::rebuildButtons)
-            )
-        }
-        updateIcon()
+    private fun rebuildDisplayData() {
+        val snapshot = store.getSnapshot()
+        displayData.clear()
+        displayData.addAll(snapshot.map { TrashcanDisplayItem(it) })
     }
 
     override fun open(player: Player) {
+        rebuildDisplayData()
         super.open(player)
         opened.add(this)
         ensureCloseListener()
     }
 
-    override fun onInventoryClick(event: InventoryClickEvent) {
-        if (event.inventory != inventory) return
+    @EventHandler
+    private fun handleItemClick(index: Int, event: InventoryClickEvent): Boolean {
+        val displayItem = displayData.getOrNull(index) ?: return false
+        val player = event.whoClicked as? Player ?: return false
 
-        val clickedInventory = event.clickedInventory ?: return
-
-        if (clickedInventory != inventory) {
-            handlePlayerInvClick(event)
-            return
+        val take = when (event.click) {
+            ClickType.LEFT -> if (event.isShiftClick) displayItem.stackType.maxStackSize else 1
+            ClickType.RIGHT -> maxOf(1, displayItem.stackAmount / 2)
+            else -> return false
         }
+        val actualTake = minOf(take, displayItem.stackAmount)
+        if (actualTake <= 0) return true
 
-        val slot = event.slot
-        val button = buttons[slot]
-        if (button != null) {
-            event.isCancelled = true
-            button.onClick(event)
-            return
+        var waitForPut = actualTake
+        val maxStackSize = displayItem.stackType.maxStackSize
+        for (i in 0 until PLAYER_INV_SIZE) {
+            if (waitForPut == 0) break
+            val slotItem = player.inventory.getItem(i)
+            if (slotItem == null || slotItem.type == Material.AIR) {
+                val count = minOf(waitForPut, maxStackSize)
+                waitForPut -= count
+                player.inventory.setItem(i, displayItem.snapshot.clone().apply { amount = count })
+                continue
+            }
+            if (!slotItem.isSimilar(displayItem.snapshot)) continue
+            if (slotItem.amount >= maxStackSize) continue
+            val count = minOf(waitForPut, maxStackSize - slotItem.amount)
+            waitForPut -= count
+            player.inventory.setItem(i, slotItem.clone().apply { amount += count })
         }
+        val given = actualTake - waitForPut
+        if (given <= 0) return true
 
-        event.isCancelled = false
+        val matchItem = store.getSnapshot().firstOrNull { it.isSimilar(displayItem.snapshot) } ?: run {
+            rebuildDisplayData()
+            updateIcon()
+            return true
+        }
+        store.removeItem(matchItem, given)
+        rebuildDisplayData()
+        updateIcon()
+        return true
     }
 
+    @EventHandler
     private fun handlePlayerInvClick(event: InventoryClickEvent) {
         val player = event.whoClicked as? Player ?: return
         val clicked = event.currentItem ?: return
@@ -77,16 +136,21 @@ class TrashcanMenu(
             else -> return
         }
 
+        val putItem = clicked.clone()
+        putItem.amount = count
+        val accepted = store.addItem(putItem)
+        if (!accepted) {
+            RuntimeServices.messages.send(player, MLang["command.trash_full"])
+            return
+        }
+
         if (count == clicked.amount) {
             player.inventory.setItem(event.slot, null)
         } else {
             clicked.amount -= count
         }
-
-        val putItem = clicked.clone()
-        putItem.amount = count
-        store.addItem(putItem)
-        rebuildButtons()
+        rebuildDisplayData()
+        updateIcon()
     }
 
     private fun saveAndClose(event: InventoryCloseEvent) {
@@ -95,6 +159,9 @@ class TrashcanMenu(
     }
 
     companion object {
+        private const val ITEM_PAGE_SIZE = 45
+        private const val PLAYER_INV_SIZE = 36
+
         val opened = mutableSetOf<TrashcanMenu>()
         private var closeListenerRegistered = false
 
@@ -110,7 +177,10 @@ class TrashcanMenu(
         }
 
         fun updateAllOpen() {
-            opened.toSet().forEach { it.rebuildButtons() }
+            opened.toSet().forEach {
+                it.rebuildDisplayData()
+                it.updateIcon()
+            }
         }
     }
 }
