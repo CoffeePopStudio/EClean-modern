@@ -15,14 +15,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Added `@Synchronized` to all Repository write methods** (`upsert`, `removeByItem`, `clear`) to guard against concurrent Folia multi-region access that would cause `ArrayIndexOutOfBoundsException` or silent data loss.
 - **`TrashcanTicker` now resets countdown to 0 when disabled**: previously returned without clearing, causing PAPI `%eclean_trashcan_countdown%` to leak stale values.
 - **`TrashcanMenu` now calls `unregister()` on close**: each `/ecl trash` opened a new `TrashcanMenu` registered as a Bukkit `Listener`, but closing only removed it from the `opened` set — leaking listeners indefinitely.
+- **Trashcan player inventory click isolation**: replaced `event.currentItem` manipulation in `onClickSelfInv` with direct `player.inventory.setItem(rawSlot-54, …)` — Bukkit reverts cancelled `InventoryClickEvent.currentItem` changes, causing items to appear in inventory while being registered in trashcan (lost on GUI close/reopen). `TrashInfo.generateItem` now clones `origin` and explicitly gets/sets `ItemMeta` through the Bukkit API boundary instead of `editItemMeta`, preventing `ItemMeta` sharing between display item and stored origin on Paper 1.21+.
+- **Trashcan player inventory interaction restored**: routed player inventory clicks through `UiMenu.onPlayerInvClick` to restore deposit/stack/lore behavior after the paginated-view removal.
+- **Merged per-world cleanup tickers into a single global ticker**: each world previously had its own ticking task calling `announceCountdown()` every second and `cleanNow()` on expiry — with 3 worlds this meant countdown messages and finish announcements were broadcast 3×. Now uses a single global ticker keyed to the minimum interval across all enabled per-world configs.
+- **Merged `check.kt` and `Players.kt` into `Commands.kt`**: eliminated multi-file class loading failures on certain server platforms where separate command handler files fail to resolve across classloader boundaries. Also replaced `EntityType.entries` (Kotlin 2.0+ only) with `.values()` for JDK compatibility.
+- **Replaced all legacy `&` color codes with MiniMessage tags** in Commands, Players, check command handlers; fixed `sendUsage` to use `MessageService.send` instead of raw `sender.sendMessage`.
+- **Fixed `MLang.flatten()` to use `ConfigurationSection` instead of `YamlConfiguration`** for correct nested key traversal. Previously `readIntoCache` converted the YAML string to a `YamlConfiguration` and then re-wrapped sections, losing intermediate nesting.
+- **`MLang.load()` now always populates cache**: previously when `LegacyLangMigrator` did not trigger (no legacy codes found), `readIntoCache` was never called, leaving the cache empty and all `MLang[key]` lookups returning raw keys.
 
 ### Changed
 - Replaced `EPlugin` base class with direct `JavaPlugin` extension — all EPlugin features (debugPrefix, prefix, debug, debuggers, bstats) self-implemented in EClean.
 - Deleted `MLangHost` — now that EPlugin's `langManager` type constraint is gone, the last eplugin import in lang is eliminated.
 - Optimized config reload to use section-level diff — only restarts affected services (cleanup ticker on `cleanup`/`perWorld` change, trashcan ticker on `trashcan` change) instead of full pipeline rebuild.
+- **Trashcan subsystem rewritten to 4-layer architecture**: `TrashcanItemStore` (thread-safe data with `ReentrantReadWriteLock`) → `TrashcanManager` (business façade) → `TrashcanTicker` (owns countdown) → `TrashcanMenu` (GUI with lore-injected `UiButton`s). Deleted `TrashcanService.kt` and `TrashcanRepository.kt`.
+- **TrashcanMenu replaced paginated view with vanilla chest-like inventory**: 54-slot grid with direct load/save via `TrashcanItemStore`. Items persist across open/close cycles. Custom `TrashcanItemButton` injects operation lore (count, left=1, right=half-stack, shift+left=full stack) and intercepts clicks to give exact amounts instead of vanilla shift-click/right-click behavior. Player inventory drag-and-drop into the trashcan is now fully supported.
+- **Trashcan default clear interval changed from 6000s (100min) to 600s (10min)**.
+- **`clearAll()` notification changed from global broadcast to admin-only** (players with `eclean.admin` permission).
+- **Trashcan UI title updated to `"共享垃圾桶 - 先到先得, 定期清空"`** to reflect the shared, first-come-first-served nature.
+- **`UiMenu.buttons` visibility changed from `private` to `protected`** to allow subclasses like `TrashcanMenu` to access button state during click handling.
 
 ### Added
 - Integration tests for DropCleanupService, LivingCleanupService, and ChunkDensityScanner using MockBukkit (end-to-end pipeline validation).
+- **`TrashcanItemStore` unit tests** (8 tests) covering: same-type merging, maxStackSize overflow, capacity rejection, removeItem subtraction/exhaustion, clear, loadInto/saveFrom round-trip, air-slot filtering.
+- **`maxSlots` config key** (`trashcan.yml`, default 54) — configurable capacity limit for the trashcan. When full, new items are discarded with a debug log.
+- **`command.trash_full` lang key** for capacity-exceeded notification.
 
 #### Zero eplugin dependencies
 The plugin now has **zero** `import top.e404.eplugin` statements in `src/main/kotlin/`.

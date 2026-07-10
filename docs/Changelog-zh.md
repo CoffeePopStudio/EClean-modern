@@ -15,14 +15,30 @@
 - **`@Synchronized` 保护所有 Repository 写方法**：`upsert`、`removeByItem`、`clear` 加锁，防止 Folia 多 Region 并发写入导致 `ArrayIndexOutOfBoundsException` / 丢数据。
 - **`TrashcanTicker` 禁用时清零 countdown**：`enabled=false` 时原来直接 return 不重置倒计时，PAPI `%eclean_trashcan_countdown%` 持续暴露旧值。
 - **关闭 TrashcanMenu 时调用 `unregister()` 释放 Listener**：每次 `TrashcanService.open()` 都 new 一个 `TrashcanMenu` 并注册为 Bukkit Listener，但关闭时只从 `opened` 集合移除，导致 listener 泄漏。
+- **垃圾桶玩家背包交互隔离**：`onClickSelfInv` 中的 `event.currentItem` 操作改为 `player.inventory.setItem(rawSlot-54, …)`——Bukkit 会还原已取消的 `InventoryClickEvent.currentItem` 变更，导致物品看似留在背包中、实际已被登记到垃圾桶，在关闭/重开 GUI 时丢失。`TrashInfo.generateItem` 改为 clone `origin` 后通过 Bukkit API 边界显式 get/set `ItemMeta`，防止 Paper 1.21+ 中 display item 与存储 origin 的 `ItemMeta` 共享。
+- **恢复垃圾桶玩家背包交互**：在移除分页视图后，将玩家背包点击路由到 `UiMenu.onPlayerInvClick`，恢复物品存放/堆叠/lore 行为。
+- **按世界独立 ticker 合并为单一全局 ticker**：原先每个世界维护独立的定时任务，每秒调用 `announceCountdown()`、到期后调用 `cleanNow()`——3 个世界即意味着倒计时消息和完成公告广播 3 次。现改为单一全局 ticker，使用所有启用世界配置中的最小间隔。
+- **合并 `check.kt` 和 `Players.kt` 到 `Commands.kt`**：消除某些服务器平台上独立命令文件跨 classloader 边界解析失败的类加载问题。同时将 `EntityType.entries`（仅 Kotlin 2.0+ 支持）替换为 `.values()` 以兼容 JDK。
+- **将所有遗留 `&` 颜色码替换为 MiniMessage 标签**：覆盖 Commands、Players、check 命令处理器；修复 `sendUsage` 改用 `MessageService.send` 而非原始 `sender.sendMessage`。
+- **修复 `MLang.flatten()` 使用 `ConfigurationSection` 替代 `YamlConfiguration`** 以正确遍历嵌套键。原先 `readIntoCache` 将 YAML 字符串转为 `YamlConfiguration` 后又重新包裹 sections，丢失中间层级。
+- **`MLang.load()` 现在始终填充 cache**：原先当 `LegacyLangMigrator` 未触发（无遗留颜色码）时，不会调用 `readIntoCache`，导致 cache 为空、所有 `MLang[key]` 查询返回原始 key。
 
 ### 变更
 - 用直接 `JavaPlugin` 继承替换 `EPlugin` 基类——所有 EPlugin 功能（debugPrefix、prefix、debug、debuggers、bstats）在 EClean 中自实现。
 - 删除 `MLangHost`——EPlugin 的 `langManager` 类型要求已不存在，lang 模块中最后一个 eplugin import 消除。
 - 优化配置重载为 section 级 diff——仅在 `cleanup`/`perWorld` 变更时重启清理 ticker，在 `trashcan` 变更时重启垃圾桶 ticker，不再全量重建。
+- **垃圾桶子系统重写为 4 层架构**：`TrashcanItemStore`（基于 `ReentrantReadWriteLock` 的线程安全数据层）→ `TrashcanManager`（业务门面）→ `TrashcanTicker`（自持倒计时）→ `TrashcanMenu`（注入 lore 的 `UiButton` GUI）。删除 `TrashcanService.kt` 和 `TrashcanRepository.kt`。
+- **TrashcanMenu 从分页视图替换为原版箱子式背包界面**：54 格网格，通过 `TrashcanItemStore` 直接 load/save。物品在开关界面之间持久保留。自定义 `TrashcanItemButton` 注入操作 lore（数量、左键=1个、右键=半组、Shift+左键=整组）并拦截点击实现精确数量提取，取代原版 shift-click/右键行为。现已完整支持玩家从背包拖放物品到垃圾桶。
+- **垃圾桶默认清理间隔从 6000s（100分钟）改为 600s（10分钟）**。
+- **`clearAll()` 通知从全服广播改为仅管理员可见**（拥有 `eclean.admin` 权限的玩家）。
+- **垃圾桶 UI 标题更新为 `"共享垃圾桶 - 先到先得, 定期清空"`** 以反映共享、先到先得的特性。
+- **`UiMenu.buttons` 可见性从 `private` 改为 `protected`** 以允许 `TrashcanMenu` 等子类在点击处理中访问按钮状态。
 
 ### 新增
 - DropCleanupService、LivingCleanupService、ChunkDensityScanner 集成测试（MockBukkit，端到端流水线验证）。
+- **`TrashcanItemStore` 单元测试**（8 项）覆盖：同物品合并、超 maxStackSize 溢出、容量满拒绝、removeItem 扣减/耗尽、清空、loadInto/saveFrom 往返、空槽位过滤。
+- **`maxSlots` 配置键**（`trashcan.yml`，默认 54）——可配置的垃圾桶容量上限。满时丢弃新物品并记录 debug log。
+- **`command.trash_full` 语言键**用于容量超限通知。
 
 #### 零 eplugin 依赖
 插件 `src/main/kotlin/` 中已无任何 `import top.e404.eplugin` 语句。
