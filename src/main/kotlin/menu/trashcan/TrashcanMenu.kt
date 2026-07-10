@@ -61,7 +61,11 @@ class TrashcanMenu(
     }
 
     private fun saveAndClose(event: InventoryCloseEvent) {
-        store.saveFrom(inventory.contents)
+        val cleaned = inventory.contents.map { slot ->
+            if (slot == null || slot.type.isAir) slot
+            else TrashcanItemButton.stripLore(slot)
+        }.toTypedArray()
+        store.saveFrom(cleaned)
         unregister()
         opened.remove(this)
     }

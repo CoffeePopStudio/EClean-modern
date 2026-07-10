@@ -25,6 +25,18 @@ object TrashcanItemButton {
 
     fun rebuild(itemStack: ItemStack): ItemStack = buildItem(itemStack)
 
+    fun stripLore(itemStack: ItemStack): ItemStack {
+        val copy = itemStack.clone()
+        val meta = copy.itemMeta ?: return copy
+        val current = meta.lore() ?: return copy
+        val lineCount = MLang["menu.trashcan.item.lore", "amount" to "0"].split("\n").size
+        if (current.size >= lineCount) {
+            meta.lore(current.dropLast(lineCount))
+            copy.itemMeta = meta
+        }
+        return copy
+    }
+
     private fun buildItem(itemStack: ItemStack): ItemStack {
         val item = itemStack.clone()
         val meta = item.itemMeta ?: return item
