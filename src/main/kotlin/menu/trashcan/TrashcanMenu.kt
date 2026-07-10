@@ -8,7 +8,6 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import top.e404.eclean.PL
-import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.feature.trashcan.TrashcanItemStore
 import top.e404.eclean.feature.trashcan.TrashcanManager
