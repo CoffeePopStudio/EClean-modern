@@ -11,6 +11,16 @@ group = "top.e404"
 version = "0.1.8"
 val paper = "io.papermc.paper:paper-api:26.1.2.build.+"
 
+val gitCommitHash: String = try {
+    ProcessBuilder("git", "rev-parse", "--short", "HEAD")
+        .directory(rootProject.projectDir)
+        .redirectErrorStream(true)
+        .start()
+        .inputStream.bufferedReader().use { it.readText().trim().ifEmpty { "unknown" } }
+} catch (_: Exception) {
+    "unknown"
+}
+
 repositories {
     mavenLocal()
     mavenCentral()
@@ -50,7 +60,7 @@ kotlin {
 
 tasks {
     shadowJar {
-        val archiveName = "${project.name}-${project.version}.jar"
+        val archiveName = "EClean-Modern-${gitCommitHash}-${project.version}.jar"
         archiveFileName.set(archiveName)
 
         relocate("org.bstats", "top.e404.eclean.relocate.bstats")
