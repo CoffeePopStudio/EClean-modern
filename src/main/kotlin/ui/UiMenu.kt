@@ -21,7 +21,7 @@ open class UiMenu(
         rows * 9,
         MiniMessage.miniMessage().deserialize(title),
     )
-    private val buttons = mutableMapOf<Int, UiButton>()
+    protected val buttons = mutableMapOf<Int, UiButton>()
     private val pagers = mutableListOf<UiPager<*>>()
     private var registered = false
 

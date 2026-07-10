@@ -3,19 +3,34 @@ package top.e404.eclean.menu.trashcan
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import top.e404.eclean.PL
+import top.e404.eclean.feature.trashcan.TrashcanItemStore
+import top.e404.eclean.feature.trashcan.TrashcanManager
 import top.e404.eclean.lang.MLang
-import top.e404.eclean.feature.trashcan.TrashcanRepository
 import top.e404.eclean.ui.UiMenu
 
 class TrashcanMenu(
-    private val repository: TrashcanRepository,
-) : UiMenu(PL, MLang["menu.trashcan.title"], 6, false) {
+    private val store: TrashcanItemStore,
+    private val manager: TrashcanManager,
+) : UiMenu(PL, MLang["trash.title"], 6, false) {
 
     init {
+        rebuildButtons()
+    }
+
+    private fun rebuildButtons() {
+        for (slot in 0 until 54) setButton(slot, null)
         val contents = inventory.contents
-        repository.loadInto(contents)
+        store.loadInto(contents)
+        for ((slot, item) in contents.withIndex()) {
+            if (item == null || item.type.isAir) continue
+            setButton(
+                slot,
+                TrashcanItemButton.create(store, item, ::rebuildButtons)
+            )
+        }
         inventory.contents = contents
     }
 
@@ -25,8 +40,28 @@ class TrashcanMenu(
         ensureCloseListener()
     }
 
+    override fun onInventoryClick(event: InventoryClickEvent) {
+        if (event.inventory != inventory) return
+
+        val clickedInventory = event.clickedInventory ?: return
+
+        if (clickedInventory != inventory) {
+            return
+        }
+
+        val slot = event.slot
+        val button = buttons[slot]
+        if (button != null) {
+            event.isCancelled = true
+            button.onClick(event)
+            return
+        }
+
+        event.isCancelled = false
+    }
+
     private fun saveAndClose(event: InventoryCloseEvent) {
-        repository.saveFrom(inventory.contents)
+        store.saveFrom(inventory.contents)
         unregister()
         opened.remove(this)
     }
@@ -47,11 +82,7 @@ class TrashcanMenu(
         }
 
         fun updateAllOpen() {
-            opened.toSet().forEach { menu ->
-                val contents = menu.inventory.contents
-                menu.repository.loadInto(contents)
-                menu.inventory.contents = contents
-            }
+            opened.toSet().forEach { it.rebuildButtons() }
         }
     }
 }
