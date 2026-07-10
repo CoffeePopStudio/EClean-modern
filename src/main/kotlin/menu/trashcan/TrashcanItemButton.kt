@@ -1,6 +1,5 @@
 package top.e404.eclean.menu.trashcan
 
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -29,11 +28,9 @@ object TrashcanItemButton {
     private fun buildItem(itemStack: ItemStack): ItemStack {
         val item = itemStack.clone()
         val meta = item.itemMeta ?: return item
-        val lore: MutableList<Component> = meta.lore?.map { Component.text(it) }?.toMutableList() ?: mutableListOf()
         val rawLore = MLang["menu.trashcan.item.lore", "amount" to item.amount.toString()]
         val lines = rawLore.split("\n").map { miniMessage.deserialize(it) }
-        lore.addAll(lines)
-        meta.lore(lore)
+        meta.lore(lines)
         item.itemMeta = meta
         return item
     }
