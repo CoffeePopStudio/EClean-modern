@@ -80,7 +80,7 @@ object RuntimeServices {
         }
         trashcanStore = TrashcanItemStore(Config.current.trashcan.maxSlots)
         trashcanManager = TrashcanManager(trashcanStore, messages)
-        trashcanTicker = TrashcanTicker(trashcanManager, statusSnapshots)
+        trashcanTicker = TrashcanTicker(trashcanManager, statusSnapshots, messages)
         cleanupAnnouncementService = CleanupAnnouncementService(messages, statusSnapshots)
         cleanupCoordinator = CleanupCoordinator(messages, statusSnapshots)
         cleanupTickService = CleanupTickService(messages, cleanupCoordinator, cleanupAnnouncementService, statusSnapshots)

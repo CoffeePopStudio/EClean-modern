@@ -29,7 +29,10 @@ class TrashcanItemStore(private val maxSlots: Int) {
     fun loadInto(slots: Array<ItemStack?>) {
         lock.readLock().lock()
         try {
-            items.indices.forEach { i -> slots[i] = items[i].clone() }
+            val count = minOf(items.size, slots.size)
+            for (i in 0 until count) {
+                slots[i] = items[i].clone()
+            }
         } finally {
             lock.readLock().unlock()
         }
@@ -100,25 +103,35 @@ class TrashcanItemStore(private val maxSlots: Int) {
         return added
     }
 
-    fun removeItem(stack: ItemStack, amount: Int): ItemStack? {
+    fun removeItem(stack: ItemStack, amount: Int): Int {
         lock.writeLock().lock()
         try {
+            var remaining = amount
             val iterator = items.listIterator()
-            while (iterator.hasNext()) {
+            while (iterator.hasNext() && remaining > 0) {
                 val existing = iterator.next()
                 if (!existing.isSimilar(stack)) continue
-                val toRemove = minOf(amount, existing.amount)
+                val toRemove = minOf(remaining, existing.amount)
                 val remainingAmount = existing.amount - toRemove
                 if (remainingAmount <= 0) {
                     iterator.remove()
-                    return null
+                } else {
+                    existing.amount = remainingAmount
                 }
-                existing.amount = remainingAmount
-                return existing.clone()
+                remaining -= toRemove
             }
-            return null
+            return amount - remaining
         } finally {
             lock.writeLock().unlock()
+        }
+    }
+
+    fun getSnapshot(): List<ItemStack> {
+        lock.readLock().lock()
+        try {
+            return items.map { it.clone() }
+        } finally {
+            lock.readLock().unlock()
         }
     }
 

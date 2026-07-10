@@ -51,22 +51,37 @@ class TrashcanItemStoreTest {
     }
 
     @Test
-    fun `removeItem subtracts amount and returns remaining clone`() {
+    fun `removeItem subtracts amount and returns removed count`() {
         val store = TrashcanItemStore(maxSlots = 54)
         store.addItem(ItemStack(Material.DIAMOND, 10))
-        val result = store.removeItem(ItemStack(Material.DIAMOND), 3)
-        assertNotNull(result)
-        assertEquals(7, result.amount)
-        assertEquals(Material.DIAMOND, result.type)
+        val removed = store.removeItem(ItemStack(Material.DIAMOND), 3)
+        assertEquals(3, removed)
+        val slots = arrayOfNulls<ItemStack>(54)
+        store.loadInto(slots)
+        assertEquals(7, slots[0]?.amount)
+        assertEquals(Material.DIAMOND, slots[0]?.type)
     }
 
     @Test
     fun `removeItem deletes entry when amount exhausted`() {
         val store = TrashcanItemStore(maxSlots = 54)
         store.addItem(ItemStack(Material.DIAMOND, 5))
-        val result = store.removeItem(ItemStack(Material.DIAMOND), 5)
-        assertNull(result)
+        val removed = store.removeItem(ItemStack(Material.DIAMOND), 5)
+        assertEquals(5, removed)
         assertTrue(store.isEmpty())
+    }
+
+    @Test
+    fun `removeItem supports cross-stack removal`() {
+        val store = TrashcanItemStore(maxSlots = 54)
+        store.addItem(ItemStack(Material.DIAMOND, 64))
+        store.addItem(ItemStack(Material.DIAMOND, 10))
+        val removed = store.removeItem(ItemStack(Material.DIAMOND), 70)
+        assertEquals(70, removed)
+        val slots = arrayOfNulls<ItemStack>(54)
+        store.loadInto(slots)
+        assertEquals(4, slots[0]?.amount)
+        assertNull(slots[1])
     }
 
     @Test

@@ -22,7 +22,7 @@ object Trashcan {
         RuntimeServices.trashcanManager.collectStacks(items)
     }
 
-    fun addItem(item: ItemStack) {
-        RuntimeServices.trashcanManager.addItem(item)
+    fun addItem(item: ItemStack): Boolean {
+        return RuntimeServices.trashcanManager.addItem(item)
     }
 }

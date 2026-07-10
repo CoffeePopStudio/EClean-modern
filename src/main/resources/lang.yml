@@ -78,6 +78,7 @@ command:
   trash_disable: "<green>垃圾桶功能已被禁用</green>"
   trash_open: "<green>已打开垃圾桶</green>"
   trash_clean_done: "<green>垃圾桶已清空</green>"
+  trash_clean_reminder: "<gold>垃圾桶将在 {seconds} 秒后清空, 请及时取回物品!</gold>"
   trash_full: "<yellow>垃圾桶已满, 部分物品无法放入</yellow>"
   clean_done: "<green>共清理<gold>{count}</gold>个实体</green>"
   teleport:
