@@ -41,11 +41,29 @@ class TrashcanItemStore(private val maxSlots: Int) {
             items.clear()
             for (slot in slots) {
                 if (slot != null && !slot.type.isAir) {
-                    items.add(slot.clone())
+                    mergeUnsafe(slot.clone())
                 }
             }
         } finally {
             lock.writeLock().unlock()
+        }
+    }
+
+    private fun mergeUnsafe(item: ItemStack) {
+        val remaining = item
+        for (existing in items) {
+            if (!existing.isSimilar(remaining)) continue
+            val space = existing.type.maxStackSize - existing.amount
+            if (space <= 0) continue
+            val take = minOf(space, remaining.amount)
+            existing.amount += take
+            remaining.amount -= take
+            if (remaining.amount <= 0) return
+        }
+        while (remaining.amount > 0) {
+            val stackSize = minOf(remaining.type.maxStackSize, remaining.amount)
+            items.add(remaining.clone().apply { amount = stackSize })
+            remaining.amount -= stackSize
         }
     }
 
