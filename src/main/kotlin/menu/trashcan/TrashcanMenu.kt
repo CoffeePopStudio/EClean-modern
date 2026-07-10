@@ -1,8 +1,10 @@
 package top.e404.eclean.menu.trashcan
 
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import top.e404.eclean.PL
@@ -46,6 +48,7 @@ class TrashcanMenu(
         val clickedInventory = event.clickedInventory ?: return
 
         if (clickedInventory != inventory) {
+            handlePlayerInvClick(event)
             return
         }
 
@@ -60,13 +63,33 @@ class TrashcanMenu(
         event.isCancelled = false
     }
 
-    private fun saveAndClose(event: InventoryCloseEvent) {
-        for (slot in 0 until 54) {
-            if (buttons[slot] != null) continue
-            val item = inventory.getItem(slot) ?: continue
-            if (item.type.isAir) continue
-            store.addItem(item)
+    private fun handlePlayerInvClick(event: InventoryClickEvent) {
+        val player = event.whoClicked as? Player ?: return
+        val clicked = event.currentItem ?: return
+        if (clicked.type == Material.AIR) return
+
+        event.isCancelled = true
+
+        val count = when (event.click) {
+            ClickType.LEFT, ClickType.DOUBLE_CLICK -> 1
+            ClickType.SHIFT_LEFT -> clicked.amount
+            ClickType.RIGHT -> maxOf(clicked.amount / 2, 1)
+            else -> return
         }
+
+        if (count == clicked.amount) {
+            player.inventory.setItem(event.slot, null)
+        } else {
+            clicked.amount -= count
+        }
+
+        val putItem = clicked.clone()
+        putItem.amount = count
+        store.addItem(putItem)
+        rebuildButtons()
+    }
+
+    private fun saveAndClose(event: InventoryCloseEvent) {
         unregister()
         opened.remove(this)
     }

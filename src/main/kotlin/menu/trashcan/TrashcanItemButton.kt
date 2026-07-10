@@ -1,6 +1,7 @@
 package top.e404.eclean.menu.trashcan
 
 import net.kyori.adventure.text.minimessage.MiniMessage
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -49,11 +50,25 @@ object TrashcanItemButton {
             ClickType.RIGHT -> maxOf(1, itemStack.amount / 2)
             else -> return false
         }
-        val actualTake = minOf(take, itemStack.amount)
-        val giveItem = itemStack.clone()
-        giveItem.amount = actualTake
-        val leftover = player.inventory.addItem(giveItem)
-        val given = actualTake - leftover.values.sumOf { it.amount }
+        var waitForTake = minOf(take, itemStack.amount)
+        if (waitForTake <= 0) return true
+        val maxStackSize = itemStack.type.maxStackSize
+        for (i in 0 until 36) {
+            if (waitForTake == 0) break
+            val slotItem = player.inventory.getItem(i)
+            if (slotItem == null || slotItem.type == Material.AIR) {
+                val count = minOf(waitForTake, maxStackSize)
+                waitForTake -= count
+                player.inventory.setItem(i, itemStack.clone().apply { amount = count })
+                continue
+            }
+            if (!slotItem.isSimilar(itemStack)) continue
+            if (slotItem.amount >= maxStackSize) continue
+            val count = minOf(waitForTake, maxStackSize - slotItem.amount)
+            waitForTake -= count
+            player.inventory.setItem(i, slotItem.clone().apply { amount += count })
+        }
+        val given = minOf(take, itemStack.amount) - waitForTake
         if (given <= 0) return true
         store.removeItem(itemStack, given)
         onChanged()
