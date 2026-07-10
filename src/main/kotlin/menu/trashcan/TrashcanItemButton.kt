@@ -62,7 +62,6 @@ object TrashcanItemButton {
         val actualTake = minOf(take, itemStack.amount)
         val giveItem = itemStack.clone()
         giveItem.amount = actualTake
-        giveItem.editMeta { it.lore(null) }
         val leftover = player.inventory.addItem(giveItem)
         val given = actualTake - leftover.values.sumOf { it.amount }
         if (given <= 0) return true
