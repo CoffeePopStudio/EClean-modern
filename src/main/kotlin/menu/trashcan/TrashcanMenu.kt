@@ -109,14 +109,13 @@ open class TrashcanMenu(
         val player = event.whoClicked as? Player ?: return false
 
         val take = when (event.click) {
-            ClickType.LEFT -> if (event.isShiftClick) displayItem.stackType.maxStackSize else 1
-            ClickType.RIGHT -> maxOf(1, displayItem.stackAmount / 2)
+            ClickType.LEFT, ClickType.DOUBLE_CLICK -> 1
+            ClickType.SHIFT_LEFT -> displayItem.item.maxStackSize
+            ClickType.RIGHT -> maxOf(displayItem.item.maxStackSize / 2, 1)
             else -> return false
         }
-        val actualTake = minOf(take, displayItem.stackAmount)
-        if (actualTake <= 0) return true
 
-        var waitForPut = actualTake
+        var waitForPut = take
         val maxStackSize = displayItem.stackType.maxStackSize
         for (i in 0 until PLAYER_INV_SIZE) {
             if (waitForPut == 0) break
@@ -133,7 +132,7 @@ open class TrashcanMenu(
             waitForPut -= count
             player.inventory.setItem(i, slotItem.clone().apply { amount += count })
         }
-        val given = actualTake - waitForPut
+        val given = take - waitForPut
         if (given <= 0) return true
 
         val matchItem = store.getSnapshot().firstOrNull { it.isSimilar(displayItem.snapshot) } ?: run {
