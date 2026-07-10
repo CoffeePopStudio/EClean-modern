@@ -10,7 +10,7 @@ class PlayerTeleportService(
 ) {
     fun teleport(player: Player, target: Location) {
         execution.runForPlayer(player.toRef(), player) {
-            player.teleport(target)
+            player.teleportAsync(target)
         }
     }
 
