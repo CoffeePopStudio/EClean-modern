@@ -19,18 +19,6 @@ class TrashcanDisplayItem(
         needUpdate = false
     }
 
-    private fun buildDisplayItem(): ItemStack {
-        val clone = snapshot.clone()
-        val realAmount = clone.amount
-        clone.amount = 1
-        val meta = clone.itemMeta ?: return clone
-        val rawLore = MLang["menu.trashcan.item.lore", "amount" to realAmount.toString()]
-        val lines = rawLore.split("\n").map { miniMessage.deserialize(it) }
-        meta.lore(lines)
-        clone.itemMeta = meta
-        return clone
-    }
-
     private fun generateItem() = snapshot.clone().editItemMeta {
         val placeholders = arrayOf<Pair<String, *>>("amount" to snapshot.clone().amount)
         val existingLore = lore() ?: mutableListOf()

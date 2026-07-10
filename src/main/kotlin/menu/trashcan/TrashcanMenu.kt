@@ -78,7 +78,6 @@ open class TrashcanMenu(
     }
 
     override fun handlePlayerInvClick(event: InventoryClickEvent) {
-        val player = event.whoClicked as Player
         event.isCancelled = true
         val clicked = event.currentItem
         if (clicked == null || clicked.type == Material.AIR) return
