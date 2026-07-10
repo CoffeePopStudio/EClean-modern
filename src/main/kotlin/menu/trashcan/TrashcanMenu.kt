@@ -94,9 +94,11 @@ open class TrashcanMenu(
 
         if (count == clicked.amount) {
             event.currentItem = emptyItem
+            Trashcan.addItem(clicked)
         } else {
             clicked.amount -= count
             event.currentItem = clicked
+            Trashcan.addItem(clicked.clone().apply { amount = count })
         }
 
         rebuildDisplayData()
