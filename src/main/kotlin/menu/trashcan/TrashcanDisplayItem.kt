@@ -9,8 +9,6 @@ import top.e404.eclean.ui.editItemMeta
 class TrashcanDisplayItem(
     val snapshot: ItemStack,
 ) : UiDisplayable {
-    private val miniMessage = MiniMessage.miniMessage()
-
     override var needUpdate = true
     override lateinit var item: ItemStack
 
