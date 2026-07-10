@@ -38,7 +38,7 @@ object Update {
             val json = JsonParser.parseString(response.body()).asJsonArray
             if (json.isEmpty) return
             val latest = json[0].asJsonObject.get("tag_name").asString
-            val current = top.e404.eclean.PL.description.version
+            val current = top.e404.eclean.PL.pluginMeta.version
             if (latest != current) {
                 Bukkit.getConsoleSender().sendMessage(
                     "§6[EClean-Modern] §e新版本可用: §b$latest §e(当前: §7$current§e) → §a$GITHUB_URL"
