@@ -5,24 +5,24 @@ import top.e404.eclean.app.RuntimeServices
 
 object Trashcan {
     fun cleanTrash() {
-        RuntimeServices.trashcanService.clearAll()
+        RuntimeServices.trashcanManager.clearAll()
     }
 
-    val countdown get() = RuntimeServices.trashcanService.countdown
+    val countdown get() = RuntimeServices.trashcanTicker.countdown
 
     fun schedule() {
         RuntimeServices.trashcanTicker.start()
     }
 
     fun open(player: org.bukkit.entity.Player) {
-        RuntimeServices.trashcanService.open(player)
+        RuntimeServices.trashcanManager.open(player)
     }
 
     fun addItems(items: Collection<ItemStack>) {
-        RuntimeServices.trashcanService.collectStacks(items)
+        RuntimeServices.trashcanManager.collectStacks(items)
     }
 
     fun addItem(item: ItemStack) {
-        RuntimeServices.trashcanService.addItem(item)
+        RuntimeServices.trashcanManager.addItem(item)
     }
 }

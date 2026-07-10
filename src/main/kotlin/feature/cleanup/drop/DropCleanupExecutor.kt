@@ -15,7 +15,7 @@ class DropCleanupExecutor {
             .mapNotNull { candidate -> candidate.item?.let { item -> candidate to item } }
         val trashCfg = Config.current.trashcan
         if (trashCfg.enabled && trashCfg.collectFromDropCleanup) {
-            RuntimeServices.trashcanService.collectStacks(selected.map { (_, item) -> item.itemStack })
+            RuntimeServices.trashcanManager.collectStacks(selected.map { (_, item) -> item.itemStack })
         }
         selected.forEach { (_, item) -> item.remove() }
         return selected.size

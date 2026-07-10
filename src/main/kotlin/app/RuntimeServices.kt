@@ -4,8 +4,8 @@ import org.bukkit.command.CommandSender
 import top.e404.eclean.feature.cleanup.CleanupAnnouncementService
 import top.e404.eclean.feature.cleanup.CleanupCoordinator
 import top.e404.eclean.feature.cleanup.CleanupTickService
-import top.e404.eclean.feature.trashcan.TrashcanRepository
-import top.e404.eclean.feature.trashcan.TrashcanService
+import top.e404.eclean.feature.trashcan.TrashcanItemStore
+import top.e404.eclean.feature.trashcan.TrashcanManager
 import top.e404.eclean.feature.trashcan.TrashcanTicker
 import top.e404.eclean.config.Config
 import top.e404.eclean.lang.MLang
@@ -53,10 +53,10 @@ object RuntimeServices {
     lateinit var cleanupTickService: CleanupTickService
         private set
 
-    lateinit var trashcanRepository: TrashcanRepository
+    lateinit var trashcanStore: TrashcanItemStore
         private set
 
-    lateinit var trashcanService: TrashcanService
+    lateinit var trashcanManager: TrashcanManager
         private set
 
     lateinit var trashcanTicker: TrashcanTicker
@@ -78,9 +78,9 @@ object RuntimeServices {
             }
             messages.send(player, MLang[key])
         }
-        trashcanRepository = TrashcanRepository()
-        trashcanService = TrashcanService(messages, trashcanRepository, statusSnapshots)
-        trashcanTicker = TrashcanTicker(trashcanService, statusSnapshots)
+        trashcanStore = TrashcanItemStore(Config.current.trashcan.maxSlots)
+        trashcanManager = TrashcanManager(trashcanStore, messages)
+        trashcanTicker = TrashcanTicker(trashcanManager, statusSnapshots)
         cleanupAnnouncementService = CleanupAnnouncementService(messages, statusSnapshots)
         cleanupCoordinator = CleanupCoordinator(messages, statusSnapshots)
         cleanupTickService = CleanupTickService(messages, cleanupCoordinator, cleanupAnnouncementService, statusSnapshots)
