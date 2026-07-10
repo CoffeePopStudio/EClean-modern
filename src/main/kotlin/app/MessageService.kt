@@ -30,7 +30,7 @@ class MessageService {
             val component = miniMessage.deserialize(full)
             Bukkit.getServer().sendMessage(component)
         } catch (_: Exception) {
-            Bukkit.broadcastMessage(stripMiniMessage(full))
+            Bukkit.getServer().broadcast(miniMessage.deserialize(stripMiniMessage(full)))
         }
     }
 
