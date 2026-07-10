@@ -63,8 +63,6 @@ open class UiMenu(
         for (pager in pagers) pager.render(inventory)
     }
 
-    var onPlayerInvClick: ((InventoryClickEvent) -> Unit)? = null
-
     @EventHandler
     open fun onInventoryClick(event: InventoryClickEvent) {
         if (event.inventory != inventory) return
@@ -73,7 +71,7 @@ open class UiMenu(
 
         if (clickedInventory != inventory) {
             event.isCancelled = true
-            onPlayerInvClick?.invoke(event)
+            handlePlayerInvClick(event)
             return
         }
 
@@ -92,6 +90,8 @@ open class UiMenu(
             }
         }
     }
+
+    open fun handlePlayerInvClick(event: InventoryClickEvent) {}
 
     fun initSlots(
         layout: List<String>,

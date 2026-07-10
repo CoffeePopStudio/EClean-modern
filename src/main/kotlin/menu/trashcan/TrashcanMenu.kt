@@ -9,21 +9,23 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import top.e404.eclean.PL
 import top.e404.eclean.app.RuntimeServices
+import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.feature.trashcan.TrashcanItemStore
 import top.e404.eclean.feature.trashcan.TrashcanManager
 import top.e404.eclean.lang.MLang
 import top.e404.eclean.ui.UiMenu
 import top.e404.eclean.ui.UiPager
+import top.e404.eclean.ui.emptyItem
 
-class TrashcanMenu(
+open class TrashcanMenu(
     private val store: TrashcanItemStore,
     private val manager: TrashcanManager,
 ) : UiMenu(PL, MLang["trash.title"], 6, false) {
 
     private var displayData = mutableListOf<TrashcanDisplayItem>()
-    private lateinit var pager: UiPager<TrashcanDisplayItem>
-    private lateinit var prevBtn: TrashcanPrevButton
-    private lateinit var nextBtn: TrashcanNextButton
+    private var pager: UiPager<TrashcanDisplayItem>
+    private var prevBtn: TrashcanPrevButton
+    private var nextBtn: TrashcanNextButton
 
     val hasPrev get() = pager.hasPrev
     val hasNext get() = pager.hasNext
@@ -60,8 +62,6 @@ class TrashcanMenu(
                 else -> null
             }
         }
-
-        onPlayerInvClick = { event -> handlePlayerInvClick(event) }
     }
 
     private fun rebuildDisplayData() {
@@ -77,7 +77,32 @@ class TrashcanMenu(
         ensureCloseListener()
     }
 
-    @EventHandler
+    override fun handlePlayerInvClick(event: InventoryClickEvent) {
+        val player = event.whoClicked as Player
+        event.isCancelled = true
+        val clicked = event.currentItem
+        if (clicked == null || clicked.type == Material.AIR) return
+
+        event.isCancelled = true
+
+        val count = when (event.click) {
+            ClickType.LEFT, ClickType.DOUBLE_CLICK -> 1
+            ClickType.SHIFT_LEFT -> clicked.amount
+            ClickType.RIGHT -> maxOf(clicked.amount / 2, 1)
+            else -> return
+        }
+
+        if (count == clicked.amount) {
+            event.currentItem = emptyItem
+        } else {
+            clicked.amount -= count
+            event.currentItem = clicked
+        }
+
+        rebuildDisplayData()
+        updateIcon()
+    }
+
     private fun handleItemClick(index: Int, event: InventoryClickEvent): Boolean {
         val displayItem = displayData.getOrNull(index) ?: return false
         val player = event.whoClicked as? Player ?: return false
@@ -121,39 +146,7 @@ class TrashcanMenu(
         return true
     }
 
-    @EventHandler
-    private fun handlePlayerInvClick(event: InventoryClickEvent) {
-        val player = event.whoClicked as? Player ?: return
-        val clicked = event.currentItem ?: return
-        if (clicked.type == Material.AIR) return
-
-        event.isCancelled = true
-
-        val count = when (event.click) {
-            ClickType.LEFT, ClickType.DOUBLE_CLICK -> 1
-            ClickType.SHIFT_LEFT -> clicked.amount
-            ClickType.RIGHT -> maxOf(clicked.amount / 2, 1)
-            else -> return
-        }
-
-        val putItem = clicked.clone()
-        putItem.amount = count
-        val accepted = store.addItem(putItem)
-        if (!accepted) {
-            RuntimeServices.messages.send(player, MLang["command.trash_full"])
-            return
-        }
-
-        if (count == clicked.amount) {
-            player.inventory.setItem(event.slot, null)
-        } else {
-            clicked.amount -= count
-        }
-        rebuildDisplayData()
-        updateIcon()
-    }
-
-    private fun saveAndClose(event: InventoryCloseEvent) {
+    protected fun saveAndClose() {
         unregister()
         opened.remove(this)
     }
@@ -171,7 +164,7 @@ class TrashcanMenu(
             PL.server.pluginManager.registerEvents(object : Listener {
                 @EventHandler
                 fun onClose(event: InventoryCloseEvent) {
-                    opened.find { it.inventory == event.inventory }?.saveAndClose(event)
+                    opened.find { it.inventory == event.inventory }?.saveAndClose()
                 }
             }, PL)
         }
