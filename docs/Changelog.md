@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.9]
+
+### Fixed
+- **Fixed double-quote wrapping of already-quoted values during migration**: `migrateIfNeeded`'s line-by-line parsing preserved original YAML quotes, then re-wrapped with `"..."` — producing invalid YAML (e.g., `key: ""<red>text</red>""`). Now strips existing quotes via `removeSurrounding` before converting.
+- **Fixed `&r` producing invalid `</reset>` closing tag**: MiniMessage's `<reset>` is a standalone tag with no closing counterpart. Now closes all open tags, emits `<reset>`, and skips adding `reset` to `openTags`.
+- **Fixed migration skipping YAML block scalar values** (`|` / `>` multi-line values): legacy `&` codes inside indented lines after `|-` were silently ignored. Now detects block scalar indicators and collects+converts indented content lines.
+- **`renameTo` return value is now checked**: when backing up `lang.old.yml`, if the rename fails the migration aborts with a warning instead of silently proceeding and risking data loss.
+- **`MLang.readIntoCache` now catches YAML parse exceptions**: if migration produces invalid YAML or users manually corrupt the file, falls back to the default `lang.yml` from the jar to prevent plugin startup crashes.
+- **`legacyToMiniMessage` reuses class-level `legacyPattern` regex** instead of redefining it inline.
+
 ## [0.1.8]
 
 ### Fixed

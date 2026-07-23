@@ -5,6 +5,16 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 版本规范。
 
+## [0.1.9]
+
+### 修复
+- **修复迁移时已加引号值被双重引号包裹**：原先 `migrateIfNeeded` 逐行解析保留原始 YAML 引号后，再次用 `"..."` 包裹导致非法 YAML（如 `key: ""<red>text</red>""`）。现在转换前先 `removeSurrounding` 剥离已有引号。
+- **修复 `&r` 转换产生错误的 `</reset>` 闭合标签**：MiniMessage 的 `<reset>` 为独立标签，无对应闭合形式。现改为先关闭所有打开标签、输出 `<reset>`，不再将 `reset` 加入 `openTags`。
+- **修复迁移逐行解析无法处理 YAML block scalar（`|` / `>` 多行值）**：原有 `&` 码出现在 `|-` 后的缩进行中会被漏掉。现在检测 block scalar 指示符，收集缩进行统一转换。
+- **`renameTo` 返回值现在被检查**：备份 `lang.old.yml` 时若改名失败，中止迁移并记录 warning，避免原始文件丢失。
+- **`MLang.readIntoCache` 新增 YAML 解析异常捕获**：当迁移产生非法 YAML 或用户手动编辑导致语法错误时，回退到 jar 内默认 `lang.yml` 覆盖，防止插件启动崩溃。
+- **`legacyToMiniMessage` 复用类级 `legacyPattern`** 正则，消除重复定义。
+
 ## [0.1.8]
 
 ### 修复
