@@ -38,7 +38,14 @@ object MLang {
     private fun readIntoCache(text: String) {
         cache.clear()
         val yaml = YamlConfiguration()
-        yaml.loadFromString(text)
+        try {
+            yaml.loadFromString(text)
+        } catch (e: Exception) {
+            PL.logger.warning("lang.yml parse failed, regenerating default: ${e.message}")
+            PL.saveResource("lang.yml", true)
+            val fallback = File(PL.dataFolder, "lang.yml").readText(Charsets.UTF_8)
+            yaml.loadFromString(fallback)
+        }
         flatten(yaml, "")
     }
 
