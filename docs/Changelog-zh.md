@@ -5,148 +5,107 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 版本规范。
 
-## [0.1.9]
+## 0.2.0
+
+### 新增
+- **垃圾桶物品堆叠**：相同的物品放进垃圾桶后会自动合并成一格，一格显示一种物品和它的总数量（比如泥土 × 2345），想放多少放多少，没有数量上限。
+- **每格物品单独计时**：每格物品有独立的存活时间，到期后这一格自己消失，不影响其他物品；剩余时间直接显示在物品说明里。
+- **新的统计指令**：`/eclean trash stats`（管理员可用）查看垃圾桶里每种物品的数量和剩余时间。
+- **新的配置选项**：`trashcan.yml` 里新增了堆叠开关、排序方式、剩余时间显示三个选项，都带注释说明。
+
+### 变更
+- 垃圾桶不再受"54 格 × 每格 64 个"的限制，容量无限。
+- 不再整桶定时清空，改为每格物品各自到期后单独消失。
+- 物品说明里现在会显示总数量（可以超过 64）和剩余时间。
+
+### 移除
+- 移除了垃圾桶容量上限的设置（容量已经无限，旧配置里留着的这一项会被自动忽略）。
+- 移除了"整桶即将清空"的全服提醒消息。
+
+## 0.1.9
 
 ### 修复
-- **修复迁移时已加引号值被双重引号包裹**：原先 `migrateIfNeeded` 逐行解析保留原始 YAML 引号后，再次用 `"..."` 包裹导致非法 YAML（如 `key: ""<red>text</red>""`）。现在转换前先 `removeSurrounding` 剥离已有引号。
-- **修复 `&r` 转换产生错误的 `</reset>` 闭合标签**：MiniMessage 的 `<reset>` 为独立标签，无对应闭合形式。现改为先关闭所有打开标签、输出 `<reset>`，不再将 `reset` 加入 `openTags`。
-- **修复迁移逐行解析无法处理 YAML block scalar（`|` / `>` 多行值）**：原有 `&` 码出现在 `|-` 后的缩进行中会被漏掉。现在检测 block scalar 指示符，收集缩进行统一转换。
-- **`renameTo` 返回值现在被检查**：备份 `lang.old.yml` 时若改名失败，中止迁移并记录 warning，避免原始文件丢失。
-- **`MLang.readIntoCache` 新增 YAML 解析异常捕获**：当迁移产生非法 YAML 或用户手动编辑导致语法错误时，回退到 jar 内默认 `lang.yml` 覆盖，防止插件启动崩溃。
-- **`legacyToMiniMessage` 复用类级 `legacyPattern`** 正则，消除重复定义。
+- **修复语言文件自动升级时的多个问题**：旧版颜色代码转换新格式时，带引号的文字、重置标记、多行文字都可能转换出错，现在都能正确处理。
+- **修复备份失败仍继续升级的问题**：升级前备份旧文件失败时会中止升级，防止原文件丢失。
+- **修复语言文件损坏导致插件无法启动的问题**：文件损坏时自动改用插件自带的默认文件。
+- **清理了重复代码**。
 
-## [0.1.8]
+## 0.1.8
 
 ### 修复
-- **垃圾桶存储对比改为 `isSimilar` 线性查找**：移除 `HashMap<ItemSign, TrashInfo>` + 自定义 `hashCode` 方案。`ItemSign.hashCode` 不可能完整复制 Paper `ItemStack.isSimilar` 的内部比较逻辑，导致相同物品分散至不同 hash bucket 无法正确堆叠。改为 `CopyOnWriteArrayList<TrashInfo>` + `upsert` 时 `isSimilar` 线性查找合并——虽 O(n) 但在数百条目上限下可忽略，且正确匹配 Paper 的完整 `DataComponent` 比较。
-- **Repository 入口 `ItemStack.clone()` 隔离外部引用**：`DropCleanupExecutor` 传入清理实体的 live `ItemStack`，`item.remove()` 后 Paper 可能回收底层 NBT，导致 trashcan 中存储的 `origin` 被连带污染——取出的物品带有残留 lore/NBT。现在 `upsert` 入参即 clone，保障数据隔离。
-- **`TrashInfo` lore 现在通过 `MiniMessage.deserialize()` 生成 `Component`**：原来使用废弃的 `List<String>` lore API，Paper 1.21+ 视为 legacy `§` 码不会解析 MiniMessage 标签，导致 `<white>共64个</white>` 原样显示。改后 lore 正确渲染为格式化文本。
-- **移除 `Trashcan.cleanTrash()` 中因 `trashData` 不可变未解压的错误逻辑**。
-- **`@Synchronized` 保护所有 Repository 写方法**：`upsert`、`removeByItem`、`clear` 加锁，防止 Folia 多 Region 并发写入导致 `ArrayIndexOutOfBoundsException` / 丢数据。
-- **`TrashcanTicker` 禁用时清零 countdown**：`enabled=false` 时原来直接 return 不重置倒计时，PAPI `%eclean_trashcan_countdown%` 持续暴露旧值。
-- **关闭 TrashcanMenu 时调用 `unregister()` 释放 Listener**：每次 `TrashcanService.open()` 都 new 一个 `TrashcanMenu` 并注册为 Bukkit Listener，但关闭时只从 `opened` 集合移除，导致 listener 泄漏。
-- **垃圾桶玩家背包交互隔离**：`onClickSelfInv` 中的 `event.currentItem` 操作改为 `player.inventory.setItem(rawSlot-54, …)`——Bukkit 会还原已取消的 `InventoryClickEvent.currentItem` 变更，导致物品看似留在背包中、实际已被登记到垃圾桶，在关闭/重开 GUI 时丢失。`TrashInfo.generateItem` 改为 clone `origin` 后通过 Bukkit API 边界显式 get/set `ItemMeta`，防止 Paper 1.21+ 中 display item 与存储 origin 的 `ItemMeta` 共享。
-- **恢复垃圾桶玩家背包交互**：在移除分页视图后，将玩家背包点击路由到 `UiMenu.onPlayerInvClick`，恢复物品存放/堆叠/lore 行为。
-- **按世界独立 ticker 合并为单一全局 ticker**：原先每个世界维护独立的定时任务，每秒调用 `announceCountdown()`、到期后调用 `cleanNow()`——3 个世界即意味着倒计时消息和完成公告广播 3 次。现改为单一全局 ticker，使用所有启用世界配置中的最小间隔。
-- **合并 `check.kt` 和 `Players.kt` 到 `Commands.kt`**：消除某些服务器平台上独立命令文件跨 classloader 边界解析失败的类加载问题。同时将 `EntityType.entries`（仅 Kotlin 2.0+ 支持）替换为 `.values()` 以兼容 JDK。
-- **将所有遗留 `&` 颜色码替换为 MiniMessage 标签**：覆盖 Commands、Players、check 命令处理器；修复 `sendUsage` 改用 `MessageService.send` 而非原始 `sender.sendMessage`。
-- **修复 `MLang.flatten()` 使用 `ConfigurationSection` 替代 `YamlConfiguration`** 以正确遍历嵌套键。原先 `readIntoCache` 将 YAML 字符串转为 `YamlConfiguration` 后又重新包裹 sections，丢失中间层级。
-- **`MLang.load()` 现在始终填充 cache**：原先当 `LegacyLangMigrator` 未触发（无遗留颜色码）时，不会调用 `readIntoCache`，导致 cache 为空、所有 `MLang[key]` 查询返回原始 key。
+- **修复相同物品不合并的问题**：完全相同的物品放进垃圾桶后各占一格，现在会自动合并。
+- **修复取出的物品带残留信息的问题**：从垃圾桶取出的物品可能带有奇怪的说明文字，现在数据是干净的。
+- **修复物品说明文字显示异常的问题**：说明文字里的格式标签会原样显示出来，现在显示正常。
+- **修复垃圾桶物品可能丢失的问题**：服务器同时处理多个区域时可能出现物品丢失，现在加了保护。
+- **修复关闭垃圾桶后倒计时残留的问题**：功能关闭后，倒计时不再一直显示旧数字。
+- **修复反复开关垃圾桶导致内存占用增加的问题**。
+- **修复从背包放物品时显示不同步的问题**：物品可能看着还在背包里、实际已经进了垃圾桶，现在正常了。
+- **修复多世界时提醒重复发送的问题**：倒计时提醒和清理公告不再重复发送多遍。
+- **修复部分服务器上指令无法使用的问题**。
+- **修复颜色代码不显示的问题**：旧版颜色代码在新版服务器中显示为乱码，已全部改用新格式。
+- **修复语言文件读取不全或为空的问题**。
 
 ### 变更
-- 用直接 `JavaPlugin` 继承替换 `EPlugin` 基类——所有 EPlugin 功能（debugPrefix、prefix、debug、debuggers、bstats）在 EClean 中自实现。
-- 删除 `MLangHost`——EPlugin 的 `langManager` 类型要求已不存在，lang 模块中最后一个 eplugin import 消除。
-- 优化配置重载为 section 级 diff——仅在 `cleanup`/`perWorld` 变更时重启清理 ticker，在 `trashcan` 变更时重启垃圾桶 ticker，不再全量重建。
-- **垃圾桶子系统重写为 4 层架构**：`TrashcanItemStore`（基于 `ReentrantReadWriteLock` 的线程安全数据层）→ `TrashcanManager`（业务门面）→ `TrashcanTicker`（自持倒计时）→ `TrashcanMenu`（注入 lore 的 `UiButton` GUI）。删除 `TrashcanService.kt` 和 `TrashcanRepository.kt`。
-- **TrashcanMenu 从分页视图替换为原版箱子式背包界面**：54 格网格，通过 `TrashcanItemStore` 直接 load/save。物品在开关界面之间持久保留。自定义 `TrashcanItemButton` 注入操作 lore（数量、左键=1个、右键=半组、Shift+左键=整组）并拦截点击实现精确数量提取，取代原版 shift-click/右键行为。现已完整支持玩家从背包拖放物品到垃圾桶。
-- **垃圾桶默认清理间隔从 6000s（100分钟）改为 600s（10分钟）**。
-- **`clearAll()` 通知从全服广播改为仅管理员可见**（拥有 `eclean.admin` 权限的玩家）。
-- **垃圾桶 UI 标题更新为 `"共享垃圾桶 - 先到先得, 定期清空"`** 以反映共享、先到先得的特性。
-- **`UiMenu.buttons` 可见性从 `private` 改为 `protected`** 以允许 `TrashcanMenu` 等子类在点击处理中访问按钮状态。
+- **重写了插件底层结构**，不再依赖旧版插件框架。
+- **重写了垃圾桶功能**：界面改为箱子样式，物品放进垃圾桶后，关掉界面再打开也会保留。
+- **垃圾桶默认清理间隔从 6000 秒（100 分钟）改为 600 秒（10 分钟）**。
+- **清空垃圾桶的提示只发给管理员**。
+- **优化配置重载**：只重载改动的部分，加载更快。
 
 ### 新增
-- DropCleanupService、LivingCleanupService、ChunkDensityScanner 集成测试（MockBukkit，端到端流水线验证）。
-- **`TrashcanItemStore` 单元测试**（8 项）覆盖：同物品合并、超 maxStackSize 溢出、容量满拒绝、removeItem 扣减/耗尽、清空、loadInto/saveFrom 往返、空槽位过滤。
-- **`maxSlots` 配置键**（`trashcan.yml`，默认 54）——可配置的垃圾桶容量上限。满时丢弃新物品并记录 debug log。
-- **`command.trash_full` 语言键**用于容量超限通知。
+- **垃圾桶容量上限设置**：可以配置垃圾桶最多放多少格，满时新物品会被丢弃（此设置在后续版本已移除）。
+- 新增了多项自动化测试，保证功能稳定。
 
-#### 零 eplugin 依赖
-插件 `src/main/kotlin/` 中已无任何 `import top.e404.eplugin` 语句。
-
-## [0.1.7]
+## 0.1.7
 
 ### 变更
-- 提取独立 `ui/` 菜单框架（UiMenu、UiButton、UiPager、UiDisplayable、util），替换所有 `eplugin.menu` 依赖。
-- 将 DenseMenu 和 TrashcanMenu 从 ChestMenu/MenuButton/MenuButtonZone 迁移至 UiMenu/UiButton/UiPager。
-- 用独立 Bukkit `Listener` 注册替换基于 `EMenuManager` 的 MenuManager。
-- 用原生 `me.clip.placeholderapi.expansion.PlaceholderExpansion` 替换 eplugin PlaceholderAPI Hook（EHookManager、PlaceholderAPIHook、PapiExpansion）。
-- 将 `MLang` 与 `ELangManager` 解耦——现使用独立 YAML 加载，通过薄层 `MLangHost` shim 仅保证 EPlugin 兼容性。
-- eplugin import 从 31 条减至 3 条（EPlugin ×2、ELangManager ×1）。
+- **重写菜单界面框架**，不再依赖旧版插件框架。
+- **重写倒计时等变量的显示功能**。
+- **重写语言文件读取**。
+- 大幅减少对旧版插件框架的依赖。
 
-## [0.1.6]
+## 0.1.6
 
 ### 新增
-- 新增 Adventure MiniMessage 消息系统，支持从旧版 `&c` 颜色代码自动迁移——`LegacyLangMigrator` 在首次载入时检测 `&` 代码，重命名为 `lang.old.yml`，转换为 MiniMessage 格式后删除备份文件。
-- 新增 `/ecl clean --preview` dry-run 预览模式——仅汇报将清理的内容，不实际移除任何实体。
-- 新增按世界独立 `per-world.yml` 配置——每个世界可覆盖 `intervalSeconds` 或设置 `enabled: false` 禁用该世界清理。
+- **文字颜色格式自动升级**：首次启动自动把旧版颜色代码转换成新格式。
+- **清理预演模式**：`/ecl clean --preview` 只显示会清理什么，不真正清理。
+- **按世界单独设置**：可以在 `per-world.yml` 里为每个世界单独设置清理间隔。
 
 ### 变更
-- 用独立 `MLang` 单例替换基于 `ELangManager` 的 `Lang.kt`（消息加载零 eplugin 依赖）。
-- `MessageService.send()` 和 `.broadcast()` 改为通过 `MiniMessage.deserialize()` 输出 Adventure `Component`。
-- `CleanupTickService` 从单个全局 ticker 扩展为按世界 `Map<String, ScheduledTask>`。
-- 配置消息默认值（倒计时、完成提示）转为 MiniMessage 格式。
-- 移除 `String.color` 和 `String.removeColor()` 扩展函数——MiniMessage 不再使用 `§` 颜色代码。
+- **每个世界单独计时**：各世界的清理倒计时互不影响。
+- 消息发送改用新版文字格式。
+- 移除旧的文字颜色处理代码。
 
-## [0.1.5]
+## 0.1.5
 
 ### 变更
-- 用单个原生 Bukkit `CommandExecutor` + `TabCompleter`（`Commands.kt`）替换 `ECommand`/`ECommandManager` 框架，8 个子命令（debug, reload, clean, stats, entity, trash, players, show）改为内联 private handler 方法。
-- 移除 `SchedulerFacade`/`FoliaSchedulerFacade`/`PaperSchedulerFacade` 抽象层，改为 `Schedulers` 单例——直接封装 Bukkit 的 Folia 兼容调度器 API（`GlobalRegionScheduler`、`RegionScheduler`、`AsyncScheduler`、`EntityScheduler`），Paper 1.21+ 已内置 polyfill。
-- `SchedulerHandle` 全面替换为 `io.papermc.paper.threadedregions.scheduler.ScheduledTask`。
-- `RuntimeServices` 不再创建 scheduler 实例；`isSchedulerReady` 守卫已移除。
+- **重写指令系统**，不再依赖旧版插件框架。
+- **重写服务器任务调度**，兼容新版服务器。
 
-## [0.1.4]
+## 0.1.4
 
 ### 新增
-- 新增 `xyz.jpenilla.run-paper` Gradle 插件，提供 `runFolia` 和 `runServer` 任务，一键启动本机集成测试服务器。
+- 新增一键启动本地服务器进行测试的功能。
 
 ### 变更
-- 将 `parseSecondAsDuration` 从 eplugin 迁移为 `util/Text` 中的独立 `Long` 扩展函数。
-- 移除 `EListener` 依赖：`DespawnListener` 和 `Trashcan` 改为直接实现 `Listener`，由 `EClean.onEnable` 通过 `Bukkit.getPluginManager().registerEvents` 注册。
-- 移除 `AbstractDebugCommand` 依赖：`Debug` 改为普通 `ECommand`，内联 debugger 管理逻辑。
-- 移除 `EUpdater` 依赖：`Update` 改为使用 `java.net.http.HttpClient` + `JsonParser` 自实现 GitHub releases API 检查，通过 `AsyncScheduler` 定时调度。
-- 将 `run/` 目录加入 `.gitignore`（`gradlew runFolia` / `runServer` 生成的测试服务器产物）。
+- 调试指令、更新检查、监听器等模块不再依赖旧版插件框架。
+- 本地测试生成的文件不再纳入版本管理。
 
 ### 修复
-- 修复 Folia 上 `chunk.isForceLoaded` 在 region 线程读取导致的 `IllegalStateException`——强制加载计数现改为在 global tick 线程收集。
-- 修复 Folia 26.1 (`Moonrise`) 下 `Thread failed main thread check: Async chunk retrieval`——改为在 region 线程阶段捕获 live `Chunk` 引用，global 线程不再调用 `getChunkAt`。
-- 将所有控制台输出（`info`、`debug`、`buildDebug`、`warn`）改为通过 `plugin.logger` 发出，使日志正确写入 `logs/latest.log` 并遵循服务器日志级别（替换 `Bukkit.getConsoleSender().sendMessage()`）。
-- 将 `debug`/`info`/`warn` 中所有硬编码中文字符串替换为英文，避免不支持 UTF-8 的终端出现乱码。
-- `broadcast()` 不再将玩家公告同步推送到控制台日志。
+- **修复新版服务器上统计区块时报错的问题**。
+- **修复新版服务器上读取区块报错的问题**。
+- **修复日志乱码的问题**：控制台日志统一走插件日志，中文改为英文防止乱码。
+- 发送给玩家的公告不再重复记录到控制台。
 
-## [0.1.3]
+## 0.1.3
 
 ### 新增
-- 在 `plugin.yml` 中添加了 Folia 支持声明。
-- 新增基于 `Kaml` 与 `kotlinx.serialization` 的现代多文件配置系统。
-- 新增独立的配置模型、配置快照加载、运行时应用入口与重载流程。
-- 新增面向 Folia 优先运行时边界的 `RuntimePlatform` 与 `ExecutionGateway` 初始抽象。
-- 新增 `chunk-density` 快照与策略定向测试，用于锁定新工作流行为。
-- 新增 `drop` 与 `living` 清理策略测试，用于锁定拆分后的保护规则与匹配行为。
-- 新增 `WorldStatsService`、`WorldStatsCollector`、`WorldStatsResult` 统计组件，基于 `ChunkTaskCoordinator` 实现 Folia-safe chunk-by-chunk 分布收集与聚合。
-- 新增聚焦 `TemporaryReturnService` 的定向测试，覆盖延时回传、覆盖重置与退出回传场景。
-- 新建独立的 `util/Text`（`color`, `formatAsConst`, `placeholder` 扩展函数）和 `app/MessageService`（消息、广播、debug、日志门面），替换 20+ 个业务文件中对 `EPlugin.Companion.*` 和 `PL.sendMsgWithPrefix/debug/info/warn` 的直接依赖。
+- **支持新架构服务器（Folia）**。
+- **重写配置系统**：默认配置拆分到多个文件，每个配置项都有注释说明。
+- **新增世界统计功能**。
+- 新增多项自动化测试。
 
 ### 变更
-- 将项目与插件标识从 `EClean` 统一更名为 `EClean-Modern`。
-- 将插件目标 API 更新为 Paper API `26.1.2`。
-- 将默认配置模板拆分为 `src/main/resources/config/` 下的多文件结构。
-- 更新了测试与 Gradle 配置，以适配新的配置工作流。
-- 更新了 `MockBukkit` 与相关测试依赖，使其与当前 Paper API 版本线对齐。
-- 修复了测试套件，使 `gradlew test` 再次通过。
-- 更新了 Shadow 插件与构建生命周期配置，使基于 Java 25 的 `shadowJar` 打包重新通过。
-- 更新了 `README`、Folia 适配设计 spec 与实现计划文档，补充当前 `Folia` 优先运行定位和实现状态说明。
-
-### 重构
-- 移除了基于 `eplugin config` 的旧配置层，改为项目内部的配置系统。
-- 将清理逻辑、垃圾桶、命令、监听器与更新检查中的运行时配置读取迁移到新的配置门面。
-- 重构运行时启动流程，使 `RuntimeServices` 注入平台感知的执行服务。
-- 将清理与垃圾桶的运行时生命周期收拢到 `RuntimeServices`，使插件启用、重载、停用统一复用同一组启动、重载与关闭入口。
-- 精简 `CleanupCoordinator` 注入，只保留其实际拥有的依赖，并让配置运行时应用流程不再直接耦合旧的 `Clean.schedule()` 调用。
-- 将 `FoliaSchedulerFacade` 从反射式调度器查找切换为直接的 Paper/Folia 调度 API，同时继续通过 `SchedulerFacade` 统一插件任务取消入口。
-- 将 `chunk-density` 清理重构为 `planner`、`snapshotter`、`policy`、`cleaner`、`report` 小组件，同时保持现有入口兼容。
-- 将 `drop` 与 `living` 清理重构为 `planner`、`collector`、`policy`、`executor`、`report` 小组件，同时保持现有入口兼容。
-- 抽离 `PlayerTeleportService` 与 `TemporaryReturnService`，并让 `DenseZone` 与 `MenuManager` 改为依赖新服务，同时保持玩家侧菜单行为不变。
-- 将 `ChunkTaskCoordinator` 从 `cleanup` 专属包迁移到 `platform/dispatch/`，供清理与统计功能共用。
-- 将 `Planner` 层 (`*Planner.planWorlds`) 改为返回世界的 `String` 名称或 `ChunkRef` 列表，不再返回 live `World` / `Chunk` 对象，避免下游跨 region 持有。
-- 为 `Collector` 层新增 `collectFromChunk(chunk)` 方法，使实体/物品收集从「整世界遍历」改为「单 chunk 收集」。
-- 将 `DropCleanupService`、`LivingCleanupService`、`ChunkDensityScanner` 改为注入 `SchedulerFacade`，通过 `ChunkTaskCoordinator` 做 region-safe 的逐 chunk 清理分发。
-- 重写 `clean/*.kt` 清理入口：移除 `Bukkit.getWorlds()` 重复逻辑，改为委托 Service 层；对外保留简单重载但内部为异步回调式，适配 Folia 的 chunk-by-chunk 模型。
-- 将 `CleanupCoordinator.cleanNow()` 改为链式异步回调，确保 drop → living → chunk 顺序完成。
-- 将 `DenseZone` 内的 chunk 实体遍历与 remove 操作包进 `regionScheduler`，并将 `getHighestBlockYAt` 迁入对应 chunk region。
-- 将 `command/check.kt` 中的 `world.entities` / `world.loadedChunks` 统计收集与结果发送收口到 `globalRegionScheduler`。
-- 将 `command/Players.kt` 中的玩家位置读取改为按玩家 entity scheduler 分发收集，使用异步聚合。
-- 将 `command/Clean.kt` 按世界清理改为每次新建 transient Service 实例，并通过回调返回清理结果。
-- 将 `command/Show.kt` 的 `scanDenseEntries` 改为注入 `SchedulerFacade` 的异步回调版本。
-- 向 `RuntimeServices` 增加 `isSchedulerReady` 属性，供各清理入口安全校验 `SchedulerFacade` 是否已注入。
-
+- **项目更名为 EClean-Modern**，升级到新版服务器接口。
+- **大量内部重构**：清理逻辑拆分、任务调度重写、统计改为逐区块执行，以适配新架构服务器。
+- 更新了文档。

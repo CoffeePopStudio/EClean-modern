@@ -2,13 +2,13 @@ package feature.trashcan
 
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.Damageable
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import setupMockBukkit
 import top.e404.eclean.feature.trashcan.TrashcanItemStore
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -21,107 +21,162 @@ class TrashcanItemStoreTest {
         }
     }
 
+    private fun store(
+        lifetime: Long? = 600L,
+        stacking: Boolean = true,
+    ) = TrashcanItemStore(
+        lifetimeSeconds = { lifetime },
+        stackingEnabled = { stacking },
+    )
+
     @Test
-    fun `addItem merges similar items`() {
-        val store = TrashcanItemStore(maxSlots = 54)
-        store.addItem(ItemStack(Material.DIAMOND, 30))
-        store.addItem(ItemStack(Material.DIAMOND, 30))
-        val slots = arrayOfNulls<ItemStack>(54)
-        store.loadInto(slots)
-        val diamond = slots[0]
-        assertNotNull(diamond)
-        assertEquals(Material.DIAMOND, diamond.type)
-        assertEquals(60, diamond.amount)
+    fun `addItem merges similar items beyond maxStackSize`() {
+        val store = store()
+        assertTrue(store.addItem(ItemStack(Material.DIAMOND, 64)))
+        assertTrue(store.addItem(ItemStack(Material.DIAMOND, 64)))
+        assertTrue(store.addItem(ItemStack(Material.DIAMOND, 10)))
+        assertEquals(1, store.size)
+        assertEquals(138, store.totalCount())
+        assertEquals(138, store.getEntries().first().count)
     }
 
     @Test
-    fun `addItem overflows to new slot when exceeding maxStackSize`() {
-        val store = TrashcanItemStore(maxSlots = 54)
-        assertTrue(store.addItem(ItemStack(Material.DIAMOND, 64)))
-        assertTrue(store.addItem(ItemStack(Material.DIAMOND, 10)))
+    fun `addItem separates different materials`() {
+        val store = store()
+        store.addItem(ItemStack(Material.DIAMOND, 10))
+        store.addItem(ItemStack(Material.IRON_INGOT, 5))
+        assertEquals(2, store.size)
+        assertEquals(15, store.totalCount())
+    }
+
+    @Test
+    fun `addItem separates items with different durability`() {
+        val store = store()
+        val newSword = ItemStack(Material.DIAMOND_SWORD)
+        val usedSword = ItemStack(Material.DIAMOND_SWORD)
+        usedSword.itemMeta = (usedSword.itemMeta as Damageable).apply { damage = 1 }
+        store.addItem(newSword)
+        store.addItem(usedSword)
         assertEquals(2, store.size)
     }
 
     @Test
-    fun `addItem returns false when store is full`() {
-        val store = TrashcanItemStore(maxSlots = 1)
-        assertTrue(store.addItem(ItemStack(Material.DIAMOND, 1)))
-        assertFalse(store.addItem(ItemStack(Material.IRON_INGOT, 1)))
-        assertEquals(1, store.size)
-    }
-
-    @Test
-    fun `removeItem subtracts amount and returns removed count`() {
-        val store = TrashcanItemStore(maxSlots = 54)
+    fun `stacking disabled creates separate entries`() {
+        val store = store(stacking = false)
         store.addItem(ItemStack(Material.DIAMOND, 10))
-        val removed = store.removeItem(ItemStack(Material.DIAMOND), 3)
-        assertEquals(3, removed)
-        val slots = arrayOfNulls<ItemStack>(54)
-        store.loadInto(slots)
-        assertEquals(7, slots[0]?.amount)
-        assertEquals(Material.DIAMOND, slots[0]?.type)
+        store.addItem(ItemStack(Material.DIAMOND, 20))
+        assertEquals(2, store.size)
     }
 
     @Test
-    fun `removeItem deletes entry when amount exhausted`() {
-        val store = TrashcanItemStore(maxSlots = 54)
-        store.addItem(ItemStack(Material.DIAMOND, 5))
-        val removed = store.removeItem(ItemStack(Material.DIAMOND), 5)
-        assertEquals(5, removed)
+    fun `new entry deadline is creation time plus lifetime`() {
+        val store = store(lifetime = 600)
+        val before = System.currentTimeMillis()
+        store.addItem(ItemStack(Material.DIAMOND, 1))
+        val deadline = store.getEntries().first().deadline
+        val after = System.currentTimeMillis()
+        assertTrue(deadline >= before + 600_000)
+        assertTrue(deadline <= after + 600_000)
+    }
+
+    @Test
+    fun `merging into existing entry does not reset deadline`() {
+        val store = store(lifetime = 600)
+        store.addItem(ItemStack(Material.DIAMOND, 1))
+        val deadline = store.getEntries().first().deadline
+        Thread.sleep(10)
+        store.addItem(ItemStack(Material.DIAMOND, 1))
+        assertEquals(deadline, store.getEntries().first().deadline)
+    }
+
+    @Test
+    fun `null lifetime never expires`() {
+        val store = store(lifetime = null)
+        store.addItem(ItemStack(Material.DIAMOND, 1))
+        val entry = store.getEntries().first()
+        assertEquals(Long.MAX_VALUE, entry.deadline)
+        assertEquals(0, store.expireEntries(Long.MAX_VALUE - 1))
+        assertEquals(1, store.size)
+        assertNull(store.earliestDeadline())
+    }
+
+    @Test
+    fun `expireEntries removes only expired entries`() {
+        val store = store(lifetime = 600)
+        store.addItem(ItemStack(Material.DIAMOND, 1))
+        val deadline = store.getEntries().first().deadline
+        assertEquals(0, store.expireEntries(deadline - 1))
+        assertEquals(1, store.expireEntries(deadline))
         assertTrue(store.isEmpty())
     }
 
     @Test
-    fun `removeItem supports cross-stack removal`() {
-        val store = TrashcanItemStore(maxSlots = 54)
-        store.addItem(ItemStack(Material.DIAMOND, 64))
+    fun `earliestDeadline returns minimum expiring deadline`() {
+        val store = store(lifetime = 600)
+        store.addItem(ItemStack(Material.DIAMOND, 1))
+        val first = store.getEntries().first().deadline
+        Thread.sleep(10)
+        store.addItem(ItemStack(Material.IRON_INGOT, 1))
+        val second = store.getEntries().last().deadline
+        assertEquals(first, store.earliestDeadline())
+        assertTrue(second > first)
+    }
+
+    @Test
+    fun `removeItem subtracts amount and removes entry when exhausted`() {
+        val store = store()
+        store.addItem(ItemStack(Material.DIAMOND, 100))
+        assertEquals(30, store.removeItem(ItemStack(Material.DIAMOND), 30))
+        assertEquals(70, store.totalCount())
+        assertEquals(70, store.removeItem(ItemStack(Material.DIAMOND), 100))
+        assertTrue(store.isEmpty())
+    }
+
+    @Test
+    fun `removeItem with other prototype does nothing`() {
+        val store = store()
         store.addItem(ItemStack(Material.DIAMOND, 10))
-        val removed = store.removeItem(ItemStack(Material.DIAMOND), 70)
-        assertEquals(70, removed)
-        val slots = arrayOfNulls<ItemStack>(54)
-        store.loadInto(slots)
-        assertEquals(4, slots[0]?.amount)
-        assertNull(slots[1])
+        assertEquals(0, store.removeItem(ItemStack(Material.IRON_INGOT), 5))
+        assertEquals(10, store.totalCount())
+    }
+
+    @Test
+    fun `getEntries preserves insertion order`() {
+        val store = store()
+        store.addItem(ItemStack(Material.IRON_INGOT, 5))
+        store.addItem(ItemStack(Material.DIAMOND, 10))
+        val entries = store.getEntries()
+        assertEquals(Material.IRON_INGOT, entries[0].prototype.type)
+        assertEquals(Material.DIAMOND, entries[1].prototype.type)
+    }
+
+    @Test
+    fun `addAll merges into existing entries`() {
+        val store = store()
+        store.addItem(ItemStack(Material.DIAMOND, 10))
+        store.addAll(listOf(ItemStack(Material.DIAMOND, 5), ItemStack(Material.IRON_INGOT, 3)))
+        assertEquals(2, store.size)
+        assertEquals(15, store.getEntries().first { it.prototype.type == Material.DIAMOND }.count)
     }
 
     @Test
     fun `clear empties the store`() {
-        val store = TrashcanItemStore(maxSlots = 54)
+        val store = store()
         store.addItem(ItemStack(Material.DIAMOND, 1))
         store.addItem(ItemStack(Material.IRON_INGOT, 1))
         store.clear()
         assertTrue(store.isEmpty())
         assertEquals(0, store.size)
+        assertEquals(0, store.totalCount())
     }
 
     @Test
-    fun `loadInto and saveFrom round-trip`() {
-        val store = TrashcanItemStore(maxSlots = 54)
-        store.addItem(ItemStack(Material.DIAMOND, 64))
-        store.addItem(ItemStack(Material.IRON_INGOT, 32))
-
-        val slots = arrayOfNulls<ItemStack>(54)
-        store.loadInto(slots)
-        assertEquals(Material.DIAMOND, slots[0]?.type)
-        assertEquals(64, slots[0]?.amount)
-        assertEquals(Material.IRON_INGOT, slots[1]?.type)
-        assertEquals(32, slots[1]?.amount)
-
-        slots[0]!!.amount = 16
-        store.saveFrom(slots)
-        val restored = arrayOfNulls<ItemStack>(54)
-        store.loadInto(restored)
-        assertEquals(16, restored[0]?.amount)
-        assertEquals(32, restored[1]?.amount)
-    }
-
-    @Test
-    fun `saveFrom skips air slots`() {
-        val store = TrashcanItemStore(maxSlots = 54)
-        store.addItem(ItemStack(Material.DIAMOND, 1))
-        val slots = arrayOfNulls<ItemStack>(54)
-        slots[0] = ItemStack(Material.AIR)
-        store.saveFrom(slots)
-        assertTrue(store.isEmpty())
+    fun `getEntries returns isolated copies`() {
+        val store = store()
+        store.addItem(ItemStack(Material.DIAMOND, 10))
+        val snapshot = store.getEntries()
+        snapshot.first().count = 999
+        assertEquals(10, store.getEntries().first().count)
+        assertFalse(store.getEntries().first().prototype === snapshot.first().prototype)
     }
 }

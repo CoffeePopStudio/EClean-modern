@@ -21,6 +21,7 @@ import top.e404.eclean.feature.stats.WorldStatsService
 import top.e404.eclean.lang.MLang
 import top.e404.eclean.platform.Schedulers
 import top.e404.eclean.util.formatAsConst
+import top.e404.eclean.util.parseSecondAsDuration
 import java.util.concurrent.atomic.AtomicInteger
 
 object Commands : CommandExecutor, TabCompleter {
@@ -43,7 +44,7 @@ object Commands : CommandExecutor, TabCompleter {
             "clean" -> handleClean(sender, args)
             "s", "stats" -> handleStats(sender, args)
             "e", "entity" -> handleEntity(sender, args)
-            "t", "trash" -> handleTrash(sender)
+            "t", "trash" -> handleTrash(sender, args)
             "p", "players" -> handlePlayers(sender)
             "show" -> handleShow(sender)
             else -> sendUsage(sender)
@@ -69,6 +70,9 @@ object Commands : CommandExecutor, TabCompleter {
             "e", "entity" -> {
                 if (args.size == 2) return EntityType.values().map { it.name }.filter { it.startsWith(args[1].uppercase()) }
                 if (args.size == 3) return Bukkit.getWorlds().map { it.name }.filter { it.startsWith(args[2].lowercase()) }
+            }
+            "t", "trash" -> {
+                if (args.size == 2) return listOf("stats").filter { it.startsWith(args[1].lowercase()) }
             }
         }
         return emptyList()
@@ -200,7 +204,12 @@ object Commands : CommandExecutor, TabCompleter {
         }
     }
 
-    private fun handleTrash(sender: CommandSender) {
+    private fun handleTrash(sender: CommandSender, args: Array<out String>) {
+        if (args.size == 2 && args[1].equals("stats", true)) {
+            if (!sender.hasPermission("eclean.admin")) return
+            sender.sendTrashStats()
+            return
+        }
         if (sender !is Player) return
         if (!sender.hasPermission("eclean.trash")) return
         if (!Config.current.trashcan.enabled) {
@@ -209,6 +218,26 @@ object Commands : CommandExecutor, TabCompleter {
         }
         top.e404.eclean.clean.Trashcan.open(sender)
         RuntimeServices.messages.send(sender, MLang["command.trash_open"])
+    }
+
+    private fun CommandSender.sendTrashStats() {
+        val entries = RuntimeServices.trashcanManager.stats()
+        if (entries.isEmpty()) {
+            RuntimeServices.messages.send(this, MLang["command.trash_stats_empty"])
+            return
+        }
+        RuntimeServices.messages.send(this, MLang["command.trash_stats_header", "count" to entries.size])
+        val now = System.currentTimeMillis()
+        for (entry in entries) {
+            val expire = entry.deadline.takeIf { it != Long.MAX_VALUE }
+                ?.let { maxOf(0, (it - now) / 1000) }
+                ?.parseSecondAsDuration()
+                ?: MLang["command.trash_never_expire"]
+            RuntimeServices.messages.send(
+                this,
+                MLang["command.trash_stats_line", "item" to entry.prototype.type.name, "amount" to entry.count, "expire" to expire],
+            )
+        }
     }
 
     private fun handlePlayers(sender: CommandSender) {

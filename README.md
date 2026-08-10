@@ -30,6 +30,7 @@
 - `/eclean stats` 统计当前所在世界的实体和区块统计
 - `/eclean stats <世界名>` 统计实体和区块统计
 - `/eclean trash` 打开垃圾桶
+- `/eclean trash stats` 查看垃圾桶统计信息(每个聚合条目的类型/数量/剩余时间)
 - `/eclean show` 打开密集实体统计信息菜单
 
 ## 权限
@@ -44,8 +45,8 @@
 - `%eclean_last_drop%` - `上次清理的掉落物数量`
 - `%eclean_last_living%` - `上次清理的生物数量`
 - `%eclean_last_chunk%` - `上次清理的密集实体数量`
-- `%eclean_trashcan_countdown%` - `垃圾桶清理倒计时, 单位秒`
-- `%eclean_trashcan_countdown_formatted%` - `垃圾桶清理倒计时, 格式化的时间`
+- `%eclean_trashcan_countdown%` - `最早到期条目的剩余时间(条目永不过期时为空桶, 为0), 单位秒`
+- `%eclean_trashcan_countdown_formatted%` - `最早到期条目的剩余时间, 格式化的时间`
 
 ## 配置
 

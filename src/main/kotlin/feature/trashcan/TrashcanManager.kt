@@ -24,12 +24,12 @@ class TrashcanManager(
 
     fun addItem(item: ItemStack): Boolean {
         val accepted = store.addItem(item)
-        if (!accepted) {
-            messages.debug { "垃圾桶已满，物品无法放入: ${item.type.name}" }
-        }
         Schedulers.runGlobal { TrashcanMenu.updateAllOpen() }
         return accepted
     }
+
+    /** 垃圾桶条目快照(插入顺序), 供统计使用 */
+    fun stats(): List<TrashcanEntry> = store.getEntries()
 
     fun clearAll() {
         if (store.isEmpty()) return

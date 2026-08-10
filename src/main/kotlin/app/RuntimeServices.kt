@@ -78,9 +78,12 @@ object RuntimeServices {
             }
             messages.send(player, MLang[key])
         }
-        trashcanStore = TrashcanItemStore(Config.current.trashcan.maxSlots)
+        trashcanStore = TrashcanItemStore(
+            lifetimeSeconds = { Config.current.trashcan.clearIntervalSeconds },
+            stackingEnabled = { Config.current.trashcan.stacking.enabled },
+        )
         trashcanManager = TrashcanManager(trashcanStore, messages)
-        trashcanTicker = TrashcanTicker(trashcanManager, statusSnapshots, messages)
+        trashcanTicker = TrashcanTicker(trashcanStore, statusSnapshots)
         cleanupAnnouncementService = CleanupAnnouncementService(messages, statusSnapshots)
         cleanupCoordinator = CleanupCoordinator(messages, statusSnapshots)
         cleanupTickService = CleanupTickService(messages, cleanupCoordinator, cleanupAnnouncementService, statusSnapshots)

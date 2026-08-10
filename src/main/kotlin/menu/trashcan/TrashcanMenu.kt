@@ -9,6 +9,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import top.e404.eclean.PL
 import top.e404.eclean.clean.Trashcan
+import top.e404.eclean.config.Config
 import top.e404.eclean.feature.trashcan.TrashcanItemStore
 import top.e404.eclean.feature.trashcan.TrashcanManager
 import top.e404.eclean.lang.MLang
@@ -64,9 +65,11 @@ open class TrashcanMenu(
     }
 
     private fun rebuildDisplayData() {
-        val snapshot = store.getSnapshot()
+        val stacking = Config.current.trashcan.stacking
+        val entries = store.getEntries()
+        val sorted = if (stacking.sortByCount) entries.sortedByDescending { it.count } else entries
         displayData.clear()
-        displayData.addAll(snapshot.map { TrashcanDisplayItem(it) })
+        displayData.addAll(sorted.map { TrashcanDisplayItem(it) })
     }
 
     override fun open(player: Player) {
@@ -109,8 +112,8 @@ open class TrashcanMenu(
 
         val take = when (event.click) {
             ClickType.LEFT, ClickType.DOUBLE_CLICK -> 1
-            ClickType.SHIFT_LEFT -> displayItem.item.maxStackSize
-            ClickType.RIGHT -> maxOf(displayItem.item.maxStackSize / 2, 1)
+            ClickType.SHIFT_LEFT -> displayItem.stackType.maxStackSize
+            ClickType.RIGHT -> maxOf(displayItem.stackType.maxStackSize / 2, 1)
             else -> return false
         }
 
@@ -122,10 +125,10 @@ open class TrashcanMenu(
             if (slotItem == null || slotItem.type == Material.AIR) {
                 val count = minOf(waitForPut, maxStackSize)
                 waitForPut -= count
-                player.inventory.setItem(i, displayItem.snapshot.clone().apply { amount = count })
+                player.inventory.setItem(i, displayItem.prototype.clone().apply { amount = count })
                 continue
             }
-            if (!slotItem.isSimilar(displayItem.snapshot)) continue
+            if (!slotItem.isSimilar(displayItem.prototype)) continue
             if (slotItem.amount >= maxStackSize) continue
             val count = minOf(waitForPut, maxStackSize - slotItem.amount)
             waitForPut -= count
@@ -134,12 +137,7 @@ open class TrashcanMenu(
         val given = take - waitForPut
         if (given <= 0) return true
 
-        val matchItem = store.getSnapshot().firstOrNull { it.isSimilar(displayItem.snapshot) } ?: run {
-            rebuildDisplayData()
-            updateIcon()
-            return true
-        }
-        store.removeItem(matchItem, given)
+        store.removeItem(displayItem.prototype, given)
         rebuildDisplayData()
         updateIcon()
         return true

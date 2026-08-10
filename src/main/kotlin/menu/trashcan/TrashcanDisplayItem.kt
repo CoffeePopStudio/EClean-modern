@@ -2,12 +2,15 @@ package top.e404.eclean.menu.trashcan
 
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.inventory.ItemStack
+import top.e404.eclean.config.Config
+import top.e404.eclean.feature.trashcan.TrashcanEntry
 import top.e404.eclean.lang.MLang
 import top.e404.eclean.ui.UiDisplayable
 import top.e404.eclean.ui.editItemMeta
+import top.e404.eclean.util.parseSecondAsDuration
 
 class TrashcanDisplayItem(
-    val snapshot: ItemStack,
+    val entry: TrashcanEntry,
 ) : UiDisplayable {
     override var needUpdate = true
     override lateinit var item: ItemStack
@@ -17,17 +20,25 @@ class TrashcanDisplayItem(
         needUpdate = false
     }
 
-    private fun generateItem() = snapshot.clone().editItemMeta {
-        val placeholders = arrayOf<Pair<String, *>>("amount" to snapshot.clone().amount)
+    private fun generateItem() = entry.prototype.clone().editItemMeta {
         val existingLore = lore() ?: mutableListOf()
-        val newLines = MLang.get("menu.trashcan.item.lore", *placeholders)
-            .removeSuffix("\n")
-            .lines()
-            .map { MiniMessage.miniMessage().deserialize(it) }
-        existingLore.addAll(newLines)
+        val newLines = mutableListOf<String>().apply {
+            addAll(
+                MLang.get("menu.trashcan.item.lore", "amount" to entry.count)
+                    .removeSuffix("\n")
+                    .lines()
+            )
+            val remainingSeconds = entry.deadline
+                .takeIf { it != Long.MAX_VALUE }
+                ?.let { maxOf(0, (it - System.currentTimeMillis()) / 1000) }
+            if (remainingSeconds != null && Config.current.trashcan.stacking.showRemainingTimeInLore) {
+                add(MLang.get("menu.trashcan.item.expire", "expire" to remainingSeconds.parseSecondAsDuration()))
+            }
+        }
+        existingLore.addAll(newLines.map { MiniMessage.miniMessage().deserialize(it) })
         lore(existingLore)
     }.apply { amount = 1 }
 
-    val stackType get() = snapshot.type
-    val stackAmount get() = snapshot.amount
+    val prototype get() = entry.prototype
+    val stackType get() = entry.prototype.type
 }
