@@ -1,0 +1,76 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: modern
+          fetch-depth: 0
+
+      - name: Read project version
+        id: version
+        run: |
+          V=$(grep -oP '^version\s*=\s*"\K[^"]+' build.gradle.kts)
+          if [ -z "$V" ]; then
+            echo "::error::无法从 build.gradle.kts 读取 version"
+            exit 1
+          fi
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "本次发版版本: $V"
+
+      - name: Check tag does not exist
+        run: |
+          V="${{ steps.version.outputs.version }}"
+          if git ls-remote --tags origin "refs/tags/v$V" | grep -q .; then
+            echo "::error::tag v$V 已存在, 请先更新 build.gradle.kts 中的版本号"
+            exit 1
+          fi
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build and test
+        run: ./gradlew build
+
+      - name: Extract release notes from changelog
+        run: |
+          V="${{ steps.version.outputs.version }}"
+          awk -v v="$V" '$0 == "## " v { f = 1; next } /^## /{ f = 0 } f' docs/Changelog.md > release_notes.md
+          if [ ! -s release_notes.md ]; then
+            echo "::error::docs/Changelog.md 中没有找到版本 $V 的段落, 请先更新 changelog"
+            exit 1
+          fi
+          echo "--- release notes ---"
+          cat release_notes.md
+
+      - name: Create and push tag
+        run: |
+          V="${{ steps.version.outputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v$V" -m "Release v$V"
+          git push origin "v$V"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
+          body_path: release_notes.md
+          files: build/libs/EClean-Modern-*.jar
+          fail_on_unmatched_files: true
