@@ -81,8 +81,9 @@ tasks {
 
     processResources {
         filteringCharset = Charsets.UTF_8.name()
+        val pluginVersion = project.version
         filesMatching("plugin.yml") {
-            expand("version" to project.version)
+            expand("version" to pluginVersion)
         }
     }
 
