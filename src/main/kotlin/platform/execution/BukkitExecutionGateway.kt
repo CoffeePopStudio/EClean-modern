@@ -5,7 +5,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import top.e404.eclean.platform.Schedulers
 
-class FoliaExecutionGateway : ExecutionGateway {
+class BukkitExecutionGateway : ExecutionGateway {
     override fun runGlobal(task: () -> Unit) = Schedulers.runGlobal(task)
 
     override fun runAsync(task: () -> Unit) = Schedulers.runAsync(task)

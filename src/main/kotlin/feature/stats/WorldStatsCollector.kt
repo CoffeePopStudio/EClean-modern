@@ -7,9 +7,7 @@ class WorldStatsCollector {
     fun collectFromChunk(chunk: Chunk): ChunkSnapshot = ChunkSnapshot(
         entityCounts = chunk.entities
             .groupingBy { it.type }
-            .eachCount()
-            .mapKeys { it.key },
-        forceLoaded = false,
+            .eachCount(),
     )
 
     fun countEntityTypeInChunk(chunk: Chunk, type: EntityType): Int =
@@ -18,7 +16,6 @@ class WorldStatsCollector {
 
 data class ChunkSnapshot(
     val entityCounts: Map<EntityType, Int>,
-    val forceLoaded: Boolean,
 ) {
     companion object {
         fun merge(

@@ -4,7 +4,6 @@ import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.command.Commands
-import top.e404.eclean.config.Config
 import top.e404.eclean.lang.MLang
 import top.e404.eclean.listener.DespawnListener
 import top.e404.eclean.menu.MenuManager
@@ -16,15 +15,7 @@ open class EClean : JavaPlugin {
         var unit = false
     }
 
-    val debugPrefix get() = MLang["debug_prefix"]
     val prefix get() = MLang["prefix"]
-    val debuggers = mutableSetOf<String>()
-
-    var debug: Boolean
-        get() = Config.current.global.debug
-        set(value) {
-            Config.update { it.copy(global = it.global.copy(debug = value)) }
-        }
 
     @Suppress("UNUSED")
     constructor() : super()
@@ -60,7 +51,6 @@ open class EClean : JavaPlugin {
 
     override fun onDisable() {
         RuntimeServices.shutdown()
-        MenuManager.shutdown()
         RuntimeServices.messages.info("EClean-Modern disabled")
     }
 }

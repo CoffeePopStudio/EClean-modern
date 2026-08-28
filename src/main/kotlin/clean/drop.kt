@@ -43,5 +43,5 @@ private fun announceDrop(results: List<DropCleanupResult>) {
     if (finish.isBlank()) return
     val message = finish.placeholder("clean" to lastDrop, "all" to all)
     if (noOnline && !noOnlineMessage) return
-    RuntimeServices.cleanupAnnouncementService.announceDropFinish(message)
+    RuntimeServices.cleanupAnnouncementService.announceFinish(message)
 }

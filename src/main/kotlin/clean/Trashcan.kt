@@ -8,12 +8,6 @@ object Trashcan {
         RuntimeServices.trashcanManager.clearAll()
     }
 
-    val countdown get() = RuntimeServices.trashcanTicker.countdown
-
-    fun schedule() {
-        RuntimeServices.trashcanTicker.start()
-    }
-
     fun open(player: org.bukkit.entity.Player) {
         RuntimeServices.trashcanManager.open(player)
     }

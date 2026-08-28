@@ -15,18 +15,9 @@ class CleanupAnnouncementService(
         messages.broadcast(message)
     }
 
-    fun announceDropFinish(message: String) {
+    fun announceFinish(message: String) {
+        if (message.isBlank()) return
         if (noOnline && !noOnlineMessage) return
-        if (message.isNotBlank()) messages.broadcast(message)
-    }
-
-    fun announceLivingFinish(message: String) {
-        if (noOnline && !noOnlineMessage) return
-        if (message.isNotBlank()) messages.broadcast(message)
-    }
-
-    fun announceChunkFinish(message: String) {
-        if (noOnline && !noOnlineMessage) return
-        if (message.isNotBlank()) messages.broadcast(message)
+        messages.broadcast(message)
     }
 }

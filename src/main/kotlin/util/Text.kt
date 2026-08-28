@@ -4,11 +4,8 @@ private val constRegex = Regex("[.\\s\\-_]+")
 
 fun String.formatAsConst() = replace(constRegex, "_").uppercase()
 
-fun String.placeholder(vararg placeholder: Pair<String, Any?>): String {
-    var s = this
-    for ((k, v) in placeholder) s = s.replace("{$k}", v.toString())
-    return s
-}
+fun String.placeholder(vararg placeholder: Pair<String, Any?>): String =
+    placeholder(mapOf(*placeholder))
 
 fun String.placeholder(placeholder: Map<String, Any?>): String {
     var s = this

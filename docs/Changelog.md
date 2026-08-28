@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.2.1
+
+### Changed
+- **Big internal cleanup and refactor** — no player-facing behavior changed.
+- Removed dead code and duplicate classes.
+- Split the command handling into smaller files so it is easier to maintain.
+- Unified repeated logic across drop/living cleanup, world planning, pager buttons, cleanup announcements, and scheduler gateways.
+- Moved hardcoded command messages into `lang.yml`.
+- Updated the Gradle wrapper.
+- Cleaned up disabled/dead tests.
+
 ## 0.2.0
 
 ### Added

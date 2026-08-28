@@ -44,5 +44,5 @@ private fun announceLiving(results: List<LivingCleanupResult>) {
     if (finish.isBlank()) return
     val message = finish.placeholder(mapOf("clean" to lastLiving, "all" to all))
     if (noOnline && !noOnlineMessage) return
-    RuntimeServices.cleanupAnnouncementService.announceLivingFinish(message)
+    RuntimeServices.cleanupAnnouncementService.announceFinish(message)
 }

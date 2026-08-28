@@ -7,6 +7,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemFlag
 import top.e404.eclean.PL
 import top.e404.eclean.lang.MLang
+import top.e404.eclean.ui.PageButton
 import top.e404.eclean.ui.UiButton
 import top.e404.eclean.ui.UiMenu
 import top.e404.eclean.ui.buildItemStack
@@ -14,8 +15,24 @@ import top.e404.eclean.ui.buildItemStack
 class DenseMenu(data: MutableList<EntityInfo>) : UiMenu(PL, MLang["menu.dense.title"], 6, false) {
     val zone = DenseZone(this, data)
     var temp = false
-    private val prev = PrevButton(this)
-    private val next = NextButton(this)
+    private val prev = PageButton(
+        isNext = false,
+        hasPage = { zone.hasPrev },
+        currentPage = { zone.page },
+        pageAction = { zone.prevPage() },
+        refresh = { updateIcon() },
+        name = MLang["menu.dense.prev.name"],
+        lore = MLang["menu.dense.prev.lore"].lines(),
+    )
+    private val next = PageButton(
+        isNext = true,
+        hasPage = { zone.hasNext },
+        currentPage = { zone.page },
+        pageAction = { zone.nextPage() },
+        refresh = { updateIcon() },
+        name = MLang["menu.dense.next.name"],
+        lore = MLang["menu.dense.next.lore"].lines(),
+    )
 
     init {
         initSlots(

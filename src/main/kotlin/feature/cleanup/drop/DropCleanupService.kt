@@ -2,63 +2,41 @@ package top.e404.eclean.feature.cleanup.drop
 
 import org.bukkit.Bukkit
 import top.e404.eclean.app.RuntimeServices
-import top.e404.eclean.platform.Schedulers
-import top.e404.eclean.platform.dispatch.ChunkTaskCoordinator
-import java.util.concurrent.atomic.AtomicInteger
+import top.e404.eclean.config.Config
+import top.e404.eclean.feature.cleanup.ChunkCleanupOutcome
+import top.e404.eclean.feature.cleanup.ChunkCleanupRunner
 
 class DropCleanupService(
     private val planner: DropCleanupPlanner = DropCleanupPlanner(),
     private val collector: DropCleanupCollector = DropCleanupCollector(),
     private val policy: DropCleanupPolicy = DropCleanupPolicy(),
     private val executor: DropCleanupExecutor = DropCleanupExecutor(),
-    private val coordinator: ChunkTaskCoordinator = ChunkTaskCoordinator(),
+    private val runner: ChunkCleanupRunner = ChunkCleanupRunner(),
 ) {
     fun cleanAllWorlds(dryRun: Boolean = false, onComplete: (List<DropCleanupResult>) -> Unit) {
         val worldNames = planner.planWorldNames()
-        if (worldNames.isEmpty()) {
-            Schedulers.runGlobal { onComplete(emptyList()) }
-            return
-        }
-        val results = mutableListOf<DropCleanupResult>()
-        val pending = AtomicInteger(worldNames.size)
-        worldNames.forEach { name ->
-            cleanWorld(name, dryRun = dryRun) { result ->
-                synchronized(results) { results += result }
-                if (pending.decrementAndGet() == 0) onComplete(results.toList())
-            }
+        runner.cleanAllWorlds(worldNames, onComplete) { name, callback ->
+            cleanWorld(name, dryRun = dryRun, onComplete = callback)
         }
     }
 
     fun cleanWorld(worldName: String, dryRun: Boolean = false, onComplete: (DropCleanupResult) -> Unit) {
-        val world = Bukkit.getWorld(worldName)
-        if (world == null) {
-            Schedulers.runGlobal { onComplete(DropCleanupResult(0, 0)) }
-            return
-        }
-        val chunkRefs = coordinator.getLoadedChunkRefs(world)
-        if (chunkRefs.isEmpty()) {
-            Schedulers.runGlobal { onComplete(DropCleanupResult(0, 0)) }
-            return
-        }
         val rule = DropCleanupRule.fromConfig()
-        val matchers = top.e404.eclean.config.Config.current.drop.matchers
-        val cleaned = AtomicInteger(0)
-        val total = AtomicInteger(0)
-        coordinator.dispatchToChunks(
-            chunkRefs = chunkRefs,
-            resolveWorld = { Bukkit.getWorld(it) },
+        val matchers = Config.current.drop.matchers
+        runner.cleanWorld(
+            worldName = worldName,
+            onEmpty = { onComplete(DropCleanupResult(0, 0)) },
             perChunk = { w, ref ->
                 val chunk = w.getChunkAt(ref.x, ref.z)
                 val collection = collector.collectFromChunk(chunk)
-                if (collection.candidates.isEmpty()) return@dispatchToChunks
+                if (collection.candidates.isEmpty()) return@cleanWorld ChunkCleanupOutcome(0, 0)
                 val decision = policy.decide(collection, rule, matchers)
-                if (!dryRun) cleaned.addAndGet(executor.execute(collection, decision))
-                else cleaned.addAndGet(decision.total)
-                total.addAndGet(decision.total)
+                val cleaned = if (!dryRun) executor.execute(collection, decision) else decision.total
+                ChunkCleanupOutcome(cleaned, decision.total)
             },
-            onComplete = {
-                RuntimeServices.messages.debug { "Drop cleanup complete in ${worldName} (${cleaned.get()}/${total.get()})" }
-                onComplete(DropCleanupResult(cleaned.get(), total.get()))
+            onComplete = { cleaned, total ->
+                RuntimeServices.messages.debug { "Drop cleanup complete in ${worldName} (${cleaned}/${total})" }
+                onComplete(DropCleanupResult(cleaned, total))
             },
         )
     }

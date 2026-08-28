@@ -2,8 +2,6 @@ package top.e404.eclean.platform.execution
 
 import java.util.UUID
 
-data class WorldRef(val name: String)
-
 data class ChunkRef(
     val world: String,
     val x: Int,

@@ -52,7 +52,7 @@ private fun announceChunk() {
     if (finish.isBlank()) return
     val message = finish.placeholder("clean" to lastChunk)
     if (noOnline && !noOnlineMessage) return
-    RuntimeServices.cleanupAnnouncementService.announceChunkFinish(message)
+    RuntimeServices.cleanupAnnouncementService.announceFinish(message)
 }
 
 fun ChunkRef.info() = "x: ${x * 16}..${x * 16 + 15}, z: ${z * 16}..${z * 16 + 15}"

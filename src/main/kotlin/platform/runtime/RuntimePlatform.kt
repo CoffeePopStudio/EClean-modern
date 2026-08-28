@@ -1,5 +1,6 @@
 package top.e404.eclean.platform.runtime
 
-interface RuntimePlatform {
-    val id: String
+enum class RuntimePlatform(val id: String) {
+    FOLIA("folia"),
+    PAPER("paper"),
 }

@@ -37,8 +37,7 @@ class WorldStatsService(
                 Schedulers.runGlobal {
                     val forceLoaded = liveChunks.count { it.isForceLoaded }
                     val result = if (snapshots.isEmpty()) {
-                        val empty = ChunkSnapshot(emptyMap(), false)
-                        ChunkSnapshot.merge(listOf(empty).repeat(liveChunks.size), forceLoaded)
+                        WorldStatsResult(emptyMap(), liveChunks.size, forceLoaded)
                     } else {
                         ChunkSnapshot.merge(snapshots, forceLoaded)
                     }
@@ -81,10 +80,4 @@ class WorldStatsService(
             },
         )
     }
-}
-
-private fun <T> List<T>.repeat(n: Int): List<T> {
-    val result = mutableListOf<T>()
-    repeat(n) { result += this }
-    return result
 }

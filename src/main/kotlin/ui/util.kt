@@ -29,9 +29,3 @@ fun ItemStack.editItemMeta(block: ItemMeta.() -> Unit): ItemStack {
     itemMeta = meta
     return this
 }
-
-fun <T> List<T>.splitByPage(pageSize: Int, page: Int): List<T> {
-    val start = page * pageSize
-    if (start >= size) return emptyList()
-    return subList(start, minOf(start + pageSize, size))
-}

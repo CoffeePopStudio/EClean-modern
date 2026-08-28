@@ -23,27 +23,44 @@ class CleanupCoordinator(
             if (dryRun) "Dry-run cleanup triggered via CleanupCoordinator" else "Full cleanup triggered via CleanupCoordinator"
         }
         if (worldName != null) {
-            DropCleanupService().cleanWorld(worldName, dryRun = dryRun) { _ ->
-                LivingCleanupService().cleanWorld(worldName, dryRun = dryRun) { _ ->
-                    ChunkDensityScanner().cleanWorld(worldName, dryRun = dryRun) { _ ->
-                        onComplete?.invoke()
-                    }
-                }
-            }
+            runSequential(
+                listOf(
+                    { next -> DropCleanupService().cleanWorld(worldName, dryRun = dryRun) { next() } },
+                    { next -> LivingCleanupService().cleanWorld(worldName, dryRun = dryRun) { next() } },
+                    { next -> ChunkDensityScanner().cleanWorld(worldName, dryRun = dryRun) { next() } },
+                ),
+                onComplete ?: {},
+            )
         } else {
-            cleanDrop(announce = !dryRun, dryRun = dryRun) {
-                cleanLiving(announce = !dryRun, dryRun = dryRun) {
-                    cleanDenseEntities(announce = !dryRun, dryRun = dryRun) {
-                        snapshots.updateCleanup {
-                            it.copy(
-                                elapsedSeconds = 0,
-                                remainingSeconds = Config.current.cleanup.intervalSeconds,
-                            )
-                        }
-                        onComplete?.invoke()
-                    }
+            runSequential(
+                listOf(
+                    { next -> cleanDrop(announce = !dryRun, dryRun = dryRun) { next() } },
+                    { next -> cleanLiving(announce = !dryRun, dryRun = dryRun) { next() } },
+                    { next -> cleanDenseEntities(announce = !dryRun, dryRun = dryRun) { next() } },
+                ),
+            ) {
+                snapshots.updateCleanup {
+                    it.copy(
+                        elapsedSeconds = 0,
+                        remainingSeconds = Config.current.cleanup.intervalSeconds,
+                    )
                 }
+                onComplete?.invoke()
             }
         }
+    }
+
+    private fun runSequential(
+        steps: List<((next: () -> Unit) -> Unit)>,
+        onComplete: () -> Unit,
+    ) {
+        fun run(index: Int) {
+            if (index >= steps.size) {
+                onComplete()
+            } else {
+                steps[index] { run(index + 1) }
+            }
+        }
+        run(0)
     }
 }

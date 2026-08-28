@@ -1,6 +1,6 @@
 package top.e404.eclean.feature.cleanup.drop
 
-import top.e404.eclean.util.isMatch
+import top.e404.eclean.util.filterByMatchers
 import java.util.UUID
 
 data class DropCleanupDecision(
@@ -20,11 +20,7 @@ class DropCleanupPolicy {
                     rule.protectLore && candidate.lore
         }
         val grouped = candidates.groupBy(DropCleanupCandidate::type)
-        val selected = if (rule.blackList) {
-            grouped.filterKeys { type -> type.isMatch(matchers) != null }
-        } else {
-            grouped.filterKeys { type -> type.isMatch(matchers) == null }
-        }
+        val selected = grouped.filterByMatchers(matchers, rule.blackList)
         return DropCleanupDecision(
             total = candidates.size,
             itemIdsToRemove = selected.values.flatten().map(DropCleanupCandidate::id),

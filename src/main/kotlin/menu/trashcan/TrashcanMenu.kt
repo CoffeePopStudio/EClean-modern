@@ -13,6 +13,7 @@ import top.e404.eclean.config.Config
 import top.e404.eclean.feature.trashcan.TrashcanItemStore
 import top.e404.eclean.feature.trashcan.TrashcanManager
 import top.e404.eclean.lang.MLang
+import top.e404.eclean.ui.PageButton
 import top.e404.eclean.ui.UiMenu
 import top.e404.eclean.ui.UiPager
 import top.e404.eclean.ui.emptyItem
@@ -24,8 +25,8 @@ open class TrashcanMenu(
 
     private var displayData = mutableListOf<TrashcanDisplayItem>()
     private var pager: UiPager<TrashcanDisplayItem>
-    private var prevBtn: TrashcanPrevButton
-    private var nextBtn: TrashcanNextButton
+    private var prevBtn: PageButton
+    private var nextBtn: PageButton
 
     val hasPrev get() = pager.hasPrev
     val hasNext get() = pager.hasNext
@@ -42,8 +43,24 @@ open class TrashcanMenu(
             startSlot = 0,
             onClickHandler = { index, event -> handleItemClick(index, event) },
         )
-        prevBtn = TrashcanPrevButton(this)
-        nextBtn = TrashcanNextButton(this)
+        prevBtn = PageButton(
+            isNext = false,
+            hasPage = { hasPrev },
+            currentPage = { currentPage },
+            pageAction = { prevPage() },
+            refresh = { updateIcon() },
+            name = MLang["menu.trashcan.prev.name"],
+            lore = MLang["menu.trashcan.prev.lore"].lines(),
+        )
+        nextBtn = PageButton(
+            isNext = true,
+            hasPage = { hasNext },
+            currentPage = { currentPage },
+            pageAction = { nextPage() },
+            refresh = { updateIcon() },
+            name = MLang["menu.trashcan.next.name"],
+            lore = MLang["menu.trashcan.next.lore"].lines(),
+        )
         addPager(pager)
 
         initSlots(

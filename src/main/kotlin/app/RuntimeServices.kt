@@ -11,9 +11,8 @@ import top.e404.eclean.config.Config
 import top.e404.eclean.lang.MLang
 import top.e404.eclean.platform.FoliaDetector
 import top.e404.eclean.platform.Schedulers
+import top.e404.eclean.platform.execution.BukkitExecutionGateway
 import top.e404.eclean.platform.execution.ExecutionGateway
-import top.e404.eclean.platform.execution.FoliaExecutionGateway
-import top.e404.eclean.platform.execution.PaperExecutionGateway
 import top.e404.eclean.platform.runtime.RuntimePlatform
 import top.e404.eclean.platform.runtime.RuntimePlatformFactory
 import top.e404.eclean.service.PlayerTeleportService
@@ -67,7 +66,7 @@ object RuntimeServices {
         messages = MessageService()
         val isFolia = FoliaDetector.isFolia()
         platform = RuntimePlatformFactory.create(isFolia)
-        execution = if (isFolia) FoliaExecutionGateway() else PaperExecutionGateway()
+        execution = BukkitExecutionGateway()
         statusSnapshots = StatusSnapshotService()
         playerTeleportService = PlayerTeleportService(execution)
         temporaryReturnService = TemporaryReturnService(execution, playerTeleportService) { player, event ->
@@ -102,12 +101,6 @@ object RuntimeServices {
                 messages.send(sender, MLang["command.reload_done"])
             }
         }
-    }
-
-    fun applyRuntimeConfig() {
-        if (!::cleanupTickService.isInitialized || !::trashcanTicker.isInitialized) return
-        cleanupTickService.start()
-        trashcanTicker.start()
     }
 
     fun shutdown() {

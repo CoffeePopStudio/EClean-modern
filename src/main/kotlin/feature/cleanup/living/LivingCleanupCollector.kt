@@ -1,7 +1,6 @@
 package top.e404.eclean.feature.cleanup.living
 
 import org.bukkit.Chunk
-import org.bukkit.World
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import java.util.UUID
@@ -20,12 +19,6 @@ data class LivingCleanupCollection(
 )
 
 class LivingCleanupCollector {
-    fun collect(world: World): LivingCleanupCollection = LivingCleanupCollection(
-        candidates = world.livingEntities
-            .filterNot { it is Player }
-            .map { entity -> toCandidate(entity) }
-    )
-
     fun collectFromChunk(chunk: Chunk): LivingCleanupCollection = LivingCleanupCollection(
         candidates = chunk.entities
             .filterIsInstance<LivingEntity>()

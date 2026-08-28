@@ -2,7 +2,6 @@ package top.e404.eclean.feature.cleanup.drop
 
 import org.bukkit.Chunk
 import org.bukkit.Material
-import org.bukkit.World
 import org.bukkit.entity.Item
 import org.bukkit.inventory.meta.BookMeta
 import java.util.UUID
@@ -21,10 +20,6 @@ data class DropCleanupCollection(
 )
 
 class DropCleanupCollector {
-    fun collect(world: World): DropCleanupCollection = DropCleanupCollection(
-        candidates = world.entities.filterIsInstance<Item>().map { item -> toCandidate(item) }
-    )
-
     fun collectFromChunk(chunk: Chunk): DropCleanupCollection = DropCleanupCollection(
         candidates = chunk.entities.filterIsInstance<Item>().map { item -> toCandidate(item) }
     )

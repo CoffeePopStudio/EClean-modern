@@ -1,6 +1,6 @@
 package top.e404.eclean.feature.cleanup.living
 
-import top.e404.eclean.util.isMatch
+import top.e404.eclean.util.filterByMatchers
 import java.util.UUID
 
 data class LivingCleanupDecision(
@@ -21,11 +21,7 @@ class LivingCleanupPolicy {
                     !rule.cleanMounted && candidate.mounted
         }
         val grouped = candidates.groupBy(LivingCleanupCandidate::type)
-        val selected = if (rule.blackList) {
-            grouped.filterKeys { type -> type.isMatch(matchers) != null }
-        } else {
-            grouped.filterKeys { type -> type.isMatch(matchers) == null }
-        }
+        val selected = grouped.filterByMatchers(matchers, rule.blackList)
         return LivingCleanupDecision(
             total = collection.candidates.size,
             entityIdsToRemove = selected.values.flatten().map(LivingCleanupCandidate::id),

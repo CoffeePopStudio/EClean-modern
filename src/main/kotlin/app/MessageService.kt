@@ -35,23 +35,13 @@ class MessageService {
     }
 
     fun debug(msg: () -> String) {
-        val hasDebuggers = debuggers.isNotEmpty()
         if (!hasDebuggers && !plugin.debug) return
-        val text = msg()
-        if (plugin.debug) {
-            plugin.logger.info(stripMiniMessage("$debugPrefix $text"))
-        }
-        debuggers.forEach { Bukkit.getPlayer(it)?.sendMessage("$debugPrefix $text") }
+        emitDebug(msg())
     }
 
     fun buildDebug(block: StringBuilder.() -> Unit) {
-        val hasDebuggers = debuggers.isNotEmpty()
         if (!hasDebuggers && !plugin.debug) return
-        val text = buildString(block)
-        if (plugin.debug) {
-            plugin.logger.info(stripMiniMessage("$debugPrefix $text"))
-        }
-        debuggers.forEach { Bukkit.getPlayer(it)?.sendMessage("$debugPrefix $text") }
+        emitDebug(buildString(block))
     }
 
     fun info(message: String) {
@@ -61,6 +51,16 @@ class MessageService {
     fun warn(message: String, throwable: Throwable? = null) {
         if (throwable == null) plugin.logger.log(Level.WARNING, message)
         else plugin.logger.log(Level.WARNING, message, throwable)
+    }
+
+    private val hasDebuggers: Boolean
+        get() = debuggers.isNotEmpty()
+
+    private fun emitDebug(text: String) {
+        if (plugin.debug) {
+            plugin.logger.info(stripMiniMessage("$debugPrefix $text"))
+        }
+        debuggers.forEach { Bukkit.getPlayer(it)?.sendMessage("$debugPrefix $text") }
     }
 
     private fun stripMiniMessage(text: String): String =
