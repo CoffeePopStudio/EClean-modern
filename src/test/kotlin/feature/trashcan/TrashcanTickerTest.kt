@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import resetConfig
 import server
 import setupMockBukkit
-import top.e404.eclean.app.RuntimeServices
+import plugin
 import top.e404.eclean.feature.trashcan.TrashcanItemStore
 import top.e404.eclean.feature.trashcan.TrashcanTicker
 import kotlin.test.assertEquals
@@ -39,7 +39,7 @@ class TrashcanTickerTest {
         store.addItem(ItemStack(Material.DIAMOND, 1))
         assertEquals(1, store.size)
 
-        val ticker = TrashcanTicker(store, RuntimeServices.statusSnapshots)
+        val ticker = TrashcanTicker(store, plugin.services.statusSnapshots)
         ticker.start()
         server.scheduler.performTicks(20)
         assertTrue(store.isEmpty())
@@ -50,7 +50,7 @@ class TrashcanTickerTest {
         val store = TrashcanItemStore(lifetimeSeconds = { 600L })
         store.addItem(ItemStack(Material.DIAMOND, 1))
 
-        val ticker = TrashcanTicker(store, RuntimeServices.statusSnapshots)
+        val ticker = TrashcanTicker(store, plugin.services.statusSnapshots)
         ticker.start()
         server.scheduler.performTicks(20)
         assertTrue(ticker.countdown in 595..600)
@@ -60,7 +60,7 @@ class TrashcanTickerTest {
     fun `ticker countdown is zero when store is empty`() {
         val store = TrashcanItemStore(lifetimeSeconds = { 600L })
 
-        val ticker = TrashcanTicker(store, RuntimeServices.statusSnapshots)
+        val ticker = TrashcanTicker(store, plugin.services.statusSnapshots)
         ticker.start()
         server.scheduler.performTicks(20)
         assertEquals(0, ticker.countdown)
