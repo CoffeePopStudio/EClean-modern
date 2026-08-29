@@ -5,7 +5,6 @@ import com.charleskorn.kaml.YamlConfiguration
 import kotlinx.serialization.SerializationStrategy
 import org.bukkit.command.CommandSender
 import top.e404.eclean.PL
-import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.model.ChunkDensityConfig
 import top.e404.eclean.config.model.CleanupConfig
 import top.e404.eclean.config.model.DropConfig
@@ -28,7 +27,7 @@ object ConfigManager {
     fun loadAll(sender: CommandSender? = null) {
         snapshot = loadCandidate()
         ConfigRuntimeApplier.apply(snapshot) // first load: apply all
-        RuntimeServices.messages.debug { "Modern config snapshot loaded" }
+        PL.services.messages.debug { "Modern config snapshot loaded" }
     }
 
     fun reloadAll(sender: CommandSender? = null) {
@@ -39,7 +38,7 @@ object ConfigManager {
         }
         snapshot = candidate
         ConfigRuntimeApplier.apply(candidate)
-        RuntimeServices.messages.debug { "Modern config snapshot reloaded" }
+        PL.services.messages.debug { "Modern config snapshot reloaded" }
     }
 
     fun replaceSnapshotForTest(bundle: ConfigBundle) {
@@ -98,7 +97,7 @@ object ConfigManager {
         val backup = File(PL.dataFolder, "config.legacy.yml")
         if (!backup.exists()) globalFile.copyTo(backup, overwrite = false)
         globalFile.delete()
-        RuntimeServices.messages.warn("Legacy single-file config detected, backed up to config.legacy.yml, please manually migrate to the new multi-file config")
+        PL.services.messages.warn("Legacy single-file config detected, backed up to config.legacy.yml, please manually migrate to the new multi-file config")
     }
 
     private fun <T> encode(value: T, serializer: SerializationStrategy<T>): String {
