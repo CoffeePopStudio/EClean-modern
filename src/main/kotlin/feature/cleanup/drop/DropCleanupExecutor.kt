@@ -1,6 +1,6 @@
 package top.e404.eclean.feature.cleanup.drop
+import top.e404.eclean.PL
 
-import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.Config
 
 class DropCleanupExecutor {
@@ -15,7 +15,7 @@ class DropCleanupExecutor {
             .mapNotNull { candidate -> candidate.item?.let { item -> candidate to item } }
         val trashCfg = Config.current.trashcan
         if (trashCfg.enabled && trashCfg.collectFromDropCleanup) {
-            RuntimeServices.trashcanManager.collectStacks(selected.map { (_, item) -> item.itemStack })
+            PL.services.trashcanManager.collectStacks(selected.map { (_, item) -> item.itemStack })
         }
         selected.forEach { (_, item) -> item.remove() }
         return selected.size

@@ -1,6 +1,6 @@
 package top.e404.eclean.clean
+import top.e404.eclean.PL
 
-import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.ModernConfig
 import top.e404.eclean.feature.cleanup.chunk.ChunkAlertService
 import top.e404.eclean.feature.cleanup.chunk.ChunkDensityScanner
@@ -20,22 +20,22 @@ var lastChunk = 0
 
 fun cleanDenseEntities(announce: Boolean = true, dryRun: Boolean = false, onComplete: ((Int) -> Unit)? = null) {
     if (!chunkCfg.enabled) {
-        RuntimeServices.messages.debug { "Chunk density cleanup is disabled" }
+        PL.services.messages.debug { "Chunk density cleanup is disabled" }
         onComplete?.invoke(0)
         return
     }
     val scanner = resolveChunkScanner()
-    RuntimeServices.messages.debug { "Starting chunk density check" }
-    RuntimeServices.messages.debug { if (chunkCfg.settings.cleanNamed) "Clean named entities" else "Skip named entities" }
-    RuntimeServices.messages.debug { if (chunkCfg.settings.cleanLeashed) "Clean leashed entities" else "Skip leashed entities" }
-    RuntimeServices.messages.debug { if (chunkCfg.settings.cleanMounted) "Clean mounted entities" else "Skip mounted entities" }
+    PL.services.messages.debug { "Starting chunk density check" }
+    PL.services.messages.debug { if (chunkCfg.settings.cleanNamed) "Clean named entities" else "Skip named entities" }
+    PL.services.messages.debug { if (chunkCfg.settings.cleanLeashed) "Clean leashed entities" else "Skip leashed entities" }
+    PL.services.messages.debug { if (chunkCfg.settings.cleanMounted) "Clean mounted entities" else "Skip mounted entities" }
 
     val time = System.currentTimeMillis()
     scanner.cleanAllWorlds(dryRun = dryRun) { result ->
         val elapsed = System.currentTimeMillis() - time
         lastChunk = result.cleaned
-        RuntimeServices.statusSnapshots.updateCleanup { it.copy(lastChunk = lastChunk) }
-        RuntimeServices.messages.debug { "Chunk density cleanup finished: ${lastChunk} removed, ${elapsed}ms" }
+        PL.services.statusSnapshots.updateCleanup { it.copy(lastChunk = lastChunk) }
+        PL.services.messages.debug { "Chunk density cleanup finished: ${lastChunk} removed, ${elapsed}ms" }
         chunkAlertService.alert(result.denseEntries)
         if (announce) announceChunk()
         onComplete?.invoke(lastChunk)
@@ -52,7 +52,7 @@ private fun announceChunk() {
     if (finish.isBlank()) return
     val message = finish.placeholder("clean" to lastChunk)
     if (noOnline && !noOnlineMessage) return
-    RuntimeServices.cleanupAnnouncementService.announceFinish(message)
+    PL.services.cleanupAnnouncementService.announceFinish(message)
 }
 
 fun ChunkRef.info() = "x: ${x * 16}..${x * 16 + 15}, z: ${z * 16}..${z * 16 + 15}"

@@ -1,6 +1,6 @@
 package top.e404.eclean.clean
+import top.e404.eclean.PL
 
-import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.ModernConfig
 import top.e404.eclean.feature.cleanup.drop.DropCleanupResult
 import top.e404.eclean.feature.cleanup.drop.DropCleanupService
@@ -17,21 +17,21 @@ var lastDrop = 0
 
 fun cleanDrop(announce: Boolean = true, dryRun: Boolean = false, onComplete: ((Int) -> Unit)? = null) {
     if (!dropCfg.enabled) {
-        RuntimeServices.messages.debug { "Drop cleanup is disabled" }
+        PL.services.messages.debug { "Drop cleanup is disabled" }
         onComplete?.invoke(0)
         return
     }
     val service = resolveDropService()
-    RuntimeServices.messages.debug { "Starting drop cleanup" }
-    RuntimeServices.messages.debug { if (dropCfg.protectEnchanted) "Protect enchanted items" else "Remove enchanted items" }
-    RuntimeServices.messages.debug { if (dropCfg.protectWrittenBook) "Protect written books" else "Remove written books" }
+    PL.services.messages.debug { "Starting drop cleanup" }
+    PL.services.messages.debug { if (dropCfg.protectEnchanted) "Protect enchanted items" else "Remove enchanted items" }
+    PL.services.messages.debug { if (dropCfg.protectWrittenBook) "Protect written books" else "Remove written books" }
 
     val time = System.currentTimeMillis()
     service.cleanAllWorlds(dryRun = dryRun) { results ->
         val elapsed = System.currentTimeMillis() - time
         lastDrop = results.sumOf { it.cleaned }
-        RuntimeServices.statusSnapshots.updateCleanup { it.copy(lastDrop = lastDrop) }
-        RuntimeServices.messages.debug { "Drop cleanup finished: ${lastDrop} removed, ${elapsed}ms" }
+        PL.services.statusSnapshots.updateCleanup { it.copy(lastDrop = lastDrop) }
+        PL.services.messages.debug { "Drop cleanup finished: ${lastDrop} removed, ${elapsed}ms" }
         if (announce) announceDrop(results)
         onComplete?.invoke(lastDrop)
     }
@@ -43,5 +43,5 @@ private fun announceDrop(results: List<DropCleanupResult>) {
     if (finish.isBlank()) return
     val message = finish.placeholder("clean" to lastDrop, "all" to all)
     if (noOnline && !noOnlineMessage) return
-    RuntimeServices.cleanupAnnouncementService.announceFinish(message)
+    PL.services.cleanupAnnouncementService.announceFinish(message)
 }

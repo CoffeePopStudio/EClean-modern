@@ -1,7 +1,7 @@
 package top.e404.eclean.feature.cleanup.chunk
+import top.e404.eclean.PL
 
 import org.bukkit.Bukkit
-import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.Config
 import top.e404.eclean.platform.Schedulers
 import top.e404.eclean.platform.dispatch.ChunkTaskCoordinator
@@ -63,7 +63,7 @@ class ChunkDensityScanner(
                 synchronized(dense) { dense += report.denseEntries }
             },
             onComplete = {
-                RuntimeServices.messages.debug { "Dense entity cleanup complete in ${worldName} (${cleaned.get()} removed)" }
+                PL.services.messages.debug { "Dense entity cleanup complete in ${worldName} (${cleaned.get()} removed)" }
                 onWorldComplete(ChunkDensityResult(cleaned.get(), dense.toList()))
             },
         )
@@ -112,11 +112,11 @@ class ChunkDensityScanner(
         val decision = policy.decide(snapshot, rule)
         if (!dryRun) {
             val report = cleaner.clean(chunk, decision)
-            RuntimeServices.messages.debug { "Dense cleanup complete in chunk ${chunk.x},${chunk.z} (${report.cleaned} removed)" }
+            PL.services.messages.debug { "Dense cleanup complete in chunk ${chunk.x},${chunk.z} (${report.cleaned} removed)" }
             return report
         } else {
             val wouldClean = decision.entityIdsToRemove.size
-            RuntimeServices.messages.debug { "Dry-run dense cleanup in chunk ${chunk.x},${chunk.z} (${wouldClean} would be removed)" }
+            PL.services.messages.debug { "Dry-run dense cleanup in chunk ${chunk.x},${chunk.z} (${wouldClean} would be removed)" }
             return ChunkDensityChunkReport(cleaned = wouldClean, denseEntries = decision.denseEntries)
         }
     }

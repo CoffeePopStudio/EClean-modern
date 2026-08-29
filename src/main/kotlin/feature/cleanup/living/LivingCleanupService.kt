@@ -1,7 +1,7 @@
 package top.e404.eclean.feature.cleanup.living
+import top.e404.eclean.PL
 
 import org.bukkit.Bukkit
-import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.Config
 import top.e404.eclean.feature.cleanup.ChunkCleanupOutcome
 import top.e404.eclean.feature.cleanup.ChunkCleanupRunner
@@ -37,8 +37,8 @@ class LivingCleanupService(
                 ChunkCleanupOutcome(cleaned, decision.total)
             },
             onComplete = { cleaned, total ->
-                RuntimeServices.messages.debug { "Living cleanup complete in ${worldName} (${cleaned}/${total})" }
-                RuntimeServices.messages.buildDebug {
+                PL.services.messages.debug { "Living cleanup complete in ${worldName} (${cleaned}/${total})" }
+                PL.services.messages.buildDebug {
                     append("Living entity stats for ").append(worldName).append(": ")
                     remaining
                         .groupingBy(LivingCleanupCandidate::type)

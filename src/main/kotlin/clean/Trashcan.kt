@@ -1,22 +1,22 @@
 package top.e404.eclean.clean
+import top.e404.eclean.PL
 
 import org.bukkit.inventory.ItemStack
-import top.e404.eclean.app.RuntimeServices
 
 object Trashcan {
     fun cleanTrash() {
-        RuntimeServices.trashcanManager.clearAll()
+        PL.services.trashcanManager.clearAll()
     }
 
     fun open(player: org.bukkit.entity.Player) {
-        RuntimeServices.trashcanManager.open(player)
+        PL.services.trashcanManager.open(player)
     }
 
     fun addItems(items: Collection<ItemStack>) {
-        RuntimeServices.trashcanManager.collectStacks(items)
+        PL.services.trashcanManager.collectStacks(items)
     }
 
     fun addItem(item: ItemStack): Boolean {
-        return RuntimeServices.trashcanManager.addItem(item)
+        return PL.services.trashcanManager.addItem(item)
     }
 }

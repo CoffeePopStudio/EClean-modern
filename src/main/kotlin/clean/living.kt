@@ -1,6 +1,6 @@
 package top.e404.eclean.clean
+import top.e404.eclean.PL
 
-import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.ModernConfig
 import top.e404.eclean.feature.cleanup.living.LivingCleanupResult
 import top.e404.eclean.feature.cleanup.living.LivingCleanupService
@@ -17,22 +17,22 @@ var lastLiving = 0
 
 fun cleanLiving(announce: Boolean = true, dryRun: Boolean = false, onComplete: ((Int) -> Unit)? = null) {
     if (!livingCfg.enabled) {
-        RuntimeServices.messages.debug { "Living entity cleanup is disabled" }
+        PL.services.messages.debug { "Living entity cleanup is disabled" }
         onComplete?.invoke(0)
         return
     }
     val service = resolveLivingService()
-    RuntimeServices.messages.debug { "Starting living entity cleanup" }
-    RuntimeServices.messages.debug { if (livingCfg.settings.cleanNamed) "Clean named entities" else "Skip named entities" }
-    RuntimeServices.messages.debug { if (livingCfg.settings.cleanLeashed) "Clean leashed entities" else "Skip leashed entities" }
-    RuntimeServices.messages.debug { if (livingCfg.settings.cleanMounted) "Clean mounted entities" else "Skip mounted entities" }
+    PL.services.messages.debug { "Starting living entity cleanup" }
+    PL.services.messages.debug { if (livingCfg.settings.cleanNamed) "Clean named entities" else "Skip named entities" }
+    PL.services.messages.debug { if (livingCfg.settings.cleanLeashed) "Clean leashed entities" else "Skip leashed entities" }
+    PL.services.messages.debug { if (livingCfg.settings.cleanMounted) "Clean mounted entities" else "Skip mounted entities" }
 
     val time = System.currentTimeMillis()
     service.cleanAllWorlds(dryRun = dryRun) { results ->
         val elapsed = System.currentTimeMillis() - time
         lastLiving = results.sumOf { it.cleaned }
-        RuntimeServices.statusSnapshots.updateCleanup { it.copy(lastLiving = lastLiving) }
-        RuntimeServices.messages.debug { "Living entity cleanup finished: ${lastLiving} removed, ${elapsed}ms" }
+        PL.services.statusSnapshots.updateCleanup { it.copy(lastLiving = lastLiving) }
+        PL.services.messages.debug { "Living entity cleanup finished: ${lastLiving} removed, ${elapsed}ms" }
         if (announce) announceLiving(results)
         onComplete?.invoke(lastLiving)
     }
@@ -44,5 +44,5 @@ private fun announceLiving(results: List<LivingCleanupResult>) {
     if (finish.isBlank()) return
     val message = finish.placeholder(mapOf("clean" to lastLiving, "all" to all))
     if (noOnline && !noOnlineMessage) return
-    RuntimeServices.cleanupAnnouncementService.announceFinish(message)
+    PL.services.cleanupAnnouncementService.announceFinish(message)
 }
