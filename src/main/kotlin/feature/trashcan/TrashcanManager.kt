@@ -5,6 +5,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import top.e404.eclean.app.MessageService
 import top.e404.eclean.lang.MLang
+import top.e404.eclean.menu.MenuManager
 import top.e404.eclean.menu.trashcan.TrashcanMenu
 import top.e404.eclean.platform.Schedulers
 
@@ -13,7 +14,7 @@ class TrashcanManager(
     private val messages: MessageService,
 ) {
     fun open(player: Player) {
-        TrashcanMenu(store, this).open(player)
+        MenuManager.openMenu(TrashcanMenu(store, this), player)
     }
 
     fun collectStacks(items: Collection<ItemStack>) {
@@ -40,8 +41,8 @@ class TrashcanManager(
     }
 
     private fun refreshOpenMenus() {
-        if (TrashcanMenu.opened.isEmpty()) return
-        Schedulers.runGlobal { TrashcanMenu.updateAllOpen() }
+        if (!MenuManager.hasOpenMenus()) return
+        Schedulers.runGlobal { MenuManager.refreshTrashcanMenus() }
     }
 
     private fun notifyAdmins(message: String) {

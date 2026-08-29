@@ -1,8 +1,9 @@
 package top.e404.eclean.feature.cleanup.chunk
 
+import net.kyori.adventure.audience.Audience
 import org.bukkit.Bukkit
-import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.config.Config
+import top.e404.eclean.util.miniMessage
 import top.e404.eclean.util.placeholder
 
 class ChunkAlertService {
@@ -16,7 +17,8 @@ class ChunkAlertService {
                 "entity" to entry.entityType.name,
                 "count" to entry.amount,
             )
-            receivers.forEach { RuntimeServices.messages.send(it, message) }
+            val component = miniMessage.deserialize(message)
+            receivers.forEach { (it as Audience).sendMessage(component) }
         }
     }
 }

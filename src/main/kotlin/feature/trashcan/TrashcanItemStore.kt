@@ -59,17 +59,18 @@ class TrashcanItemStore(
 
     /** 放入物品: 合并到相似条目(不重置其到期时间), 否则新建条目; 无限容量, 恒为 true */
     fun addItem(item: ItemStack): Boolean {
+        val stacking = stackingEnabled()
+        val lifetime = lifetimeSeconds()
         lock.writeLock().lock()
         try {
             val amount = item.amount.toLong()
-            if (stackingEnabled()) {
+            if (stacking) {
                 for (entry in entries) {
                     if (!entry.prototype.isSimilar(item)) continue
                     entry.count += amount
                     return true
                 }
             }
-            val lifetime = lifetimeSeconds()
             entries.add(
                 TrashcanEntry(
                     prototype = item.clone().apply { this.amount = 1 },

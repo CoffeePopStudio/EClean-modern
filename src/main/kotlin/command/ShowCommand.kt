@@ -3,6 +3,7 @@ package top.e404.eclean.command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import top.e404.eclean.feature.cleanup.chunk.ChunkDensityScanner
+import top.e404.eclean.menu.MenuManager
 import top.e404.eclean.platform.Schedulers
 
 object ShowCommand {
@@ -15,7 +16,7 @@ object ShowCommand {
                 .map { top.e404.eclean.menu.dense.EntityInfo(it.entityType, it.amount, it.chunk) }
                 .toMutableList()
             Schedulers.runGlobal {
-                top.e404.eclean.menu.dense.DenseMenu(data).open(sender)
+                MenuManager.openMenu(top.e404.eclean.menu.dense.DenseMenu(data), sender)
             }
         }
     }

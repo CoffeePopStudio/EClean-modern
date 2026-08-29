@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit
 object Update {
     private const val GITHUB_API = "https://api.github.com/repos/CoffeePopStudio/EClean-modern/releases"
     private const val GITHUB_URL = "https://github.com/CoffeePopStudio/EClean-modern"
+    private val httpClient = HttpClient.newHttpClient()
 
     fun register() {
         if (!Config.current.global.updateCheck) return
@@ -27,13 +28,12 @@ object Update {
 
     private fun check() {
         try {
-            val client = HttpClient.newHttpClient()
             val request = HttpRequest.newBuilder()
                 .uri(URI.create(GITHUB_API))
                 .header("Accept", "application/vnd.github+json")
                 .GET()
                 .build()
-            val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+            val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
             if (response.statusCode() != 200) return
             val json = JsonParser.parseString(response.body()).asJsonArray
             if (json.isEmpty) return

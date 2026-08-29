@@ -2,7 +2,7 @@ package top.e404.eclean.feature.trashcan
 
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import top.e404.eclean.config.Config
-import top.e404.eclean.menu.trashcan.TrashcanMenu
+import top.e404.eclean.menu.MenuManager
 import top.e404.eclean.platform.Schedulers
 import top.e404.eclean.service.StatusSnapshotService
 
@@ -30,7 +30,7 @@ class TrashcanTicker(
         task = Schedulers.scheduleRepeatingGlobal(20, 20) {
             val now = System.currentTimeMillis()
             val expired = store.expireEntries(now)
-            if (expired > 0) TrashcanMenu.updateAllOpen()
+            if (expired > 0) MenuManager.refreshTrashcanMenus()
             val remaining = store.earliestDeadline()?.let { maxOf(0, (it - now) / 1000) } ?: 0
             updateCountdown(remaining)
         }

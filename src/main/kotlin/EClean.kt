@@ -51,6 +51,7 @@ open class EClean : JavaPlugin {
 
     override fun onDisable() {
         RuntimeServices.shutdown()
+        MenuManager.shutdown()
         RuntimeServices.messages.info("EClean-Modern disabled")
     }
 }

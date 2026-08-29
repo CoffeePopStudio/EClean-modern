@@ -2,11 +2,8 @@ package top.e404.eclean.menu.trashcan
 
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.inventory.InventoryCloseEvent
 import top.e404.eclean.PL
 import top.e404.eclean.clean.Trashcan
 import top.e404.eclean.config.Config
@@ -81,7 +78,7 @@ open class TrashcanMenu(
         }
     }
 
-    private fun rebuildDisplayData() {
+    internal fun rebuildDisplayData() {
         val stacking = Config.current.trashcan.stacking
         val entries = store.getEntries()
         val sorted = if (stacking.sortByCount) entries.sortedByDescending { it.count } else entries
@@ -92,8 +89,6 @@ open class TrashcanMenu(
     override fun open(player: Player) {
         rebuildDisplayData()
         super.open(player)
-        opened.add(this)
-        ensureCloseListener()
     }
 
     override fun handlePlayerInvClick(event: InventoryClickEvent) {
@@ -160,34 +155,8 @@ open class TrashcanMenu(
         return true
     }
 
-    protected fun saveAndClose() {
-        unregister()
-        opened.remove(this)
-    }
-
     companion object {
         private const val ITEM_PAGE_SIZE = 45
         private const val PLAYER_INV_SIZE = 36
-
-        val opened = mutableSetOf<TrashcanMenu>()
-        private var closeListenerRegistered = false
-
-        private fun ensureCloseListener() {
-            if (closeListenerRegistered) return
-            closeListenerRegistered = true
-            PL.server.pluginManager.registerEvents(object : Listener {
-                @EventHandler
-                fun onClose(event: InventoryCloseEvent) {
-                    opened.find { it.inventory == event.inventory }?.saveAndClose()
-                }
-            }, PL)
-        }
-
-        fun updateAllOpen() {
-            opened.toSet().forEach {
-                it.rebuildDisplayData()
-                it.updateIcon()
-            }
-        }
     }
 }

@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.2.3
+
+### Changed
+- **Unified menu lifecycle**: all open menus are now tracked by `MenuManager` and cleaned up on close, quit, and plugin disable.
+- Reused the update-check `HttpClient` instead of creating a new one each check.
+- Dense-chunk alerts now parse each message once before sending to all admins.
+- Trash-can item storage reads config values outside the write lock.
+- Reused a single MiniMessage regex for stripping tags.
+- Removed leftover dead legacy tests.
+
 ## 0.2.2
 
 ### Fixed

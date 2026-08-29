@@ -10,6 +10,8 @@ import java.util.logging.Level
 class MessageService {
     val debuggers = mutableSetOf<String>()
 
+    private val miniMessageTagRegex = Regex("<[^>]+>")
+
     val debugPrefix: String get() = MLang["debug_prefix"]
     val prefix: String get() = MLang["prefix"]
 
@@ -63,7 +65,7 @@ class MessageService {
     }
 
     private fun stripMiniMessage(text: String): String =
-        text.replace(Regex("<[^>]+>"), "")
+        text.replace(miniMessageTagRegex, "")
 
     private object plugin {
         val debug: Boolean get() = top.e404.eclean.config.Config.current.global.debug
