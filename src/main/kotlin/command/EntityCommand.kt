@@ -1,8 +1,8 @@
 package top.e404.eclean.command
+import top.e404.eclean.PL
 
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.lang.MLang
 
 object EntityCommand {
@@ -17,7 +17,7 @@ object EntityCommand {
             4 -> {
                 val min = args[3].toIntOrNull()
                 if (min == null) {
-                    RuntimeServices.messages.send(sender, MLang["message.invalid_number", "number" to args[3]])
+                    PL.services.messages.send(sender, MLang["message.invalid_number", "number" to args[3]])
                     return
                 }
                 sender.sendEntityStats(args[2], args[1], min)

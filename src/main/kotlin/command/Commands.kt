@@ -1,4 +1,5 @@
 package top.e404.eclean.command
+import top.e404.eclean.PL
 
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
@@ -7,7 +8,6 @@ import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
 import org.bukkit.entity.EntityType
 import top.e404.eclean.lang.MLang
-import top.e404.eclean.app.RuntimeServices
 
 object Commands : CommandExecutor, TabCompleter {
     private val subcommands = listOf("debug", "reload", "clean", "stats", "entity", "trash", "players", "show")
@@ -74,6 +74,6 @@ object Commands : CommandExecutor, TabCompleter {
             "command.usage.entity",
             "command.usage.clean",
         )
-        for (key in keys) RuntimeServices.messages.send(sender, MLang[key])
+        for (key in keys) PL.services.messages.send(sender, MLang[key])
     }
 }

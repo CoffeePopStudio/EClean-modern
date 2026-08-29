@@ -1,10 +1,10 @@
 package top.e404.eclean.command
+import top.e404.eclean.PL
 
 import org.bukkit.command.CommandSender
-import top.e404.eclean.app.RuntimeServices
 
 object ReloadCommand {
     fun handle(sender: CommandSender) {
-        RuntimeServices.reload(sender)
+        PL.services.reload(sender)
     }
 }
