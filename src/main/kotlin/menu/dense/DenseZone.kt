@@ -5,7 +5,6 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import top.e404.eclean.PL
-import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.clean.info
 import top.e404.eclean.lang.MLang
 import top.e404.eclean.platform.Schedulers
@@ -46,7 +45,7 @@ class DenseZone(
         Schedulers.runAtLocation(loc) {
             val chunk = world.getChunkAt(chunkRef.x, chunkRef.z)
             val entities = chunk.entities.filter { it.type == type }
-            RuntimeServices.messages.send(
+            PL.services.messages.send(
                 player,
                 MLang[
                     "menu.dense.clean",
@@ -72,10 +71,10 @@ class DenseZone(
             val y = world.getHighestBlockYAt(x, z)
             val target = Location(world, x + 0.5, y + 1.0, z + 0.5)
             if (!temp) {
-                RuntimeServices.playerTeleportService.teleport(player, target)
-                RuntimeServices.messages.send(player, MLang["command.teleport.done"])
+                PL.services.playerTeleportService.teleport(player, target)
+                PL.services.messages.send(player, MLang["command.teleport.done"])
             } else {
-                RuntimeServices.temporaryReturnService.teleportWithReturn(player, target, 600)
+                PL.services.temporaryReturnService.teleportWithReturn(player, target, 600)
             }
         }
     }

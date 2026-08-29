@@ -1,11 +1,11 @@
 package top.e404.eclean.menu
+import top.e404.eclean.PL
 
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.menu.trashcan.TrashcanMenu
 import top.e404.eclean.ui.UiMenu
 
@@ -49,7 +49,7 @@ object MenuManager : Listener {
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
         openMenus.remove(event.player)?.unregister()
-        RuntimeServices.temporaryReturnService.handleQuit(event.player)
+        PL.services.temporaryReturnService.handleQuit(event.player)
     }
 
     @EventHandler

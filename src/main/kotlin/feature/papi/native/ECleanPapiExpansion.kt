@@ -1,9 +1,9 @@
 package top.e404.eclean.feature.papi.native
+import top.e404.eclean.PL
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
-import top.e404.eclean.app.RuntimeServices
 import top.e404.eclean.util.parseSecondAsDuration
 
 class ECleanPapiExpansion : PlaceholderExpansion() {
@@ -15,7 +15,7 @@ class ECleanPapiExpansion : PlaceholderExpansion() {
         Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")
 
     override fun onRequest(player: OfflinePlayer?, params: String): String? {
-        val snapshot = RuntimeServices.statusSnapshots.current()
+        val snapshot = PL.services.statusSnapshots.current()
         return when (params.lowercase()) {
             "before_next" -> snapshot.cleanup.remainingSeconds.toString()
             "before_next_formatted" -> snapshot.cleanup.remainingSeconds.parseSecondAsDuration()
