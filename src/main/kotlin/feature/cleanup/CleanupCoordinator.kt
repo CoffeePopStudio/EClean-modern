@@ -23,6 +23,7 @@ class CleanupCoordinator(
             if (dryRun) "Dry-run cleanup triggered via CleanupCoordinator" else "Full cleanup triggered via CleanupCoordinator"
         }
         if (worldName != null) {
+            // 指定世界清理属于手动定向操作，不重置全局清理倒计时
             runSequential(
                 listOf(
                     { next -> DropCleanupService().cleanWorld(worldName, dryRun = dryRun) { next() } },

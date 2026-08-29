@@ -19,12 +19,12 @@ class TrashcanManager(
     fun collectStacks(items: Collection<ItemStack>) {
         messages.debug { "收集 ${items.size} 组物品到垃圾桶" }
         store.addAll(items)
-        Schedulers.runGlobal { TrashcanMenu.updateAllOpen() }
+        refreshOpenMenus()
     }
 
     fun addItem(item: ItemStack): Boolean {
         val accepted = store.addItem(item)
-        Schedulers.runGlobal { TrashcanMenu.updateAllOpen() }
+        refreshOpenMenus()
         return accepted
     }
 
@@ -36,6 +36,11 @@ class TrashcanManager(
         messages.debug { "清空垃圾桶" }
         store.clear()
         notifyAdmins(MLang["command.trash_clean_done"])
+        refreshOpenMenus()
+    }
+
+    private fun refreshOpenMenus() {
+        if (TrashcanMenu.opened.isEmpty()) return
         Schedulers.runGlobal { TrashcanMenu.updateAllOpen() }
     }
 

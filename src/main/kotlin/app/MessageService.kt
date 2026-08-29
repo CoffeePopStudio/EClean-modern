@@ -1,14 +1,13 @@
 package top.e404.eclean.app
 
 import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import top.e404.eclean.lang.MLang
+import top.e404.eclean.util.miniMessage
 import java.util.logging.Level
 
 class MessageService {
-    private val miniMessage = MiniMessage.miniMessage()
     val debuggers = mutableSetOf<String>()
 
     val debugPrefix: String get() = MLang["debug_prefix"]

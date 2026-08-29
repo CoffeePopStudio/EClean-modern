@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.2.2
+
+### Fixed
+- **Chunk cleanup preview now matches real cleanup**: the dry-run count no longer shows the total number of dense entities; it shows how many would actually be removed.
+- **Stats/entity/players commands now require the admin permission**, matching the plugin's permission design.
+- **Async callbacks are consistent for empty worlds/chunks**: chunk scanning now calls back on the global scheduler just like drop and living cleanup.
+
+### Changed
+- Optimized dense-chunk checks by grouping entities by type before applying limits.
+- Avoided unnecessary menu refresh scheduling when no trash-can menu is open.
+- Menus only rebuild item stacks when the item actually needs updating.
+- Reused a single MiniMessage instance instead of creating it repeatedly.
+
 ## 0.2.1
 
 ### Changed

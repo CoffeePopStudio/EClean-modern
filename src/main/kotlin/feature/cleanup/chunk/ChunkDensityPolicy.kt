@@ -15,13 +15,26 @@ class ChunkDensityPolicy {
         if (!rule.cleanLeashed) candidates.removeIf(ChunkEntityState::leashed)
         if (!rule.cleanMounted) candidates.removeIf(ChunkEntityState::mounted)
 
+        val byType = candidates.groupBy(ChunkEntityState::type).mapValues { it.value.toMutableList() }
+        val orderIndex = HashMap<UUID, Int>().apply {
+            candidates.forEachIndexed { index, state -> put(state.uuid, index) }
+        }
+
         val entityIdsToRemove = mutableListOf<UUID>()
         rule.entityLimits.forEach { (regex, limit) ->
-            val matches = candidates.filter { it.type.matches(regex) }.toMutableList()
+            val matches = byType
+                .filterKeys { type -> type.matches(regex) }
+                .values
+                .flatten()
+                .sortedBy { orderIndex.getValue(it.uuid) }
+                .toMutableList()
             if (matches.size <= limit) return@forEach
             val overflow = matches.subList(limit, matches.size).toList()
             entityIdsToRemove += overflow.map(ChunkEntityState::uuid)
             candidates.removeAll(overflow)
+            overflow.groupBy(ChunkEntityState::type).forEach { (type, removed) ->
+                byType[type]?.removeAll(removed)
+            }
         }
 
         val denseEntries = snapshot.counts.entries

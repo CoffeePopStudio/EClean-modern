@@ -1,6 +1,5 @@
 package top.e404.eclean.ui
 
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -9,6 +8,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.plugin.Plugin
+import top.e404.eclean.util.miniMessage
 
 open class UiMenu(
     private val plugin: Plugin,
@@ -19,7 +19,7 @@ open class UiMenu(
     val inventory: Inventory = Bukkit.createInventory(
         null,
         rows * 9,
-        MiniMessage.miniMessage().deserialize(title),
+        miniMessage.deserialize(title),
     )
     protected val buttons = mutableMapOf<Int, UiButton>()
     private val pagers = mutableListOf<UiPager<*>>()

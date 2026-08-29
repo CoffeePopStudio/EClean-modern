@@ -1,9 +1,9 @@
 package top.e404.eclean.ui
 
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
+import top.e404.eclean.util.miniMessage
 
 fun buildItemStack(
     material: Material,
@@ -14,8 +14,8 @@ fun buildItemStack(
 ): ItemStack {
     val item = ItemStack(material, amount)
     val meta = item.itemMeta ?: return item
-    if (name != null) meta.displayName(MiniMessage.miniMessage().deserialize(name))
-    if (lore != null) meta.lore(lore.map { MiniMessage.miniMessage().deserialize(it) })
+    if (name != null) meta.displayName(miniMessage.deserialize(name))
+    if (lore != null) meta.lore(lore.map { miniMessage.deserialize(it) })
     block?.invoke(meta)
     item.itemMeta = meta
     return item

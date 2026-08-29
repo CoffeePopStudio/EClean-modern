@@ -18,7 +18,7 @@ class ChunkDensityScanner(
         val worldNames = planner.planWorldNames()
         val rule = ChunkDensityRule.fromConfig(Config.current.chunkDensity)
         if (worldNames.isEmpty()) {
-            onComplete(ChunkDensityResult(0, emptyList()))
+            Schedulers.runGlobal { onComplete(ChunkDensityResult(0, emptyList())) }
             return
         }
         val cleaned = AtomicInteger(0)
@@ -43,12 +43,12 @@ class ChunkDensityScanner(
     ) {
         val world = Bukkit.getWorld(worldName)
         if (world == null) {
-            onWorldComplete(ChunkDensityResult(0, emptyList()))
+            Schedulers.runGlobal { onWorldComplete(ChunkDensityResult(0, emptyList())) }
             return
         }
         val chunkRefs = planner.planChunks(world)
         if (chunkRefs.isEmpty()) {
-            onWorldComplete(ChunkDensityResult(0, emptyList()))
+            Schedulers.runGlobal { onWorldComplete(ChunkDensityResult(0, emptyList())) }
             return
         }
         val cleaned = AtomicInteger(0)
@@ -73,7 +73,7 @@ class ChunkDensityScanner(
         val worldNames = planner.planWorldNames(includeDisabled = true)
         val rule = ChunkDensityRule.fromConfig(Config.current.chunkDensity)
         if (worldNames.isEmpty()) {
-            onComplete(emptyList())
+            Schedulers.runGlobal { onComplete(emptyList()) }
             return
         }
         val dense = mutableListOf<ChunkDensityEntry>()
@@ -81,7 +81,9 @@ class ChunkDensityScanner(
         worldNames.forEach { name ->
             val world = Bukkit.getWorld(name)
             if (world == null) {
-                if (pending.decrementAndGet() == 0) onComplete(dense.sortedByDescending { it.amount })
+                if (pending.decrementAndGet() == 0) {
+                    Schedulers.runGlobal { onComplete(dense.sortedByDescending { it.amount }) }
+                }
                 return@forEach
             }
             val chunkRefs = planner.planChunks(world)
@@ -113,7 +115,7 @@ class ChunkDensityScanner(
             RuntimeServices.messages.debug { "Dense cleanup complete in chunk ${chunk.x},${chunk.z} (${report.cleaned} removed)" }
             return report
         } else {
-            val wouldClean = decision.denseEntries.sumOf { it.amount }
+            val wouldClean = decision.entityIdsToRemove.size
             RuntimeServices.messages.debug { "Dry-run dense cleanup in chunk ${chunk.x},${chunk.z} (${wouldClean} would be removed)" }
             return ChunkDensityChunkReport(cleaned = wouldClean, denseEntries = decision.denseEntries)
         }

@@ -7,6 +7,7 @@ import top.e404.eclean.lang.MLang
 
 object EntityCommand {
     fun handle(sender: CommandSender, args: Array<out String>) {
+        if (!sender.hasPermission("eclean.admin")) return
         when (args.size) {
             2 -> {
                 if (sender !is Player) return

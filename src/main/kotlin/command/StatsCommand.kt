@@ -5,6 +5,7 @@ import org.bukkit.entity.Player
 
 object StatsCommand {
     fun handle(sender: CommandSender, args: Array<out String>) {
+        if (!sender.hasPermission("eclean.admin")) return
         when (args.size) {
             1 -> {
                 if (sender !is Player) return

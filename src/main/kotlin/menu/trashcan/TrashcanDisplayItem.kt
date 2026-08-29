@@ -1,12 +1,12 @@
 package top.e404.eclean.menu.trashcan
 
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.inventory.ItemStack
 import top.e404.eclean.config.Config
 import top.e404.eclean.feature.trashcan.TrashcanEntry
 import top.e404.eclean.lang.MLang
 import top.e404.eclean.ui.UiDisplayable
 import top.e404.eclean.ui.editItemMeta
+import top.e404.eclean.util.miniMessage
 import top.e404.eclean.util.parseSecondAsDuration
 
 class TrashcanDisplayItem(
@@ -35,7 +35,7 @@ class TrashcanDisplayItem(
                 add(MLang.get("menu.trashcan.item.expire", "expire" to remainingSeconds.parseSecondAsDuration()))
             }
         }
-        existingLore.addAll(newLines.map { MiniMessage.miniMessage().deserialize(it) })
+        existingLore.addAll(newLines.map { miniMessage.deserialize(it) })
         lore(existingLore)
     }.apply { amount = 1 }
 

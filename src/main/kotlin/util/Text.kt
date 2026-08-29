@@ -1,5 +1,9 @@
 package top.e404.eclean.util
 
+import net.kyori.adventure.text.minimessage.MiniMessage
+
+val miniMessage: MiniMessage = MiniMessage.miniMessage()
+
 private val constRegex = Regex("[.\\s\\-_]+")
 
 fun String.formatAsConst() = replace(constRegex, "_").uppercase()

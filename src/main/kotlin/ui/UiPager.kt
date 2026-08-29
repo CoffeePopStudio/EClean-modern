@@ -30,7 +30,7 @@ class UiPager<T : UiDisplayable>(
         val end = minOf(start + pageSize, data.size)
         for (i in start until end) {
             val displayable = data[i]
-            displayable.update()
+            if (displayable.needUpdate) displayable.update()
             inventory.setItem(startSlot + (i - start), displayable.item)
         }
         for (i in (end - start) until pageSize) {
