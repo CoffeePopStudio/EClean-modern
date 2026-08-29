@@ -5,6 +5,12 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 版本规范。
 
+## 0.2.4
+
+### 变更
+- **去掉了全局 `RuntimeServices` 单例**：服务改成一个普通对象，由插件实例持有，通过 `EClean.services` / `PL.services` 访问。
+- 指令、清理、配置、监听器、菜单、PAPI 等代码全部改为使用插件持有的服务容器。
+
 ## 0.2.3
 
 ### 变更
