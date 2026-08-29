@@ -17,6 +17,9 @@ open class EClean : JavaPlugin {
 
     val prefix get() = MLang["prefix"]
 
+    lateinit var services: RuntimeServices
+        private set
+
     @Suppress("UNUSED")
     constructor() : super()
 
@@ -28,8 +31,8 @@ open class EClean : JavaPlugin {
         if (!unit) {
             org.bstats.bukkit.Metrics(this, 14312)
         }
-        RuntimeServices.init(this)
-        RuntimeServices.load()
+        services = RuntimeServices()
+        services.load()
         Commands.register()
         Update.register()
         Bukkit.getPluginManager().registerEvents(DespawnListener, this)
@@ -46,13 +49,13 @@ open class EClean : JavaPlugin {
         } catch (_: NoClassDefFoundError) {
             logger.info("PlaceholderAPI not found, skipping PAPI expansion registration")
         }
-        RuntimeServices.messages.info("EClean-Modern enabled. Author: 404E")
+        services.messages.info("EClean-Modern enabled. Author: 404E")
     }
 
     override fun onDisable() {
-        RuntimeServices.shutdown()
+        services.shutdown()
         MenuManager.shutdown()
-        RuntimeServices.messages.info("EClean-Modern disabled")
+        services.messages.info("EClean-Modern disabled")
     }
 }
 

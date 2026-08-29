@@ -5,11 +5,11 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Entity
 import org.bukkit.plugin.Plugin
-import top.e404.eclean.app.RuntimeServices
+import top.e404.eclean.PL
 import java.util.function.Consumer
 
 object Schedulers {
-    private val plugin: Plugin get() = RuntimeServices.plugin
+    private val plugin: Plugin get() = PL
 
     fun runGlobal(task: () -> Unit) {
         Bukkit.getGlobalRegionScheduler().execute(plugin, Runnable(task))

@@ -19,74 +19,30 @@ import top.e404.eclean.service.PlayerTeleportService
 import top.e404.eclean.service.StatusSnapshotService
 import top.e404.eclean.service.TemporaryReturnEvent
 import top.e404.eclean.service.TemporaryReturnService
-import top.e404.eclean.EClean
 
-object RuntimeServices {
-    lateinit var plugin: EClean
-        private set
-
-    lateinit var messages: MessageService
-        private set
-
-    lateinit var platform: RuntimePlatform
-        private set
-
-    lateinit var execution: ExecutionGateway
-        private set
-
-    lateinit var statusSnapshots: StatusSnapshotService
-        private set
-
-    lateinit var playerTeleportService: PlayerTeleportService
-        private set
-
-    lateinit var temporaryReturnService: TemporaryReturnService
-        private set
-
-    lateinit var cleanupAnnouncementService: CleanupAnnouncementService
-        private set
-
-    lateinit var cleanupCoordinator: CleanupCoordinator
-        private set
-
-    lateinit var cleanupTickService: CleanupTickService
-        private set
-
-    lateinit var trashcanStore: TrashcanItemStore
-        private set
-
-    lateinit var trashcanManager: TrashcanManager
-        private set
-
-    lateinit var trashcanTicker: TrashcanTicker
-        private set
-
-    fun init(plugin: EClean) {
-        this.plugin = plugin
-        messages = MessageService()
-        val isFolia = FoliaDetector.isFolia()
-        platform = RuntimePlatformFactory.create(isFolia)
-        execution = BukkitExecutionGateway()
-        statusSnapshots = StatusSnapshotService()
-        playerTeleportService = PlayerTeleportService(execution)
-        temporaryReturnService = TemporaryReturnService(execution, playerTeleportService) { player, event ->
-            val key = when (event) {
-                TemporaryReturnEvent.Started -> "command.teleport.temp"
-                TemporaryReturnEvent.Returned -> "command.teleport.back"
-                TemporaryReturnEvent.ReturnedAfterReplace -> "command.teleport.cover"
-            }
-            messages.send(player, MLang[key])
+class RuntimeServices {
+    val messages = MessageService()
+    val platform: RuntimePlatform = RuntimePlatformFactory.create(FoliaDetector.isFolia())
+    val execution: ExecutionGateway = BukkitExecutionGateway()
+    val statusSnapshots = StatusSnapshotService()
+    val playerTeleportService = PlayerTeleportService(execution)
+    val temporaryReturnService = TemporaryReturnService(execution, playerTeleportService) { player, event ->
+        val key = when (event) {
+            TemporaryReturnEvent.Started -> "command.teleport.temp"
+            TemporaryReturnEvent.Returned -> "command.teleport.back"
+            TemporaryReturnEvent.ReturnedAfterReplace -> "command.teleport.cover"
         }
-        trashcanStore = TrashcanItemStore(
-            lifetimeSeconds = { Config.current.trashcan.clearIntervalSeconds },
-            stackingEnabled = { Config.current.trashcan.stacking.enabled },
-        )
-        trashcanManager = TrashcanManager(trashcanStore, messages)
-        trashcanTicker = TrashcanTicker(trashcanStore, statusSnapshots)
-        cleanupAnnouncementService = CleanupAnnouncementService(messages, statusSnapshots)
-        cleanupCoordinator = CleanupCoordinator(messages, statusSnapshots)
-        cleanupTickService = CleanupTickService(messages, cleanupCoordinator, cleanupAnnouncementService, statusSnapshots)
+        messages.send(player, MLang[key])
     }
+    val trashcanStore = TrashcanItemStore(
+        lifetimeSeconds = { Config.current.trashcan.clearIntervalSeconds },
+        stackingEnabled = { Config.current.trashcan.stacking.enabled },
+    )
+    val trashcanManager = TrashcanManager(trashcanStore, messages)
+    val trashcanTicker = TrashcanTicker(trashcanStore, statusSnapshots)
+    val cleanupAnnouncementService = CleanupAnnouncementService(messages, statusSnapshots)
+    val cleanupCoordinator = CleanupCoordinator(messages, statusSnapshots)
+    val cleanupTickService = CleanupTickService(messages, cleanupCoordinator, cleanupAnnouncementService, statusSnapshots)
 
     fun load(sender: CommandSender? = null) {
         MLang.load(sender)
@@ -104,9 +60,9 @@ object RuntimeServices {
     }
 
     fun shutdown() {
-        if (::cleanupTickService.isInitialized) cleanupTickService.stop()
-        if (::trashcanTicker.isInitialized) trashcanTicker.stop()
-        if (::temporaryReturnService.isInitialized) temporaryReturnService.shutdown()
+        cleanupTickService.stop()
+        trashcanTicker.stop()
+        temporaryReturnService.shutdown()
         Schedulers.cancelPluginTasks()
     }
 }
