@@ -11,6 +11,9 @@ class MessageService {
     val debuggers = mutableSetOf<String>()
 
     private val miniMessageTagRegex = Regex("<[^>]+>")
+    private var lastDebugText: String? = null
+    private var lastDebugTime: Long = 0
+    private var suppressedDebugCount: Int = 0
 
     val debugPrefix: String get() = MLang["debug_prefix"]
     val prefix: String get() = MLang["prefix"]
@@ -58,10 +61,20 @@ class MessageService {
         get() = debuggers.isNotEmpty()
 
     private fun emitDebug(text: String) {
-        if (plugin.debug) {
-            plugin.logger.info(stripMiniMessage("$debugPrefix $text"))
+        val now = System.currentTimeMillis()
+        val cooldown = top.e404.eclean.config.Config.current.global.debugCooldownMillis
+        if (text == lastDebugText && now - lastDebugTime < cooldown) {
+            suppressedDebugCount++
+            return
         }
-        debuggers.forEach { Bukkit.getPlayer(it)?.sendMessage("$debugPrefix $text") }
+        val display = if (suppressedDebugCount > 0) "$text (x${suppressedDebugCount + 1})" else text
+        if (plugin.debug) {
+            plugin.logger.info(stripMiniMessage("$debugPrefix $display"))
+        }
+        debuggers.forEach { Bukkit.getPlayer(it)?.sendMessage("$debugPrefix $display") }
+        lastDebugText = text
+        lastDebugTime = now
+        suppressedDebugCount = 0
     }
 
     private fun stripMiniMessage(text: String): String =
