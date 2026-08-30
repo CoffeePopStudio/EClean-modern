@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import setupMockBukkit
 import top.e404.eclean.feature.trashcan.TrashcanItemStore
+import top.e404.eclean.menu.trashcan.TrashcanDisplayItem
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
@@ -178,5 +179,29 @@ class TrashcanItemStoreTest {
         snapshot.first().count = 999
         assertEquals(10, store.getEntries().first().count)
         assertFalse(store.getEntries().first().prototype === snapshot.first().prototype)
+    }
+
+    @Test
+    fun `removeItem never removes more than available`() {
+        val store = store()
+        store.addItem(ItemStack(Material.DIAMOND, 5))
+        assertEquals(5, store.removeItem(ItemStack(Material.DIAMOND), 100))
+        assertTrue(store.isEmpty())
+    }
+
+    @Test
+    fun `display item lore does not pollute stored prototype`() {
+        val store = store()
+        store.addItem(ItemStack(Material.DIAMOND, 1))
+        val entry = store.getEntries().single()
+        val display = TrashcanDisplayItem(entry)
+        display.update()
+
+        val prototypeLore = display.prototype.itemMeta?.lore()?.joinToString("\n").orEmpty()
+        val displayLore = display.item.itemMeta?.lore()?.joinToString("\n").orEmpty()
+
+        assertTrue(displayLore.isNotBlank())
+        assertFalse(prototypeLore.contains("共"))
+        assertFalse(prototypeLore.contains("剩余"))
     }
 }

@@ -40,7 +40,7 @@ class TrashcanManager(
         refreshOpenMenus()
     }
 
-    private fun refreshOpenMenus() {
+    internal fun refreshOpenMenus() {
         if (!MenuManager.hasOpenMenus()) return
         Schedulers.runGlobal { MenuManager.refreshTrashcanMenus() }
     }

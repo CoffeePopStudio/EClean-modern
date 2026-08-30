@@ -129,29 +129,54 @@ open class TrashcanMenu(
             else -> return false
         }
 
-        var waitForPut = take
+        // 先计算背包最多能放多少，再按这个数量从垃圾桶扣除，最后发放；
+        // 避免“先发物品、后扣库存”在库存不足/菜单过期时复制物品。
         val maxStackSize = displayItem.stackType.maxStackSize
+        var placeable = 0
+        var remainingToSimulate = take
         for (i in 0 until PLAYER_INV_SIZE) {
-            if (waitForPut == 0) break
+            if (remainingToSimulate == 0) break
             val slotItem = player.inventory.getItem(i)
             if (slotItem == null || slotItem.type == Material.AIR) {
-                val count = minOf(waitForPut, maxStackSize)
-                waitForPut -= count
+                val count = minOf(remainingToSimulate, maxStackSize)
+                remainingToSimulate -= count
+                placeable += count
+            } else if (slotItem.isSimilar(displayItem.prototype) && slotItem.amount < maxStackSize) {
+                val count = minOf(remainingToSimulate, maxStackSize - slotItem.amount)
+                remainingToSimulate -= count
+                placeable += count
+            }
+        }
+
+        val removed = store.removeItem(displayItem.prototype, placeable)
+        if (removed <= 0) {
+            manager.refreshOpenMenus()
+            return true
+        }
+
+        var remainingToPlace = removed
+        for (i in 0 until PLAYER_INV_SIZE) {
+            if (remainingToPlace == 0) break
+            val slotItem = player.inventory.getItem(i)
+            if (slotItem == null || slotItem.type == Material.AIR) {
+                val count = minOf(remainingToPlace, maxStackSize)
+                remainingToPlace -= count
                 player.inventory.setItem(i, displayItem.prototype.clone().apply { amount = count })
                 continue
             }
             if (!slotItem.isSimilar(displayItem.prototype)) continue
             if (slotItem.amount >= maxStackSize) continue
-            val count = minOf(waitForPut, maxStackSize - slotItem.amount)
-            waitForPut -= count
+            val count = minOf(remainingToPlace, maxStackSize - slotItem.amount)
+            remainingToPlace -= count
             player.inventory.setItem(i, slotItem.clone().apply { amount += count })
         }
-        val given = take - waitForPut
-        if (given <= 0) return true
 
-        store.removeItem(displayItem.prototype, given)
-        rebuildDisplayData()
-        updateIcon()
+        // 正常情况下不会走到这里；万一有极端并发，把没放下的部分放回垃圾桶
+        if (remainingToPlace > 0) {
+            store.addItem(displayItem.prototype.clone().apply { amount = remainingToPlace })
+        }
+
+        manager.refreshOpenMenus()
         return true
     }
 
