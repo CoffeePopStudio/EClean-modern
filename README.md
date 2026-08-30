@@ -31,6 +31,12 @@
 - `/eclean entity <实体名> <世界名> <区块X> <区块Z>` 查看指定区块内该类型的实体列表
 - `/eclean stats` 统计当前所在世界的实体和区块统计
 - `/eclean stats <世界名>` 统计实体和区块统计
+- `/eclean stats gui [世界名]` 打开统计 GUI
+- `/eclean status all` 统计全服所有世界的实体/区块
+- `/eclean status <世界名>` 查看单个世界状态
+- `/eclean history [数量]` 查看最近清理记录
+- `/eclean top entity [数量] [世界名]` 查看实体数量最多的类型
+- `/eclean top chunk [数量] [世界名]` 查看实体数量最多的区块
 - `/eclean trash` 打开垃圾桶
 - `/eclean trash stats` 查看垃圾桶统计信息(每个聚合条目的类型/数量/剩余时间)
 - `/eclean show` 打开密集实体统计信息菜单
@@ -55,6 +61,9 @@
 - `%eclean_last_chunk%` - `上次清理的密集实体数量`
 - `%eclean_trashcan_countdown%` - `最早到期条目的剩余时间(条目永不过期时为空桶, 为0), 单位秒`
 - `%eclean_trashcan_countdown_formatted%` - `最早到期条目的剩余时间, 格式化的时间`
+- `%eclean_total_entities%` - `全服实体总数`
+- `%eclean_total_chunks%` - `全服已加载区块总数`
+- `%eclean_world_<世界名>_entities%` - `指定世界的实体总数`
 
 ## 配置
 
