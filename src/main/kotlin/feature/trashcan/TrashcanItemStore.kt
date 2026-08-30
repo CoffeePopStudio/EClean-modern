@@ -1,16 +1,19 @@
 package top.e404.eclean.feature.trashcan
 
 import org.bukkit.inventory.ItemStack
+import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /**
  * 垃圾桶聚合条目
  *
+ * @param id        条目唯一 id，用于按具体条目扣减（尤其是 stacking=false 时）
  * @param prototype 该条目的 isSimilar 键(amount 恒为 1), 用于合并/匹配
  * @param count     聚合后的总数量, 可超过 maxStackSize
  * @param deadline  条目到期时间戳(epoch millis), Long.MAX_VALUE 表示永不过期
  */
 data class TrashcanEntry(
+    val id: Long,
     val prototype: ItemStack,
     var count: Long,
     var deadline: Long,
@@ -28,6 +31,7 @@ class TrashcanItemStore(
 ) {
     private val lock = ReentrantReadWriteLock()
     private val entries = mutableListOf<TrashcanEntry>()
+    private val idCounter = AtomicLong(0)
 
     val size: Int
         get() {
@@ -64,18 +68,27 @@ class TrashcanItemStore(
         lock.writeLock().lock()
         try {
             val amount = item.amount.toLong()
+            val now = System.currentTimeMillis()
             if (stacking) {
-                for (entry in entries) {
-                    if (!entry.prototype.isSimilar(item)) continue
-                    entry.count += amount
-                    return true
+                val iterator = entries.listIterator()
+                while (iterator.hasNext()) {
+                    val entry = iterator.next()
+                    if (entry.deadline <= now) {
+                        iterator.remove()
+                        continue
+                    }
+                    if (entry.prototype.isSimilar(item)) {
+                        entry.count += amount
+                        return true
+                    }
                 }
             }
             entries.add(
                 TrashcanEntry(
+                    id = idCounter.incrementAndGet(),
                     prototype = item.clone().apply { this.amount = 1 },
                     count = amount,
-                    deadline = if (lifetime == null) Long.MAX_VALUE else System.currentTimeMillis() + lifetime * 1000,
+                    deadline = if (lifetime == null) Long.MAX_VALUE else now + lifetime * 1000,
                 )
             )
             return true
@@ -93,14 +106,24 @@ class TrashcanItemStore(
     }
 
     /** 取出物品: 从相似条目中扣除数量, 扣完的条目移除; 返回实际取出的数量 */
-    fun removeItem(prototype: ItemStack, amount: Int): Int {
+    fun removeItem(prototype: ItemStack, amount: Int): Int =
+        removeItem(prototype, amount, null)
+
+    /** 取出物品: 可指定只从某个条目扣除（stacking=false 时按被点击条目扣减） */
+    fun removeItem(prototype: ItemStack, amount: Int, entryId: Long?): Int {
         lock.writeLock().lock()
         try {
             var remaining = amount.toLong()
+            val now = System.currentTimeMillis()
             val iterator = entries.listIterator()
             while (iterator.hasNext() && remaining > 0) {
                 val entry = iterator.next()
+                if (entry.deadline <= now) {
+                    iterator.remove()
+                    continue
+                }
                 if (!entry.prototype.isSimilar(prototype)) continue
+                if (entryId != null && entry.id != entryId) continue
                 val toRemove = minOf(remaining, entry.count)
                 val newCount = entry.count - toRemove
                 if (newCount <= 0) {

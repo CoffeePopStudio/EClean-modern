@@ -67,7 +67,11 @@ open class UiMenu(
     open fun onInventoryClick(event: InventoryClickEvent) {
         if (event.inventory != inventory) return
 
-        val clickedInventory = event.clickedInventory ?: return
+        val clickedInventory = event.clickedInventory
+        if (clickedInventory == null) {
+            event.isCancelled = cancelUnmappedClicks
+            return
+        }
 
         if (clickedInventory != inventory) {
             event.isCancelled = true

@@ -1,19 +1,25 @@
 package top.e404.eclean.menu
-import top.e404.eclean.PL
 
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import top.e404.eclean.PL
 import top.e404.eclean.menu.trashcan.TrashcanMenu
+import top.e404.eclean.platform.Schedulers
 import top.e404.eclean.ui.UiMenu
+import java.util.concurrent.ConcurrentHashMap
 
 object MenuManager : Listener {
-    private val openMenus = mutableMapOf<Player, UiMenu>()
+    private val openMenus = ConcurrentHashMap<Player, UiMenu>()
 
     fun openMenu(menu: UiMenu, player: Player) {
-        openMenus[player] = menu
+        val previous = openMenus.put(player, menu)
+        if (previous != null && previous !== menu) {
+            previous.unregister()
+            player.closeInventory()
+        }
         menu.open(player)
     }
 
@@ -26,10 +32,12 @@ object MenuManager : Listener {
     }
 
     fun refreshTrashcanMenus() {
-        forEachOpenMenu { menu ->
+        openMenus.entries.toList().forEach { (player, menu) ->
             if (menu is TrashcanMenu) {
-                menu.rebuildDisplayData()
-                menu.updateIcon()
+                Schedulers.runForEntity(player) {
+                    menu.rebuildDisplayData()
+                    menu.updateIcon()
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 package top.e404.eclean.feature.trashcan
 
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -7,7 +8,6 @@ import top.e404.eclean.app.MessageService
 import top.e404.eclean.lang.MLang
 import top.e404.eclean.menu.MenuManager
 import top.e404.eclean.menu.trashcan.TrashcanMenu
-import top.e404.eclean.platform.Schedulers
 
 class TrashcanManager(
     private val store: TrashcanItemStore,
@@ -19,12 +19,12 @@ class TrashcanManager(
 
     fun collectStacks(items: Collection<ItemStack>) {
         messages.debug { "收集 ${items.size} 组物品到垃圾桶" }
-        store.addAll(items)
+        store.addAll(items.map(::sanitizeItem))
         refreshOpenMenus()
     }
 
     fun addItem(item: ItemStack): Boolean {
-        val accepted = store.addItem(item)
+        val accepted = store.addItem(sanitizeItem(item))
         refreshOpenMenus()
         return accepted
     }
@@ -42,7 +42,21 @@ class TrashcanManager(
 
     internal fun refreshOpenMenus() {
         if (!MenuManager.hasOpenMenus()) return
-        Schedulers.runGlobal { MenuManager.refreshTrashcanMenus() }
+        MenuManager.refreshTrashcanMenus()
+    }
+
+    private fun sanitizeItem(item: ItemStack): ItemStack {
+        val meta = item.itemMeta ?: return item
+        val lore = meta.lore() ?: return item
+        val plain = PlainTextComponentSerializer.plainText()
+        val filtered = lore.filter { line ->
+            val text = plain.serialize(line)
+            !text.matches(TRASH_LORE_PATTERN) && !text.startsWith("剩余 ")
+        }
+        if (filtered.size == lore.size) return item
+        if (filtered.isEmpty()) meta.lore(null) else meta.lore(filtered)
+        item.itemMeta = meta
+        return item
     }
 
     private fun notifyAdmins(message: String) {
@@ -51,5 +65,9 @@ class TrashcanManager(
                 messages.send(player, message)
             }
         }
+    }
+
+    private companion object {
+        val TRASH_LORE_PATTERN = Regex("^共\\d+个$")
     }
 }

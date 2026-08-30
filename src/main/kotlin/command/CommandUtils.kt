@@ -47,12 +47,10 @@ internal fun CommandSender.sendWorldStats(worldName: String) {
             PL.services.messages.send(this, MLang["command.stats.empty"])
             return@collectWorldStats
         }
-        val entity = result.sortedEntries().joinToString(MLang["command.stats.spacing"]) { (k, v) ->
-            MLang[
-                "command.stats.content",
-                "type" to k,
-                "count" to v.withColor()
-            ]
+        val entity = result.sortedEntries().joinToString(MLang["command.stats.spacing"]) { (type, count) ->
+            val command = "/eclean entity ${type.name} $worldName"
+            val content = MLang["command.stats.content", "type" to type.name, "count" to count.withColor()]
+            "<click:run_command:'$command'><hover:show_text:'${MLang["command.stats.detail_hover"]}'>$content</hover></click>"
         }
         PL.services.messages.send(
             this,
@@ -67,7 +65,13 @@ internal fun CommandSender.sendWorldStats(worldName: String) {
     }
 }
 
-internal fun CommandSender.sendEntityStats(worldName: String, typeName: String, min: Int = 0) {
+internal fun CommandSender.sendEntityStats(
+    worldName: String,
+    typeName: String,
+    min: Int = 0,
+    chunkX: Int? = null,
+    chunkZ: Int? = null,
+) {
     val world = Bukkit.getWorld(worldName)
     if (world == null) {
         PL.services.messages.send(this, MLang["command.invalid_world", "world" to worldName])
@@ -80,17 +84,38 @@ internal fun CommandSender.sendEntityStats(worldName: String, typeName: String, 
         return
     }
     val service = WorldStatsService()
+    if (chunkX != null && chunkZ != null) {
+        service.collectChunkEntities(worldName, type, chunkX, chunkZ) { details ->
+            if (details.isEmpty()) {
+                PL.services.messages.send(this, MLang["command.stats.empty"])
+                return@collectChunkEntities
+            }
+            val entity = details.joinToString(MLang["command.stats.spacing"]) { detail ->
+                val command = "/eclean tp $worldName ${detail.x} ${detail.y} ${detail.z}"
+                "<click:run_command:'$command'><hover:show_text:'${MLang["command.stats.tp_hover"]}'><white>${typeName} @ ${detail.x}, ${detail.y}, ${detail.z}</white></hover></click>"
+            }
+            PL.services.messages.send(
+                this,
+                MLang[
+                    "command.stats.entity",
+                    "type" to typeName,
+                    "entity" to entity
+                ]
+            )
+        }
+        return
+    }
+
     service.collectEntityStats(worldName, type, min) { entries ->
         if (entries.isEmpty()) {
             PL.services.messages.send(this, MLang["command.stats.empty"])
             return@collectEntityStats
         }
-        val entity = entries.joinToString(MLang["command.stats.spacing"]) { (label, v) ->
-            MLang[
-                "command.stats.content",
-                "type" to label,
-                "count" to v.withColor()
-            ]
+        val entity = entries.joinToString(MLang["command.stats.spacing"]) { entry ->
+            val command = "/eclean entity $typeName $worldName ${entry.chunkX} ${entry.chunkZ}"
+            val label = "x: ${entry.chunkX * 16}..${entry.chunkX * 16 + 15}, z: ${entry.chunkZ * 16}..${entry.chunkZ * 16 + 15}"
+            val content = MLang["command.stats.content", "type" to label, "count" to entry.count.withColor()]
+            "<click:run_command:'$command'><hover:show_text:'${MLang["command.stats.chunk_hover"]}'>$content</hover></click>"
         }
         PL.services.messages.send(
             this,

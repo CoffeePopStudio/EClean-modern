@@ -25,6 +25,12 @@ class UiPager<T : UiDisplayable>(
     fun nextPage() { if (hasNext) page++ }
     fun prevPage() { if (hasPrev) page-- }
 
+    fun clampPage() {
+        if (page <= 0) return
+        val maxPage = maxOf(0, (data.size - 1) / pageSize)
+        if (page > maxPage) page = maxPage
+    }
+
     fun render(inventory: Inventory) {
         val start = page * pageSize
         val end = minOf(start + pageSize, data.size)

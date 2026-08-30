@@ -14,3 +14,15 @@ data class WorldStatsResult(
             .sortedByDescending { it.value }
             .map { it.key to it.value }
 }
+
+data class ChunkEntityCount(
+    val chunkX: Int,
+    val chunkZ: Int,
+    val count: Int,
+)
+
+data class EntityLocationDetail(
+    val x: Double,
+    val y: Double,
+    val z: Double,
+)

@@ -32,6 +32,7 @@ object Commands : CommandExecutor, TabCompleter {
             "t", "trash" -> TrashCommand.handle(sender, args)
             "p", "players" -> PlayersCommand.handle(sender)
             "show" -> ShowCommand.handle(sender)
+            "tp" -> TeleportCommand.handle(sender, args)
             else -> sendUsage(sender)
         }
         return true

@@ -12,7 +12,7 @@ import top.e404.eclean.ui.UiButton
 import top.e404.eclean.ui.UiMenu
 import top.e404.eclean.ui.buildItemStack
 
-class DenseMenu(data: MutableList<EntityInfo>) : UiMenu(PL, MLang["menu.dense.title"], 6, false) {
+class DenseMenu(data: MutableList<EntityInfo>) : UiMenu(PL, MLang["menu.dense.title"], 6, true) {
     val zone = DenseZone(this, data)
     var temp = false
     private val prev = PageButton(

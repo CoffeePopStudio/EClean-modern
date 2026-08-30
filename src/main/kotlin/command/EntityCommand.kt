@@ -22,6 +22,15 @@ object EntityCommand {
                 }
                 sender.sendEntityStats(args[2], args[1], min)
             }
+            5 -> {
+                val chunkX = args[3].toIntOrNull()
+                val chunkZ = args[4].toIntOrNull()
+                if (chunkX == null || chunkZ == null) {
+                    PL.services.messages.send(sender, MLang["message.invalid_number", "number" to if (chunkX == null) args[3] else args[4]])
+                    return
+                }
+                sender.sendEntityStats(args[2], args[1], chunkX = chunkX, chunkZ = chunkZ)
+            }
             else -> Commands.sendUsage(sender)
         }
     }

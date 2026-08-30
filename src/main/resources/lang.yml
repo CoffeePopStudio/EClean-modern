@@ -103,6 +103,9 @@ command:
     spacing: "<gray>, </gray>"
     content: "<white>{type}: {count}个</white>"
     empty: "<red>无结果</red>"
+    detail_hover: "<gray>点击查看区块分布</gray>"
+    chunk_hover: "<gray>点击查看该区块实体</gray>"
+    tp_hover: "<gray>点击传送</gray>"
     world: |-
       <white>世界<green>{world}</green>共加载区块{count}个(强加载{force}个)</white>
       <aqua>实体统计信息:</aqua>

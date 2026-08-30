@@ -18,12 +18,13 @@ import top.e404.eclean.ui.emptyItem
 open class TrashcanMenu(
     private val store: TrashcanItemStore,
     private val manager: TrashcanManager,
-) : UiMenu(PL, MLang["trash.title"], 6, false) {
+) : UiMenu(PL, MLang["trash.title"], 6, true) {
 
     private var displayData = mutableListOf<TrashcanDisplayItem>()
     private var pager: UiPager<TrashcanDisplayItem>
     private var prevBtn: PageButton
     private var nextBtn: PageButton
+    private var pagerInitialized = false
 
     val hasPrev get() = pager.hasPrev
     val hasNext get() = pager.hasNext
@@ -40,6 +41,7 @@ open class TrashcanMenu(
             startSlot = 0,
             onClickHandler = { index, event -> handleItemClick(index, event) },
         )
+        pagerInitialized = true
         prevBtn = PageButton(
             isNext = false,
             hasPage = { hasPrev },
@@ -84,6 +86,7 @@ open class TrashcanMenu(
         val sorted = if (stacking.sortByCount) entries.sortedByDescending { it.count } else entries
         displayData.clear()
         displayData.addAll(sorted.map { TrashcanDisplayItem(it) })
+        if (pagerInitialized) pager.clampPage()
     }
 
     override fun open(player: Player) {
@@ -148,7 +151,7 @@ open class TrashcanMenu(
             }
         }
 
-        val removed = store.removeItem(displayItem.prototype, placeable)
+        val removed = store.removeItem(displayItem.prototype, placeable, displayItem.entry.id)
         if (removed <= 0) {
             manager.refreshOpenMenus()
             return true
