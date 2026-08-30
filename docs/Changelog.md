@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.2.6
+
+### Added
+- **Stats detail view**: entity types in `/eclean stats` are now clickable to show per-chunk distribution.
+- **Chunk entity list**: chunk rows in `/eclean entity` are clickable to list the entities in that chunk.
+- **Click-to-teleport**: entity coordinates in chat are clickable and teleport the admin directly to that position.
+
+### Fixed
+- **Fixed number-key exploit in trash can**: unhandled clicks such as hotbar number keys can no longer take the display item without deducting from the store.
+- **Fixed trash-can lore leaking onto taken items**: plugin-generated lore is cleaned when items are deposited.
+- **Fixed expired-entry window**: adding to or taking from an expired entry is no longer possible.
+- **Fixed wrong-entry deduction when stacking is disabled**: taking now deducts from the exact clicked entry.
+- **Fixed menu listener leaks and Folia thread-safety issues** in `MenuManager`.
+- **Fixed remaining-time lore not refreshing** while the trash-can menu is open.
+- **Fixed pager staying on an empty page** after entries shrink.
+
 ## 0.2.5
 
 ### Fixed
