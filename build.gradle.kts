@@ -1,10 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "2.4.0"
-    kotlin("plugin.serialization") version "2.4.0"
-    id("com.gradleup.shadow") version "9.4.3"
-    id("xyz.jpenilla.run-paper") version "3.0.2"
+    kotlin("jvm") version "2.4.10"
+    kotlin("plugin.serialization") version "2.4.10"
+    id("com.gradleup.shadow") version "9.6.1"
+    id("xyz.jpenilla.run-paper") version "3.1.0"
 }
 
 group = "top.e404"
@@ -22,12 +22,8 @@ val gitCommitHash: String = try {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    maven("https://oss.sonatype.org/content/groups/public/")
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
-    maven("https://nexus.e404.top:3443/repository/maven-snapshots/")
     maven("https://repo.papermc.io/repository/maven-public/")
 }
 
@@ -37,15 +33,15 @@ dependencies {
     implementation("com.charleskorn.kaml:kaml:0.104.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.11.0")
     // placeholderAPI
-    compileOnly("me.clip:placeholderapi:2.11.6")
+    compileOnly("me.clip:placeholderapi:2.12.3")
     // Bstats
-    implementation("org.bstats:bstats-bukkit:3.0.2")
+    implementation("org.bstats:bstats-bukkit:3.2.1")
 
     // mock bukkit
-    testImplementation(kotlin("test", "2.4.0"))
+    testImplementation(kotlin("test", "2.4.10"))
     testImplementation(paper)
-    testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v26.1.2:4.114.0")
-    testImplementation("org.slf4j:slf4j-simple:2.0.13")
+    testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v26.1.2:4.115.0")
+    testImplementation("org.slf4j:slf4j-simple:2.0.18")
 }
 
 java {
