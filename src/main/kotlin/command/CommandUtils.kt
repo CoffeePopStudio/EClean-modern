@@ -50,7 +50,7 @@ internal fun CommandSender.sendWorldStats(worldName: String) {
         val entity = result.sortedEntries().joinToString(MLang["command.stats.spacing"]) { (type, count) ->
             val command = "/eclean entity ${type.name} $worldName"
             val content = MLang["command.stats.content", "type" to type.name, "count" to count.withColor()]
-            "<click:run_command:'$command'><hover:show_text:'${MLang["command.stats.detail_hover"]}'>$content</hover></click>"
+            "<click:run_command:'$command'><hover:show_text:'${MLang["common.hover.view_distribution"]}'>$content</hover></click>"
         }
         PL.services.messages.send(
             this,
@@ -92,7 +92,7 @@ internal fun CommandSender.sendEntityStats(
             }
             val entity = details.joinToString(MLang["command.stats.spacing"]) { detail ->
                 val command = "/eclean tp $worldName ${detail.x} ${detail.y} ${detail.z}"
-                "<click:run_command:'$command'><hover:show_text:'${MLang["command.stats.tp_hover"]}'><white>${typeName} @ ${detail.x}, ${detail.y}, ${detail.z}</white></hover></click>"
+                "<click:run_command:'$command'><hover:show_text:'${MLang["common.hover.tp"]}'><white>${typeName} @ ${detail.x}, ${detail.y}, ${detail.z}</white></hover></click>"
             }
             PL.services.messages.send(
                 this,
@@ -115,7 +115,7 @@ internal fun CommandSender.sendEntityStats(
             val command = "/eclean entity $typeName $worldName ${entry.chunkX} ${entry.chunkZ}"
             val label = "x: ${entry.chunkX * 16}..${entry.chunkX * 16 + 15}, z: ${entry.chunkZ * 16}..${entry.chunkZ * 16 + 15}"
             val content = MLang["command.stats.content", "type" to label, "count" to entry.count.withColor()]
-            "<click:run_command:'$command'><hover:show_text:'${MLang["command.stats.chunk_hover"]}'>$content</hover></click>"
+            "<click:run_command:'$command'><hover:show_text:'${MLang["common.hover.view_chunk"]}'>$content</hover></click>"
         }
         PL.services.messages.send(
             this,

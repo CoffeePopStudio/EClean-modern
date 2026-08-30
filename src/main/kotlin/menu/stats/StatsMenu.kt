@@ -15,7 +15,7 @@ import top.e404.eclean.ui.buildItemStack
 class StatsMenu(
     private val worldName: String,
     entries: List<Pair<EntityType, Int>>,
-) : UiMenu(PL, MLang["stats_gui.title", "world" to worldName], 6, true) {
+) : UiMenu(PL, MLang["command.stats_gui.title", "world" to worldName], 6, true) {
 
     private val data = entries.map { StatsEntry(it.first, it.second, worldName) }.toMutableList()
 
@@ -50,8 +50,8 @@ private class StatsEntry(
         item = buildItemStack(
             Material.PAPER,
             1,
-            MLang["stats_gui.item_name", "type" to type.name],
-            MLang["stats_gui.item_lore", "world" to world, "count" to count].lines(),
+            MLang["command.stats_gui.item_name", "type" to type.name],
+            MLang["command.stats_gui.item_lore", "world" to world, "count" to count].lines(),
         )
         needUpdate = false
     }

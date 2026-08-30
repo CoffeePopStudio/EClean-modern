@@ -34,7 +34,7 @@ object StatusCommand {
                 ]
                 PL.services.messages.send(
                     sender,
-                    "<click:run_command:'$command'><hover:show_text:'${MLang["command.stats.detail_hover"]}'>$content</hover></click>",
+                    "<click:run_command:'$command'><hover:show_text:'${MLang["common.hover.view_distribution"]}'>$content</hover></click>",
                 )
             }
             val total = results.sumOf { it.second.totalEntities }
