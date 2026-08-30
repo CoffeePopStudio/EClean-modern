@@ -3,7 +3,9 @@ package top.e404.eclean.app
 import org.bukkit.command.CommandSender
 import top.e404.eclean.feature.cleanup.CleanupAnnouncementService
 import top.e404.eclean.feature.cleanup.CleanupCoordinator
+import top.e404.eclean.feature.cleanup.CleanupHistoryService
 import top.e404.eclean.feature.cleanup.CleanupTickService
+import top.e404.eclean.feature.stats.StatsAlertService
 import top.e404.eclean.feature.trashcan.TrashcanItemStore
 import top.e404.eclean.feature.trashcan.TrashcanManager
 import top.e404.eclean.feature.trashcan.TrashcanTicker
@@ -41,12 +43,15 @@ class RuntimeServices {
     val trashcanManager = TrashcanManager(trashcanStore, messages)
     val trashcanTicker = TrashcanTicker(trashcanStore, statusSnapshots)
     val cleanupAnnouncementService = CleanupAnnouncementService(messages, statusSnapshots)
-    val cleanupCoordinator = CleanupCoordinator(messages, statusSnapshots)
+    val cleanupHistory = CleanupHistoryService()
+    val cleanupCoordinator = CleanupCoordinator(messages, statusSnapshots, cleanupHistory)
     val cleanupTickService = CleanupTickService(messages, cleanupCoordinator, cleanupAnnouncementService, statusSnapshots)
+    val statsAlertService = StatsAlertService(messages)
 
     fun load(sender: CommandSender? = null) {
         MLang.load(sender)
         Config.load(sender)
+        statsAlertService.start()
     }
 
     fun reload(sender: CommandSender) {
@@ -62,6 +67,7 @@ class RuntimeServices {
     fun shutdown() {
         cleanupTickService.stop()
         trashcanTicker.stop()
+        statsAlertService.stop()
         temporaryReturnService.shutdown()
         Schedulers.cancelPluginTasks()
     }

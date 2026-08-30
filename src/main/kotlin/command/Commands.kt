@@ -10,7 +10,7 @@ import org.bukkit.entity.EntityType
 import top.e404.eclean.lang.MLang
 
 object Commands : CommandExecutor, TabCompleter {
-    private val subcommands = listOf("debug", "reload", "clean", "stats", "entity", "trash", "players", "show")
+    private val subcommands = listOf("debug", "reload", "clean", "stats", "status", "entity", "trash", "players", "show", "history", "top")
 
     fun register() {
         val cmd = Bukkit.getPluginCommand("eclean") ?: return
@@ -28,10 +28,13 @@ object Commands : CommandExecutor, TabCompleter {
             "r", "reload" -> ReloadCommand.handle(sender)
             "clean" -> CleanCommand.handle(sender, args)
             "s", "stats" -> StatsCommand.handle(sender, args)
+            "status" -> StatusCommand.handle(sender, args)
             "e", "entity" -> EntityCommand.handle(sender, args)
             "t", "trash" -> TrashCommand.handle(sender, args)
             "p", "players" -> PlayersCommand.handle(sender)
             "show" -> ShowCommand.handle(sender)
+            "history" -> HistoryCommand.handle(sender, args)
+            "top" -> TopCommand.handle(sender, args)
             "tp" -> TeleportCommand.handle(sender, args)
             else -> sendUsage(sender)
         }

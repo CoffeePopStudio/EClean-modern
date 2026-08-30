@@ -26,3 +26,10 @@ data class EntityLocationDetail(
     val y: Double,
     val z: Double,
 )
+
+data class ChunkTotal(
+    val worldName: String,
+    val chunkX: Int,
+    val chunkZ: Int,
+    val count: Int,
+)

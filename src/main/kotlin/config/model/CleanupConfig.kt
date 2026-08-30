@@ -13,4 +13,8 @@ data class CleanupConfig(
     ),
     val cleanWhenNoPlayers: Boolean = true,
     val broadcastWhenNoPlayers: Boolean = true,
+    val alertEnabled: Boolean = false,
+    val alertEntityThreshold: Int = 500,
+    val alertCheckIntervalSeconds: Long = 600,
+    val alertFormat: String = "<red>实体数量异常</red> <white>{world} 的 {type} 数量达到 {count}</white>",
 )

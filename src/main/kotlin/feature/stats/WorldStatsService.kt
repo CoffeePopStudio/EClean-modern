@@ -5,6 +5,7 @@ import org.bukkit.Location
 import org.bukkit.entity.EntityType
 import top.e404.eclean.platform.Schedulers
 import top.e404.eclean.platform.dispatch.ChunkTaskCoordinator
+import java.util.concurrent.atomic.AtomicInteger
 
 class WorldStatsService(
     private val coordinator: ChunkTaskCoordinator = ChunkTaskCoordinator(),
@@ -98,6 +99,61 @@ class WorldStatsService(
             val chunk = world.getChunkAt(chunkX, chunkZ)
             val entities = chunk.entities.filter { it.type == type }
             onComplete(entities.map { EntityLocationDetail(it.location.x, it.location.y, it.location.z) })
+        }
+    }
+
+    fun collectAllWorldStats(onComplete: (List<Pair<String, WorldStatsResult>>) -> Unit) {
+        val worldNames = Bukkit.getWorlds().map { it.name }
+        if (worldNames.isEmpty()) {
+            Schedulers.runGlobal { onComplete(emptyList()) }
+            return
+        }
+        val results = mutableListOf<Pair<String, WorldStatsResult>>()
+        val pending = AtomicInteger(worldNames.size)
+        worldNames.forEach { name ->
+            collectWorldStats(name) { result ->
+                if (result != null) {
+                    synchronized(results) { results += name to result }
+                }
+                if (pending.decrementAndGet() == 0) {
+                    onComplete(results.toList())
+                }
+            }
+        }
+    }
+
+    fun collectChunkTotals(
+        worldName: String?,
+        onComplete: (List<ChunkTotal>) -> Unit,
+    ) {
+        val worlds = if (worldName != null) {
+            listOfNotNull(Bukkit.getWorld(worldName))
+        } else {
+            Bukkit.getWorlds()
+        }
+        if (worlds.isEmpty()) {
+            Schedulers.runGlobal { onComplete(emptyList()) }
+            return
+        }
+        val totals = mutableListOf<ChunkTotal>()
+        val pending = AtomicInteger(worlds.size)
+        worlds.forEach { world ->
+            val chunkRefs = coordinator.getLoadedChunkRefs(world)
+            if (chunkRefs.isEmpty()) {
+                if (pending.decrementAndGet() == 0) onComplete(totals.sortedByDescending { it.count })
+                return@forEach
+            }
+            coordinator.dispatchToChunks(
+                chunkRefs = chunkRefs,
+                resolveWorld = { Bukkit.getWorld(it) },
+                perChunk = { w, ref ->
+                    val chunk = w.getChunkAt(ref.x, ref.z)
+                    synchronized(totals) { totals += ChunkTotal(world.name, ref.x, ref.z, chunk.entities.size) }
+                },
+                onComplete = {
+                    if (pending.decrementAndGet() == 0) onComplete(totals.sortedByDescending { it.count })
+                },
+            )
         }
     }
 }

@@ -90,6 +90,22 @@ command:
   clean_dry_chunk: "<green>Preview — Chunk density: <gold>{cleaned}</gold> entities across <gold>{regions}</gold> dense regions</green>"
   clean_world_result: "Cleanup: {cleaned}/{total}"
   clean_world_chunk_result: "Cleanup: {cleaned}"
+  status_header: "<gold>全服统计</gold>"
+  status_world: "<white>世界 <gold>{world}</gold>: 实体{entities} 区块{chunks} 强加载{force}</white>"
+  status_total: "<white>全服实体总数: <gold>{total}</gold></white>"
+  history_empty: "<red>暂无清理记录</red>"
+  history_header: "<gold>最近清理记录</gold>"
+  history_line: "<white>{time}</white> <gray>掉落 {drop} / 生物 {living} / 密集 {chunk}</gray>"
+  top_header: "<gold>Top {type}</gold>"
+  top_entity: "<white>{rank}. {type}: {count}</white>"
+  top_chunk: "<white>{rank}. {world} x:{x} z:{z}: {count}</white>"
+  stats_gui:
+    title: "<gold>统计 - {world}</gold>"
+    item_name: "<gold>{type}</gold>"
+    item_lore: |-
+      <white>世界: {world}</white>
+      <white>数量: {count}</white>
+      <gray>点击查看区块分布</gray>
   invalid_world: "<red>不存在名为<yellow>{world}</yellow>的世界</red>"
   stats_collect_failed: "<red>收集世界统计信息失败</red>"
   players_header: "<gold>{world}</gold>:{lines}"

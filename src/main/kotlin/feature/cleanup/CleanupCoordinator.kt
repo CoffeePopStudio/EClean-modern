@@ -3,6 +3,9 @@ package top.e404.eclean.feature.cleanup
 import top.e404.eclean.clean.cleanDenseEntities
 import top.e404.eclean.clean.cleanDrop
 import top.e404.eclean.clean.cleanLiving
+import top.e404.eclean.clean.lastChunk
+import top.e404.eclean.clean.lastDrop
+import top.e404.eclean.clean.lastLiving
 import top.e404.eclean.config.Config
 import top.e404.eclean.feature.cleanup.chunk.ChunkDensityScanner
 import top.e404.eclean.feature.cleanup.drop.DropCleanupService
@@ -13,6 +16,7 @@ import top.e404.eclean.app.MessageService
 class CleanupCoordinator(
     private val messages: MessageService,
     private val snapshots: StatusSnapshotService,
+    private val history: CleanupHistoryService,
 ) {
     fun cleanNow(
         dryRun: Boolean = false,
@@ -45,6 +49,9 @@ class CleanupCoordinator(
                         elapsedSeconds = 0,
                         remainingSeconds = Config.current.cleanup.intervalSeconds,
                     )
+                }
+                if (!dryRun) {
+                    history.record(null, lastDrop, lastLiving, lastChunk)
                 }
                 onComplete?.invoke()
             }

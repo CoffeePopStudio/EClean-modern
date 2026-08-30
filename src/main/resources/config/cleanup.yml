@@ -6,3 +6,8 @@ countdownMessages:
   0: "<white>正在清理</white>"
 cleanWhenNoPlayers: true
 broadcastWhenNoPlayers: true
+# 实体数量异常提醒
+alertEnabled: false
+alertEntityThreshold: 500
+alertCheckIntervalSeconds: 600
+alertFormat: "<red>实体数量异常</red> <white>{world} 的 {type} 数量达到 {count}</white>"
