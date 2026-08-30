@@ -5,6 +5,20 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 版本规范。
 
+## 0.2.7
+
+### 新增
+- **全服统计**：`/eclean status all` 查看所有世界的实体/区块统计。
+- **单世界状态**：`/eclean status <世界>` 查看单个世界状态。
+- **清理历史**：`/eclean history` 查看最近清理记录。
+- **Top 排行**：`/eclean top entity` 和 `/eclean top chunk` 查看最密集的实体类型/区块。
+- **统计 GUI**：`/eclean stats gui [世界]` 打开可点击的统计菜单。
+- **新的 PlaceholderAPI 变量**：全服实体总数、全服区块数、指定世界实体数。
+- **实体数量异常提醒**：可配置周期性检查，超过阈值自动提醒管理员。
+
+### 变更
+- 更新了依赖，并清理了不再需要的 Maven 仓库。
+
 ## 0.2.6
 
 ### 新增

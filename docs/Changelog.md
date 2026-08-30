@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.2.7
+
+### Added
+- **Server-wide status**: `/eclean status all` shows entity/chunk statistics for every world.
+- **Single-world status**: `/eclean status <world>` shows one world's status.
+- **Cleanup history**: `/eclean history` shows recent cleanup records.
+- **Top lists**: `/eclean top entity` and `/eclean top chunk` show the busiest entity types/chunks.
+- **Stats GUI**: `/eclean stats gui [world]` opens a clickable statistics menu.
+- **New PlaceholderAPI variables**: total entities, total chunks, and per-world entity counts.
+- **Entity threshold alerts**: optional periodic alerts when a world/entity type exceeds a configured count.
+
+### Changed
+- Updated dependencies and removed unused Maven repositories.
+
 ## 0.2.6
 
 ### Added
