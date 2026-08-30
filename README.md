@@ -37,7 +37,7 @@
 - `/eclean history [数量]` 查看最近清理记录
 - `/eclean top entity [数量] [世界名]` 查看实体数量最多的类型
 - `/eclean top chunk [数量] [世界名]` 查看实体数量最多的区块
-- `/eclean trash` 打开垃圾桶
+- `/eclean trash` 打开垃圾桶（支持分类、搜索、排序）
 - `/eclean trash stats` 查看垃圾桶统计信息(每个聚合条目的类型/数量/剩余时间)
 - `/eclean show` 打开密集实体统计信息菜单
 - `/eclean tp <世界名> <x> <y> <z>` 直接传送到指定坐标(管理员)
@@ -64,6 +64,12 @@
 - `%eclean_total_entities%` - `全服实体总数`
 - `%eclean_total_chunks%` - `全服已加载区块总数`
 - `%eclean_world_<世界名>_entities%` - `指定世界的实体总数`
+- `%eclean_last_clean_time%` - `上次清理时间`
+- `%eclean_next_clean%` - `距离下次清理的秒数`
+- `%eclean_next_clean_formatted%` - `距离下次清理的格式化时间`
+- `%eclean_trashcan_entries%` - `垃圾桶条目数`
+- `%eclean_trashcan_total%` - `垃圾桶物品总数量`
+- `%eclean_history_count%` - `清理历史次数`
 
 ## 配置
 
