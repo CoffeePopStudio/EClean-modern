@@ -11,8 +11,10 @@ import top.e404.eclean.feature.trashcan.TrashcanItemStore
 import top.e404.eclean.feature.trashcan.TrashcanManager
 import top.e404.eclean.lang.MLang
 import top.e404.eclean.ui.PageButton
+import top.e404.eclean.ui.UiButton
 import top.e404.eclean.ui.UiMenu
 import top.e404.eclean.ui.UiPager
+import top.e404.eclean.ui.buildItemStack
 import top.e404.eclean.ui.emptyItem
 
 open class TrashcanMenu(
@@ -25,6 +27,12 @@ open class TrashcanMenu(
     private var prevBtn: PageButton
     private var nextBtn: PageButton
     private var pagerInitialized = false
+
+    private var category = TrashcanCategory.ALL
+    private var sort = TrashcanSort.COUNT_DESC
+    private var searchQuery: String? = null
+    internal var isSearching = false
+        private set
 
     val hasPrev get() = pager.hasPrev
     val hasNext get() = pager.hasNext
@@ -60,6 +68,11 @@ open class TrashcanMenu(
             name = MLang["menu.trashcan.next.name"],
             lore = MLang["menu.trashcan.next.lore"].lines(),
         )
+
+        val categoryBtn = createCategoryButton()
+        val sortBtn = createSortButton()
+        val searchBtn = createSearchButton()
+
         addPager(pager)
 
         initSlots(
@@ -68,11 +81,14 @@ open class TrashcanMenu(
                 "         ",
                 "         ",
                 "         ",
-                "         ",
+                " c s r   ",
                 "  p   n  ",
             )
         ) { char ->
             when (char) {
+                'c' -> categoryBtn
+                's' -> sortBtn
+                'r' -> searchBtn
                 'p' -> prevBtn.button
                 'n' -> nextBtn.button
                 else -> null
@@ -81,9 +97,15 @@ open class TrashcanMenu(
     }
 
     internal fun rebuildDisplayData() {
-        val stacking = Config.current.trashcan.stacking
+        val query = searchQuery
         val entries = store.getEntries()
-        val sorted = if (stacking.sortByCount) entries.sortedByDescending { it.count } else entries
+            .filter { category == TrashcanCategory.ALL || category.matches(it.prototype.type) }
+            .filter { entry -> query == null || entry.prototype.type.name.contains(query, true) }
+        val sorted = when (sort) {
+            TrashcanSort.COUNT_DESC -> entries.sortedByDescending { it.count }
+            TrashcanSort.NAME_ASC -> entries.sortedBy { it.prototype.type.name }
+            TrashcanSort.TIME_ASC -> entries.sortedBy { if (it.deadline == Long.MAX_VALUE) Long.MAX_VALUE else it.deadline }
+        }
         displayData.clear()
         displayData.addAll(sorted.map { TrashcanDisplayItem(it) })
         if (pagerInitialized) pager.clampPage()
@@ -181,6 +203,78 @@ open class TrashcanMenu(
 
         manager.refreshOpenMenus()
         return true
+    }
+
+    private fun createCategoryButton(): UiButton {
+        val item = buildItemStack(Material.HOPPER, 1, MLang["menu.trashcan.category.name"], null)
+        return UiButton(
+            initialItem = item,
+            onClickHandler = {
+                category = TrashcanCategory.entries[(category.ordinal + 1) % TrashcanCategory.entries.size]
+                isSearching = false
+                rebuildDisplayData()
+                updateIcon()
+                true
+            },
+            updateItemHandler = { btn ->
+                val lore = MLang["menu.trashcan.category.${category.key}"].lines()
+                btn.setItem(buildItemStack(Material.HOPPER, 1, MLang["menu.trashcan.category.name"], lore))
+            },
+        )
+    }
+
+    private fun createSortButton(): UiButton {
+        val item = buildItemStack(Material.COMPARATOR, 1, MLang["menu.trashcan.sort.name"], null)
+        return UiButton(
+            initialItem = item,
+            onClickHandler = {
+                sort = TrashcanSort.entries[(sort.ordinal + 1) % TrashcanSort.entries.size]
+                rebuildDisplayData()
+                updateIcon()
+                true
+            },
+            updateItemHandler = { btn ->
+                val lore = MLang["menu.trashcan.sort.${sort.key}"].lines()
+                btn.setItem(buildItemStack(Material.COMPARATOR, 1, MLang["menu.trashcan.sort.name"], lore))
+            },
+        )
+    }
+
+    private fun createSearchButton(): UiButton {
+        val item = buildItemStack(Material.COMPASS, 1, MLang["menu.trashcan.search.name"], null)
+        return UiButton(
+            initialItem = item,
+            onClickHandler = {
+                if (searchQuery != null) {
+                    searchQuery = null
+                    isSearching = false
+                } else {
+                    isSearching = true
+                    val player = inventory.viewers.firstOrNull() as? Player
+                    if (player != null) {
+                        PL.services.messages.send(player, MLang["menu.trashcan.search.prompt"])
+                    }
+                }
+                rebuildDisplayData()
+                updateIcon()
+                true
+            },
+            updateItemHandler = { btn ->
+                val lore = if (searchQuery != null) {
+                    MLang["menu.trashcan.search.reset", "query" to searchQuery!!].lines()
+                } else {
+                    MLang["menu.trashcan.search.name"].lines()
+                }
+                btn.setItem(buildItemStack(Material.COMPASS, 1, MLang["menu.trashcan.search.name"], lore))
+            },
+        )
+    }
+
+    internal fun applySearchQuery(query: String?) {
+        searchQuery = query?.takeIf { it.isNotBlank() }
+        isSearching = false
+        rebuildDisplayData()
+        updateIcon()
     }
 
     companion object {

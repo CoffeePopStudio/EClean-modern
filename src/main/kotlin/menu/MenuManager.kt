@@ -1,5 +1,7 @@
 package top.e404.eclean.menu
 
+import io.papermc.paper.event.player.AsyncChatEvent
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -58,6 +60,19 @@ object MenuManager : Listener {
     fun onPlayerQuit(event: PlayerQuitEvent) {
         openMenus.remove(event.player)?.unregister()
         PL.services.temporaryReturnService.handleQuit(event.player)
+    }
+
+    @EventHandler
+    fun onAsyncChat(event: AsyncChatEvent) {
+        val player = event.player
+        val menu = openMenus[player]
+        if (menu is TrashcanMenu && menu.isSearching) {
+            event.isCancelled = true
+            val query = PlainTextComponentSerializer.plainText().serialize(event.message())
+            Schedulers.runForEntity(player) {
+                if (query.equals("cancel", true)) menu.applySearchQuery(null) else menu.applySearchQuery(query)
+            }
+        }
     }
 
     @EventHandler
