@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.2.9
+
+### Added
+- **i18n language system**: flat-key language files (`lang/zh_cn.yml`, `lang/en_us.yml`), auto-merge missing keys, configurable language in `config.yml`.
+- **Cron cleanup scheduling**: `cleanup.yml` supports `cron` expressions while keeping `intervalSeconds`.
+- **Cleanup rules refinement**: distance-to-player filtering, per-entity-type rules, and per-world distance overrides.
+- **Trash can enhancements**: category filter, search (via chat), and sort options (count/name/time).
+- **More PlaceholderAPI variables**: last clean time, next clean time, trash-can entries/total, cleanup history count.
+- **Debug rate limiting**: repeated debug messages are merged within a configurable cooldown.
+
 ## 0.2.8
 
 ### Changed

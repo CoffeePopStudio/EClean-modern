@@ -5,6 +5,16 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 版本规范。
 
+## 0.2.9
+
+### 新增
+- **i18n 语言系统**：扁平 key 语言文件（`lang/zh_cn.yml`、`lang/en_us.yml`），自动补缺失 key，`config.yml` 可配置语言。
+- **Cron 清理计划**：`cleanup.yml` 支持 Cron 表达式，同时保留原来的 `intervalSeconds`。
+- **清理规则细化**：距离玩家过滤、按实体类型单独配置、按世界覆盖距离。
+- **垃圾桶增强**：分类筛选、搜索（聊天输入）、排序（数量/名称/剩余时间）。
+- **更多 PlaceholderAPI 变量**：上次清理时间、下次清理时间、垃圾桶条目/总数、清理历史次数。
+- **Debug 限流**：相同 debug 消息在可配置冷却时间内自动合并，避免刷屏。
+
 ## 0.2.8
 
 ### 变更
