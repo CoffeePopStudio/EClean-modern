@@ -19,3 +19,10 @@ matchers:
   - "ENDER_CHEST"
   - "DRAGON_EGG"
   - "ELYTRA"
+# 只清理距离最近玩家超过该距离的掉落物；不填或 null 表示不限制
+maxDistance: null
+# 按物品类型单独覆盖
+typeRules:
+  DIAMOND:
+    enabled: true
+    maxDistance: 10

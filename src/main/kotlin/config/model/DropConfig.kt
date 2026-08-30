@@ -4,6 +4,12 @@ import kotlinx.serialization.Serializable
 import top.e404.eclean.config.serialization.RegexSerializer
 
 @Serializable
+data class DropTypeRule(
+    val enabled: Boolean? = null,
+    val maxDistance: Double? = null,
+)
+
+@Serializable
 data class DropConfig(
     val enabled: Boolean = true,
     val disabledWorlds: List<@Serializable(with = RegexSerializer::class) Regex> = emptyList(),
@@ -13,4 +19,6 @@ data class DropConfig(
     val protectLore: Boolean = false,
     val protectWrittenBook: Boolean = false,
     val matchers: List<@Serializable(with = RegexSerializer::class) Regex> = emptyList(),
+    val maxDistance: Double? = null,
+    val typeRules: Map<String, DropTypeRule> = emptyMap(),
 )

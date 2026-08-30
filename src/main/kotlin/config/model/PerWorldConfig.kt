@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 data class PerWorldEntry(
     val enabled: Boolean? = null,
     val intervalSeconds: Long? = null,
+    val livingMaxDistance: Double? = null,
+    val dropMaxDistance: Double? = null,
 )
 
 @Serializable

@@ -32,6 +32,8 @@ class LivingCleanupPolicyTest {
                 cleanLeashed = false,
                 cleanMounted = false,
                 blackList = true,
+                maxDistance = null,
+                typeRules = emptyMap(),
             ),
             matchers = listOf(Regex("ZOMBIE")),
         )
@@ -62,6 +64,8 @@ class LivingCleanupPolicyTest {
                 cleanLeashed = true,
                 cleanMounted = true,
                 blackList = false,
+                maxDistance = null,
+                typeRules = emptyMap(),
             ),
             matchers = listOf(Regex("ZOMBIE")),
         )

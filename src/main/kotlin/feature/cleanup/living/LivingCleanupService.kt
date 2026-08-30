@@ -21,7 +21,7 @@ class LivingCleanupService(
     }
 
     fun cleanWorld(worldName: String, dryRun: Boolean = false, onComplete: (LivingCleanupResult) -> Unit) {
-        val rule = LivingCleanupRule.fromConfig()
+        val rule = LivingCleanupRule.fromConfig(worldName)
         val matchers = Config.current.living.matchers
         val remaining = mutableListOf<LivingCleanupCandidate>()
         runner.cleanWorld(

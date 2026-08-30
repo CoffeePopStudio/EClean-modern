@@ -1,5 +1,6 @@
 package top.e404.eclean.feature.cleanup.drop
 
+import top.e404.eclean.util.distanceToNearestPlayer
 import top.e404.eclean.util.filterByMatchers
 import java.util.UUID
 
@@ -14,16 +15,26 @@ class DropCleanupPolicy {
         rule: DropCleanupRule,
         matchers: List<Regex>,
     ): DropCleanupDecision {
-        val candidates = collection.candidates.filterNot { candidate ->
-            rule.protectEnchanted && candidate.enchanted ||
-                    rule.protectWrittenBook && candidate.writtenBook ||
-                    rule.protectLore && candidate.lore
-        }
+        val candidates = collection.candidates
+            .filterNot { candidate ->
+                rule.protectEnchanted && candidate.enchanted ||
+                        rule.protectWrittenBook && candidate.writtenBook ||
+                        rule.protectLore && candidate.lore
+            }
+            .filter { candidate -> passesTypeAndDistanceRule(candidate, rule) }
         val grouped = candidates.groupBy(DropCleanupCandidate::type)
         val selected = grouped.filterByMatchers(matchers, rule.blackList)
         return DropCleanupDecision(
             total = candidates.size,
             itemIdsToRemove = selected.values.flatten().map(DropCleanupCandidate::id),
         )
+    }
+
+    private fun passesTypeAndDistanceRule(candidate: DropCleanupCandidate, rule: DropCleanupRule): Boolean {
+        val typeRule = rule.typeRules[candidate.type]
+        if (typeRule?.enabled == false) return false
+        val maxDistance = typeRule?.maxDistance ?: rule.maxDistance ?: return true
+        val item = candidate.item ?: return true
+        return item.location.distanceToNearestPlayer() > maxDistance
     }
 }

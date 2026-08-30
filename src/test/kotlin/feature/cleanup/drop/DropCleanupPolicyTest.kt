@@ -32,6 +32,8 @@ class DropCleanupPolicyTest {
                 protectEnchanted = true,
                 protectLore = true,
                 protectWrittenBook = true,
+                maxDistance = null,
+                typeRules = emptyMap(),
             ),
             matchers = listOf(Regex("DIAMOND.*"), Regex("WRITABLE_BOOK")),
         )
@@ -61,6 +63,8 @@ class DropCleanupPolicyTest {
                 protectEnchanted = false,
                 protectLore = false,
                 protectWrittenBook = false,
+                maxDistance = null,
+                typeRules = emptyMap(),
             ),
             matchers = listOf(Regex("DIAMOND")),
         )

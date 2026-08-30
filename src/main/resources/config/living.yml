@@ -14,3 +14,10 @@ matchers:
   - "(GLOW_)?SQUID"
   - "PHANTOM"
   - "PILLAGER"
+# 只清理距离最近玩家超过该距离的生物；不填或 null 表示不限制
+maxDistance: null
+# 按实体类型单独覆盖
+typeRules:
+  ZOMBIE:
+    enabled: true
+    maxDistance: 10

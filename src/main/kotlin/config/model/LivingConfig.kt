@@ -11,6 +11,12 @@ data class EntityRuleSettings(
 )
 
 @Serializable
+data class LivingTypeRule(
+    val enabled: Boolean? = null,
+    val maxDistance: Double? = null,
+)
+
+@Serializable
 data class LivingConfig(
     val enabled: Boolean = true,
     val disabledWorlds: List<@Serializable(with = RegexSerializer::class) Regex> = emptyList(),
@@ -18,4 +24,6 @@ data class LivingConfig(
     val settings: EntityRuleSettings = EntityRuleSettings(),
     val blacklistMode: Boolean = true,
     val matchers: List<@Serializable(with = RegexSerializer::class) Regex> = emptyList(),
+    val maxDistance: Double? = null,
+    val typeRules: Map<String, LivingTypeRule> = emptyMap(),
 )

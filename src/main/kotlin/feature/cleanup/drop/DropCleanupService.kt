@@ -21,7 +21,7 @@ class DropCleanupService(
     }
 
     fun cleanWorld(worldName: String, dryRun: Boolean = false, onComplete: (DropCleanupResult) -> Unit) {
-        val rule = DropCleanupRule.fromConfig()
+        val rule = DropCleanupRule.fromConfig(worldName)
         val matchers = Config.current.drop.matchers
         runner.cleanWorld(
             worldName = worldName,
