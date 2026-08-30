@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.2.5
+
+### Fixed
+- **Fixed trash-can item duplication**: items are now deducted from the store before being given to the player, so stale menus, concurrent players, or expired entries can no longer create extra items.
+- **Fixed other open trash-can menus showing stale counts**: all open menus are refreshed after taking items.
+- Added tests to ensure taking never removes more than available and display lore never leaks into the stored/taken item.
+
 ## 0.2.4
 
 ### Changed

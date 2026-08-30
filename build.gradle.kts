@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "top.e404"
-version = "0.2.4"
+version = "0.2.5"
 val paper = "io.papermc.paper:paper-api:26.1.2.build.+"
 
 val gitCommitHash: String = try {
