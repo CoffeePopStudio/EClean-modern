@@ -5,11 +5,13 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import top.e404.eclean.util.parseSecondAsDuration
+import java.text.SimpleDateFormat
+import java.util.Date
 
 class ECleanPapiExpansion : PlaceholderExpansion() {
     override fun getIdentifier(): String = "eclean"
     override fun getAuthor(): String = "404E"
-    override fun getVersion(): String = "0.1.7"
+    override fun getVersion(): String = "0.2.9"
 
     override fun canRegister(): Boolean =
         Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")
@@ -17,14 +19,20 @@ class ECleanPapiExpansion : PlaceholderExpansion() {
     override fun onRequest(player: OfflinePlayer?, params: String): String? {
         val snapshot = PL.services.statusSnapshots.current()
         val lower = params.lowercase()
+        val lastClean = PL.services.cleanupHistory.recent(1).firstOrNull()
+        val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         return when {
-            lower == "before_next" -> snapshot.cleanup.remainingSeconds.toString()
-            lower == "before_next_formatted" -> snapshot.cleanup.remainingSeconds.parseSecondAsDuration()
+            lower == "before_next" || lower == "next_clean" -> snapshot.cleanup.remainingSeconds.toString()
+            lower == "before_next_formatted" || lower == "next_clean_formatted" -> snapshot.cleanup.remainingSeconds.parseSecondAsDuration()
             lower == "last_drop" -> snapshot.cleanup.lastDrop.toString()
             lower == "last_living" -> snapshot.cleanup.lastLiving.toString()
             lower == "last_chunk" -> snapshot.cleanup.lastChunk.toString()
             lower == "trashcan_countdown" -> snapshot.trashcanCountdown.toString()
             lower == "trashcan_countdown_formatted" -> snapshot.trashcanCountdown.parseSecondAsDuration()
+            lower == "last_clean_time" -> lastClean?.let { format.format(Date(it.timestamp)) }
+            lower == "trashcan_entries" -> PL.services.trashcanStore.size.toString()
+            lower == "trashcan_total" -> PL.services.trashcanStore.totalCount().toString()
+            lower == "history_count" -> PL.services.cleanupHistory.count().toString()
             lower == "total_entities" -> Bukkit.getWorlds().sumOf { it.entities.size }.toString()
             lower == "total_chunks" -> Bukkit.getWorlds().sumOf { it.loadedChunks.size }.toString()
             lower.startsWith("world_") && lower.endsWith("_entities") -> {

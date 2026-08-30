@@ -24,4 +24,7 @@ class CleanupHistoryService(
     @Synchronized
     fun recent(limit: Int = 10): List<CleanupRecord> =
         records.takeLast(limit.coerceAtLeast(1)).reversed()
+
+    @Synchronized
+    fun count(): Int = records.size
 }
