@@ -36,6 +36,7 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.12.3")
     // Bstats
     implementation("org.bstats:bstats-bukkit:3.2.1")
+    implementation("com.cronutils:cron-utils:9.2.1")
 
     // mock bukkit
     testImplementation(kotlin("test", "2.4.10"))

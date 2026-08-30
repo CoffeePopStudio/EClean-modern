@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CleanupConfig(
     val intervalSeconds: Long = 600,
+    val cron: String? = null,
     val countdownMessages: Map<Long, String> = mapOf(
         60L to "&f将在1分钟后进行清理",
         30L to "&f将在30秒后进行清理",

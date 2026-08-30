@@ -1,11 +1,17 @@
 package top.e404.eclean.feature.cleanup
 
+import com.cronutils.model.CronType
+import com.cronutils.model.definition.CronDefinitionBuilder
+import com.cronutils.model.time.ExecutionTime
+import com.cronutils.parser.CronParser
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import org.bukkit.Bukkit
 import top.e404.eclean.config.Config
 import top.e404.eclean.platform.Schedulers
 import top.e404.eclean.service.StatusSnapshotService
 import top.e404.eclean.app.MessageService
+import java.time.Duration
+import java.time.ZonedDateTime
 
 class CleanupTickService(
     private val messages: MessageService,
@@ -15,9 +21,46 @@ class CleanupTickService(
 ) {
     private var task: ScheduledTask? = null
     private var elapsed: Long = 0
+    private var cronExecution: ExecutionTime? = null
 
     fun start() {
         stop()
+        val cronExpr = Config.current.cleanup.cron?.takeIf { it.isNotBlank() }
+        if (cronExpr != null) {
+            startCron(cronExpr)
+            return
+        }
+        startInterval()
+    }
+
+    private fun startCron(expression: String) {
+        val parser = CronParser(CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ))
+        cronExecution = try {
+            ExecutionTime.forCron(parser.parse(expression))
+        } catch (e: Exception) {
+            messages.warn("Invalid cron expression '$expression', falling back to interval: ${e.message}")
+            startInterval()
+            return
+        }
+        elapsed = 0
+        snapshots.updateCleanup {
+            it.copy(elapsedSeconds = 0, remainingSeconds = 0)
+        }
+        task = Schedulers.scheduleRepeatingGlobal(20, 20) {
+            val now = ZonedDateTime.now()
+            val execution = cronExecution ?: return@scheduleRepeatingGlobal
+            val next = execution.nextExecution(now).orElse(null) ?: return@scheduleRepeatingGlobal
+            val remaining = maxOf(0, Duration.between(now, next).seconds)
+            snapshots.updateCleanup { it.copy(elapsedSeconds = 0, remainingSeconds = remaining) }
+            announcements.announceCountdown(remaining)
+            if (remaining <= 0) {
+                coordinator.cleanNow()
+            }
+        }
+        messages.info("Cleanup ticker started (cron=$expression)")
+    }
+
+    private fun startInterval() {
         val worlds = Bukkit.getWorlds().map { it.name }
         val intervals = worlds.mapNotNull { name ->
             val entry = Config.current.perWorld.worlds[name]
@@ -49,6 +92,7 @@ class CleanupTickService(
     fun stop() {
         task?.cancel()
         task = null
+        cronExecution = null
         elapsed = 0
     }
 }
