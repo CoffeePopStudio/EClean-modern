@@ -5,6 +5,11 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 版本规范。
 
+## 0.2.8
+
+### 变更
+- **bStats**：切换到注册后的插件 ID，统计数据现在会记录到项目自己的 bStats 面板。
+
 ## 0.2.7
 
 ### 新增
