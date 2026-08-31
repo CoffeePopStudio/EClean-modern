@@ -1,5 +1,7 @@
 package top.e404.eclean.feature.cleanup.living
 
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.Tameable
 import top.e404.eclean.util.distanceToNearestPlayer
 import top.e404.eclean.util.filterByMatchers
 import java.util.UUID
@@ -33,10 +35,13 @@ class LivingCleanupPolicy {
     }
 
     private fun passesTypeAndDistanceRule(candidate: LivingCleanupCandidate, rule: LivingCleanupRule): Boolean {
+        val entity = candidate.entity
+        if (entity == null) return true
+        if (rule.protectTamed && entity is Tameable && entity.isTamed) return false
+        if (rule.protectAllay && entity.type == EntityType.ALLAY) return false
         val typeRule = rule.typeRules[candidate.type]
         if (typeRule?.enabled == false) return false
         val maxDistance = typeRule?.maxDistance ?: rule.maxDistance ?: return true
-        val entity = candidate.entity ?: return true
         return entity.location.distanceToNearestPlayer() > maxDistance
     }
 }

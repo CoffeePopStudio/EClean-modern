@@ -21,3 +21,7 @@ typeRules:
   ZOMBIE:
     enabled: true
     maxDistance: 10
+# 保护已驯服的宠物（狗、猫等）
+protectTamed: true
+# 保护悦灵 Allay
+protectAllay: true

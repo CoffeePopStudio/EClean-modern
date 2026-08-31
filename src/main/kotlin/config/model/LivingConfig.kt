@@ -26,4 +26,6 @@ data class LivingConfig(
     val matchers: List<@Serializable(with = RegexSerializer::class) Regex> = emptyList(),
     val maxDistance: Double? = null,
     val typeRules: Map<String, LivingTypeRule> = emptyMap(),
+    val protectTamed: Boolean = true,
+    val protectAllay: Boolean = true,
 )

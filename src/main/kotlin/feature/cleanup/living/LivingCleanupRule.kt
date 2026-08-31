@@ -9,6 +9,8 @@ data class LivingCleanupRule(
     val blackList: Boolean,
     val maxDistance: Double?,
     val typeRules: Map<String, LivingTypeRule>,
+    val protectTamed: Boolean = true,
+    val protectAllay: Boolean = true,
 ) {
     companion object {
         fun fromConfig(worldName: String? = null) = top.e404.eclean.config.Config.current.let { config ->
@@ -21,6 +23,8 @@ data class LivingCleanupRule(
                 blackList = cfg.blacklistMode,
                 maxDistance = perWorld?.livingMaxDistance ?: cfg.maxDistance,
                 typeRules = cfg.typeRules,
+                protectTamed = cfg.protectTamed,
+                protectAllay = cfg.protectAllay,
             )
         }
     }
