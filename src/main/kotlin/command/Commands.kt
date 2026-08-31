@@ -75,7 +75,10 @@ object Commands : CommandExecutor, TabCompleter {
             "command.usage.players",
             "command.usage.show",
             "command.usage.stats",
+            "command.usage.status",
             "command.usage.entity",
+            "command.usage.history",
+            "command.usage.top",
             "command.usage.clean",
         )
         for (key in keys) PL.services.messages.send(sender, MLang[key])
