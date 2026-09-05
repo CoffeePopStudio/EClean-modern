@@ -6,8 +6,8 @@ interface CommonCommandSender {
     fun sendMessage(component: net.kyori.adventure.text.Component)
 }
 
-interface CommonPlayer : CommonCommandSender {
+interface CommonPlayer : top.e404.eclean.common.api.CommonCommandSender {
     val uniqueId: String
     val worldName: String
-    val location: CommonLocation
+    val location: top.e404.eclean.common.api.CommonLocation
 }

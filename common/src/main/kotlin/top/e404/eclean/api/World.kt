@@ -9,32 +9,32 @@ import java.util.UUID
  */
 interface CommonWorld {
     val name: String
-    fun getLoadedChunkRefs(): List<ChunkRef>
-    fun getChunk(ref: ChunkRef): CommonChunk?
+    fun getLoadedChunkRefs(): List<top.e404.eclean.platform.execution.ChunkRef>
+    fun getChunk(ref: top.e404.eclean.platform.execution.ChunkRef): top.e404.eclean.common.api.CommonChunk?
 }
 
 interface CommonChunk {
-    val ref: ChunkRef
-    fun entities(): List<CommonEntity>
-    fun items(): List<CommonItem>
-    fun livingEntities(): List<CommonLivingEntity>
+    val ref: top.e404.eclean.platform.execution.ChunkRef
+    fun entities(): List<top.e404.eclean.common.api.CommonEntity>
+    fun items(): List<top.e404.eclean.common.api.CommonItem>
+    fun livingEntities(): List<top.e404.eclean.common.api.CommonLivingEntity>
 }
 
 interface CommonEntity {
     val uniqueId: UUID
     val type: String
-    val location: CommonLocation
+    val location: top.e404.eclean.common.api.CommonLocation
     fun remove()
 }
 
-interface CommonItem : CommonEntity {
+interface CommonItem : top.e404.eclean.common.api.CommonEntity {
     val enchanted: Boolean
     val hasLore: Boolean
     val isWrittenBook: Boolean
     val distanceToNearestPlayer: Double?
 }
 
-interface CommonLivingEntity : CommonEntity {
+interface CommonLivingEntity : top.e404.eclean.common.api.CommonEntity {
     val named: Boolean
     val leashed: Boolean
     val mounted: Boolean

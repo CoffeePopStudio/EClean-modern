@@ -8,9 +8,9 @@ import top.e404.eclean.util.miniMessage
  * Platform-agnostic `/eclean clean` command handler.
  */
 fun cleanCommandHandler(
-    messageProvider: MessageProvider,
-    cleanupService: CleanupCommandService,
-): (CommonCommandSender, Array<out String>) -> Boolean {
+    messageProvider: top.e404.eclean.command.MessageProvider,
+    cleanupService: top.e404.eclean.feature.cleanup.CleanupCommandService,
+): (top.e404.eclean.common.api.CommonCommandSender, Array<out String>) -> Boolean {
     fun execute(sender: CommonCommandSender, args: Array<out String>): Boolean {
         val hasPreview = args.any { it.equals("--preview", true) }
         val cleanArgs = args.filter { !it.equals("--preview", true) }.toTypedArray()
