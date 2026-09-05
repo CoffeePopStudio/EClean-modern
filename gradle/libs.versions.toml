@@ -1,0 +1,35 @@
+[versions]
+kotlin = "2.4.10"
+kotlinx-serialization = "1.11.0"
+kaml = "0.104.0"
+cron-utils = "9.2.1"
+adventure = "4.26.1"
+paper = "26.1.2.build.+"
+placeholderapi = "2.12.3"
+bstats = "3.2.1"
+mockbukkit = "4.115.0"
+slf4j = "2.0.18"
+snakeyaml = "2.2"
+shadow = "9.6.1"
+run-paper = "3.1.0"
+
+[libraries]
+adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure" }
+adventure-text-minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure" }
+adventure-text-serializer-plain = { module = "net.kyori:adventure-text-serializer-plain", version.ref = "adventure" }
+kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
+kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
+cron-utils = { module = "com.cronutils:cron-utils", version.ref = "cron-utils" }
+snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
+paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper" }
+placeholderapi = { module = "me.clip:placeholderapi", version.ref = "placeholderapi" }
+bstats-bukkit = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
+mockbukkit = { module = "org.mockbukkit.mockbukkit:mockbukkit-v26.1.2", version.ref = "mockbukkit" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }

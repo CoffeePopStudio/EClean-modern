@@ -1,0 +1,8 @@
+// EClean Common convention.
+// Shared JVM configuration for modules that contain platform-agnostic code.
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
+}
+kotlin {
+    jvmToolchain(25)
+}

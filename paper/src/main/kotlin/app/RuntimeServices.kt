@@ -12,6 +12,7 @@ import top.e404.eclean.feature.stats.StatsAlertService
 import top.e404.eclean.feature.trashcan.TrashcanItemStore
 import top.e404.eclean.feature.trashcan.TrashcanManager
 import top.e404.eclean.feature.trashcan.TrashcanTicker
+import top.e404.eclean.lang.LanguageManager
 import top.e404.eclean.lang.MLang
 import top.e404.eclean.paper.adapt.PaperPlatform
 import top.e404.eclean.paper.adapt.PaperTeleportService
@@ -31,6 +32,10 @@ import top.e404.eclean.service.TemporaryReturnService
 
 class RuntimeServices {
     val messages = MessageService()
+    val language = LanguageManager(
+        dataDirectory = PL.dataFolder.toPath(),
+        logger = { PL.logger.info(it) },
+    )
     val platform: RuntimePlatform = RuntimePlatformFactory.create(FoliaDetector.isFolia())
     val execution: ExecutionGateway = BukkitExecutionGateway()
     val statusSnapshots = StatusSnapshotService()
@@ -73,6 +78,7 @@ class RuntimeServices {
     ) { MLang["prefix"] }
 
     init {
+        MLang.bind(language)
         Schedulers.init(commonPlatform.scheduler)
     }
 

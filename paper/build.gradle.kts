@@ -5,17 +5,8 @@ plugins {
     id("xyz.jpenilla.run-paper")
 }
 
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
-    sourceCompatibility = JavaVersion.VERSION_25
-    targetCompatibility = JavaVersion.VERSION_25
-}
-
-kotlin {
-    jvmToolchain(25)
-}
-
-val paperApi: String = "io.papermc.paper:paper-api:26.1.2.build.+"
+apply(from = rootProject.file("gradle/convention/eclean-common.gradle"))
+apply(from = rootProject.file("gradle/convention/eclean-paper.gradle"))
 
 val gitCommitHash: String = try {
     ProcessBuilder("git", "rev-parse", "--short", "HEAD")
@@ -30,22 +21,22 @@ val gitCommitHash: String = try {
 dependencies {
     implementation(project(":common"))
 
-    implementation("com.charleskorn.kaml:kaml:0.104.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.11.0")
-    implementation("com.cronutils:cron-utils:9.2.1")
+    implementation(libs.kaml)
+    implementation(libs.kotlinx.serialization.core)
+    implementation(libs.cron.utils)
 
     // paper / folia-compatible api surface
-    compileOnly(paperApi)
+    compileOnly(libs.paper.api)
     // placeholderAPI
-    compileOnly("me.clip:placeholderapi:2.12.3")
+    compileOnly(libs.placeholderapi)
     // bstats
-    implementation("org.bstats:bstats-bukkit:3.2.1")
+    implementation(libs.bstats.bukkit)
 
     // mock bukkit
-    testImplementation(kotlin("test"))
-    testImplementation(paperApi)
-    testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v26.1.2:4.115.0")
-    testImplementation("org.slf4j:slf4j-simple:2.0.18")
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.paper.api)
+    testImplementation(libs.mockbukkit)
+    testImplementation(libs.slf4j.simple)
 }
 
 tasks {
@@ -58,6 +49,7 @@ tasks {
         relocate("org.bstats", "top.e404.eclean.relocate.bstats")
         relocate("kotlin", "top.e404.eclean.relocate.kotlin")
         relocate("com.charleskorn.kaml", "top.e404.eclean.relocate.kaml")
+        relocate("org.yaml", "top.e404.eclean.relocate.snakeyaml")
         exclude("META-INF/**")
 
         doLast {

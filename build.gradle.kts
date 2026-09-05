@@ -1,8 +1,8 @@
 plugins {
-    kotlin("jvm") version "2.4.10" apply false
-    kotlin("plugin.serialization") version "2.4.10" apply false
-    id("com.gradleup.shadow") version "9.6.1" apply false
-    id("xyz.jpenilla.run-paper") version "3.1.0" apply false
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.shadow) apply false
+    alias(libs.plugins.run.paper) apply false
 }
 
 allprojects {

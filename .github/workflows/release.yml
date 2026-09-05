@@ -19,7 +19,7 @@ jobs:
       - name: Read project version
         id: version
         run: |
-          V=$(grep -oP '^version\s*=\s*"\K[^"]+' build.gradle.kts)
+          V=$(grep -oP 'version\s*=\s*"\K[^"]+' build.gradle.kts)
           if [ -z "$V" ]; then
             echo "::error::无法从 build.gradle.kts 读取 version"
             exit 1
@@ -72,5 +72,5 @@ jobs:
           tag_name: v${{ steps.version.outputs.version }}
           name: v${{ steps.version.outputs.version }}
           body_path: release_notes.md
-          files: build/libs/EClean-Modern-*.jar
+          files: paper/build/libs/EClean-Modern-*.jar
           fail_on_unmatched_files: true

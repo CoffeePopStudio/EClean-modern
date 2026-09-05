@@ -32,5 +32,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: EClean-Modern
-          path: build/libs/*.jar
+          path: paper/build/libs/*.jar
           if-no-files-found: error
