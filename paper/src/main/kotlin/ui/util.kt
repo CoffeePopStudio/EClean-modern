@@ -1,0 +1,31 @@
+package top.e404.eclean.ui
+
+import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.ItemMeta
+import top.e404.eclean.util.miniMessage
+
+fun buildItemStack(
+    material: Material,
+    amount: Int = 1,
+    name: String? = null,
+    lore: List<String>? = null,
+    block: (ItemMeta.() -> Unit)? = null,
+): ItemStack {
+    val item = ItemStack(material, amount)
+    val meta = item.itemMeta ?: return item
+    if (name != null) meta.displayName(miniMessage.deserialize(name))
+    if (lore != null) meta.lore(lore.map { miniMessage.deserialize(it) })
+    block?.invoke(meta)
+    item.itemMeta = meta
+    return item
+}
+
+val emptyItem = ItemStack(Material.AIR)
+
+fun ItemStack.editItemMeta(block: ItemMeta.() -> Unit): ItemStack {
+    val meta = itemMeta ?: return this
+    block(meta)
+    itemMeta = meta
+    return this
+}
