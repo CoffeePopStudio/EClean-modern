@@ -1,0 +1,15 @@
+enabled: true
+disabledWorlds:
+  - "not_cleaned_world"
+finishMessage: "<green>密集实体清理完成, 清理{clean}个</green>"
+settings:
+  cleanNamed: false
+  cleanLeashed: false
+  cleanMounted: false
+alertThreshold: 50
+alertFormat: "{chunk}中{entity}的数量较多({count})"
+entityLimits:
+  "ZOMBIE|SKELETON": 10
+  "SPIDER": 2
+  "CHICKEN|PIG|COW|SHEEP": 50
+  "EGG|ENDER_PEARL|EXPERIENCE_ORB|FIREBALL|FIREWORK|SMALL_FIREBALL|SNOWBALL|ARROW|SPECTRAL_ARROW|SPLASH_POTION": 10

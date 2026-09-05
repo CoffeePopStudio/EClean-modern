@@ -1,0 +1,171 @@
+name: EClean-Modern
+version: ${version}
+main: top.e404.eclean.EClean
+api-version: '1.21.11'
+folia-supported: true
+softdepend:
+  - PlaceholderAPI
+authors: [ 404E ]
+commands:
+  eclean:
+    description: 插件主命令
+    aliases:
+      - ecl
+permissions:
+  eclean.admin:
+    default: op
+    description: 允许使用 EClean 的全部功能（旧版综合管理权限）
+    children:
+      eclean.command.debug: true
+      eclean.command.reload: true
+      eclean.command.clean: true
+      eclean.command.clean.all: true
+      eclean.command.clean.entity: true
+      eclean.command.clean.drop: true
+      eclean.command.clean.chunk: true
+      eclean.command.clean.preview: true
+      eclean.command.clean.trash: true
+      eclean.command.trash.open: true
+      eclean.command.trash.stats: true
+      eclean.command.stats: true
+      eclean.command.stats.self: true
+      eclean.command.stats.world: true
+      eclean.command.stats.gui: true
+      eclean.command.status: true
+      eclean.command.status.world: true
+      eclean.command.status.all: true
+      eclean.command.entity: true
+      eclean.command.entity.self: true
+      eclean.command.entity.world: true
+      eclean.command.entity.chunk: true
+      eclean.command.players: true
+      eclean.command.show: true
+      eclean.command.show.teleport: true
+      eclean.command.show.clean: true
+      eclean.command.history: true
+      eclean.command.top: true
+      eclean.command.top.entity: true
+      eclean.command.top.chunk: true
+      eclean.command.teleport: true
+      eclean.alerts: true
+  eclean.trash:
+    default: op
+    description: 允许打开共享垃圾桶（旧版权限，等价于 eclean.command.trash.open）
+    children:
+      eclean.command.trash.open: true
+
+  eclean.command.debug:
+    default: op
+    description: 切换 Debug 消息
+  eclean.command.reload:
+    default: op
+    description: 重载插件配置和语言
+  eclean.command.clean:
+    default: op
+    description: 允许执行清理操作（父权限）
+    children:
+      eclean.command.clean.all: true
+      eclean.command.clean.entity: true
+      eclean.command.clean.drop: true
+      eclean.command.clean.chunk: true
+  eclean.command.clean.all:
+    default: op
+    description: 执行一次完整清理
+  eclean.command.clean.entity:
+    default: op
+    description: 执行实体清理
+  eclean.command.clean.drop:
+    default: op
+    description: 执行掉落物清理
+  eclean.command.clean.chunk:
+    default: op
+    description: 执行密集实体清理
+  eclean.command.clean.preview:
+    default: op
+    description: 允许使用 --preview 预演模式
+  eclean.command.clean.trash:
+    default: op
+    description: 清空共享垃圾桶
+  eclean.command.trash.open:
+    default: op
+    description: 打开共享垃圾桶
+  eclean.command.trash.stats:
+    default: op
+    description: 查看垃圾桶统计
+  eclean.command.stats:
+    default: op
+    description: 统计父权限
+    children:
+      eclean.command.stats.self: true
+      eclean.command.stats.world: true
+      eclean.command.stats.gui: true
+  eclean.command.stats.self:
+    default: op
+    description: 统计当前世界
+  eclean.command.stats.world:
+    default: op
+    description: 统计指定世界
+  eclean.command.stats.gui:
+    default: op
+    description: 打开统计 GUI
+  eclean.command.status:
+    default: op
+    description: 状态查询父权限
+    children:
+      eclean.command.status.world: true
+      eclean.command.status.all: true
+  eclean.command.status.world:
+    default: op
+    description: 查看指定世界状态
+  eclean.command.status.all:
+    default: op
+    description: 查看全服状态
+  eclean.command.entity:
+    default: op
+    description: 实体分布查询父权限
+    children:
+      eclean.command.entity.self: true
+      eclean.command.entity.world: true
+      eclean.command.entity.chunk: true
+  eclean.command.entity.self:
+    default: op
+    description: 查询当前世界实体分布
+  eclean.command.entity.world:
+    default: op
+    description: 查询指定世界实体分布
+  eclean.command.entity.chunk:
+    default: op
+    description: 查询指定区块实体详情
+  eclean.command.players:
+    default: op
+    description: 查看在线玩家坐标
+  eclean.command.show:
+    default: op
+    description: 打开密集实体统计菜单
+  eclean.command.show.teleport:
+    default: op
+    description: 在密集实体菜单中传送
+  eclean.command.show.clean:
+    default: op
+    description: 在密集实体菜单中删除实体
+  eclean.command.history:
+    default: op
+    description: 查看清理历史
+  eclean.command.top:
+    default: op
+    description: Top 排名父权限
+    children:
+      eclean.command.top.entity: true
+      eclean.command.top.chunk: true
+  eclean.command.top.entity:
+    default: op
+    description: 查看实体类型排名
+  eclean.command.top.chunk:
+    default: op
+    description: 查看区块排名
+  eclean.command.teleport:
+    default: op
+    description: 使用 /eclean tp 传送
+  eclean.alerts:
+    default: op
+    description: 接收插件自动提醒

@@ -1,0 +1,28 @@
+enabled: true
+disabledWorlds:
+  - "not_cleaned_world"
+finishMessage: "<green>掉落物清理完成, 已清理{clean}/{all}</green>"
+blacklistMode: false
+protectEnchanted: false
+protectLore: false
+protectWrittenBook: false
+matchers:
+  - "DIAMOND[A-Z_]*"
+  - "NETHERITE[A-Z_]*"
+  - "[A-Z_]*SHULKER_BOX"
+  - "[A-Z_]*(HEAD|SKULL)"
+  - "SHULKER_SHELL"
+  - "BEACON"
+  - "(ENCHANTED_)?GOLDEN_APPLE"
+  - "TRIDENT"
+  - "TOTEM_OF_UNDYING"
+  - "ENDER_CHEST"
+  - "DRAGON_EGG"
+  - "ELYTRA"
+# 只清理距离最近玩家超过该距离的掉落物；不填或 null 表示不限制
+maxDistance: null
+# 按物品类型单独覆盖
+typeRules:
+  DIAMOND:
+    enabled: true
+    maxDistance: 10
