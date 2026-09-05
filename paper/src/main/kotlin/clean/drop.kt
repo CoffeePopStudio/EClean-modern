@@ -1,0 +1,47 @@
+package top.e404.eclean.clean
+import top.e404.eclean.PL
+
+import top.e404.eclean.config.ModernConfig
+import top.e404.eclean.feature.cleanup.drop.DropCleanupResult
+import top.e404.eclean.feature.cleanup.drop.DropCleanupService
+import top.e404.eclean.util.noOnline
+import top.e404.eclean.util.noOnlineMessage
+import top.e404.eclean.util.placeholder
+
+private inline val dropCfg get() = ModernConfig.drop
+
+private fun resolveDropService(): DropCleanupService = DropCleanupService()
+
+var lastDrop = 0
+    private set
+
+fun cleanDrop(announce: Boolean = true, dryRun: Boolean = false, onComplete: ((Int) -> Unit)? = null) {
+    if (!dropCfg.enabled) {
+        PL.services.messages.debug { "Drop cleanup is disabled" }
+        onComplete?.invoke(0)
+        return
+    }
+    val service = resolveDropService()
+    PL.services.messages.debug { "Starting drop cleanup" }
+    PL.services.messages.debug { if (dropCfg.protectEnchanted) "Protect enchanted items" else "Remove enchanted items" }
+    PL.services.messages.debug { if (dropCfg.protectWrittenBook) "Protect written books" else "Remove written books" }
+
+    val time = System.currentTimeMillis()
+    service.cleanAllWorlds(dryRun = dryRun) { results ->
+        val elapsed = System.currentTimeMillis() - time
+        lastDrop = results.sumOf { it.cleaned }
+        PL.services.statusSnapshots.updateCleanup { it.copy(lastDrop = lastDrop) }
+        PL.services.messages.debug { "Drop cleanup finished: ${lastDrop} removed, ${elapsed}ms" }
+        if (announce) announceDrop(results)
+        onComplete?.invoke(lastDrop)
+    }
+}
+
+private fun announceDrop(results: List<DropCleanupResult>) {
+    val all = results.sumOf { it.total }
+    val finish = dropCfg.finishMessage
+    if (finish.isBlank()) return
+    val message = finish.placeholder("clean" to lastDrop, "all" to all)
+    if (noOnline && !noOnlineMessage) return
+    PL.services.cleanupAnnouncementService.announceFinish(message)
+}
