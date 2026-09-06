@@ -43,7 +43,7 @@ fun entityCommandHandler(
                 val min = args[3].toIntOrNull()
                 if (min == null || min < 0) {
                     sender.sendMessage(
-                        miniMessage.deserialize(messageProvider.get("message.invalid_number", "number" to args[3]))
+                        miniMessage.deserialize(messageProvider.get("command.invalid.number", "number" to args[3]))
                     )
                     return true
                 }
@@ -59,7 +59,7 @@ fun entityCommandHandler(
                 if (chunkX == null || chunkZ == null) {
                     val invalid = if (chunkX == null) args[3] else args[4]
                     sender.sendMessage(
-                        miniMessage.deserialize(messageProvider.get("message.invalid_number", "number" to invalid))
+                        miniMessage.deserialize(messageProvider.get("command.invalid.number", "number" to invalid))
                     )
                     return true
                 }
@@ -88,7 +88,7 @@ private fun sendEntityStats(
 ) {
     val type = typeName.formatAsConst()
     if (!worldStatsProvider.isValidEntityType(type)) {
-        sender.sendMessage(miniMessage.deserialize(messageProvider.get("message.invalid_entity_type")))
+        sender.sendMessage(miniMessage.deserialize(messageProvider.get("command.invalid.entity_type")))
         return
     }
     if (chunkX != null && chunkZ != null) {

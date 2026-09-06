@@ -4,9 +4,9 @@ import top.e404.eclean.PL
 import top.e404.eclean.config.ModernConfig
 import top.e404.eclean.feature.cleanup.drop.DropCleanupResult
 import top.e404.eclean.feature.cleanup.drop.DropCleanupService
+import top.e404.eclean.lang.MLang
 import top.e404.eclean.util.noOnline
 import top.e404.eclean.util.noOnlineMessage
-import top.e404.eclean.util.placeholder
 
 private inline val dropCfg get() = ModernConfig.drop
 
@@ -39,9 +39,7 @@ fun cleanDrop(announce: Boolean = true, dryRun: Boolean = false, onComplete: ((I
 
 private fun announceDrop(results: List<DropCleanupResult>) {
     val all = results.sumOf { it.total }
-    val finish = dropCfg.finishMessage
-    if (finish.isBlank()) return
-    val message = finish.placeholder("clean" to lastDrop, "all" to all)
+    val message = MLang["cleanup.finish.drop", "cleaned" to lastDrop, "total" to all]
     if (noOnline && !noOnlineMessage) return
     PL.services.cleanupAnnouncementService.announceFinish(message)
 }

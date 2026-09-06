@@ -23,10 +23,10 @@ fun statusCommandHandler(
                         sender.sendMessage(miniMessage.deserialize(messageProvider.get("command.stats.empty")))
                         return@collectAllWorldStats
                     }
-                    sender.sendMessage(miniMessage.deserialize(messageProvider.get("command.status_header")))
+                    sender.sendMessage(miniMessage.deserialize(messageProvider.get("command.status.header")))
                     results.forEach { (worldName, result) ->
                         val content = messageProvider.get(
-                            "command.status_world",
+                            "command.status.world",
                             "world" to worldName,
                             "entities" to result.totalEntities,
                             "chunks" to result.loadedChunks,
@@ -40,7 +40,7 @@ fun statusCommandHandler(
                     }
                     sender.sendMessage(
                         miniMessage.deserialize(
-                            messageProvider.get("command.status_total", "total" to results.sumOf { it.second.totalEntities })
+                            messageProvider.get("command.status.total", "total" to results.sumOf { it.second.totalEntities })
                         )
                     )
                 }
@@ -55,7 +55,7 @@ fun statusCommandHandler(
                     if (result == null) {
                         sender.sendMessage(
                             miniMessage.deserialize(
-                                messageProvider.get("command.invalid_world", "world" to worldName)
+                                messageProvider.get("command.invalid.world", "world" to worldName)
                             )
                         )
                         return@collectWorldStats
@@ -63,7 +63,7 @@ fun statusCommandHandler(
                     sender.sendMessage(
                         miniMessage.deserialize(
                             messageProvider.get(
-                                "command.status_world",
+                                "command.status.world",
                                 "world" to worldName,
                                 "entities" to result.totalEntities,
                                 "chunks" to result.loadedChunks,

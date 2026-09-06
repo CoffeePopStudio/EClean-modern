@@ -79,7 +79,7 @@ private fun sendWorldStats(
     worldStatsProvider.collectWorldStats(worldName) { result ->
         if (result == null) {
             sender.sendMessage(
-                miniMessage.deserialize(messageProvider.get("command.invalid_world", "world" to worldName))
+                miniMessage.deserialize(messageProvider.get("command.invalid.world", "world" to worldName))
             )
             return@collectWorldStats
         }

@@ -43,6 +43,10 @@ class LanguageManager(
         return raw.placeholder(*placeholder)
     }
 
+    /** Returns null instead of the key itself when the key is missing. */
+    fun getOrNull(key: String, vararg placeholder: Pair<String, Any?>): String? =
+        cache[key]?.placeholder(*placeholder)
+
     fun load(language: String = DEFAULT_LANGUAGE) {
         val selected = language.ifBlank { DEFAULT_LANGUAGE }
         currentLanguage = selected

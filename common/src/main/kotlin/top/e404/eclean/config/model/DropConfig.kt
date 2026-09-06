@@ -13,7 +13,6 @@ data class DropTypeRule(
 data class DropConfig(
     val enabled: Boolean = true,
     val disabledWorlds: List<@Serializable(with = RegexSerializer::class) Regex> = emptyList(),
-    val finishMessage: String = "",
     val blacklistMode: Boolean = false,
     val protectEnchanted: Boolean = false,
     val protectLore: Boolean = false,

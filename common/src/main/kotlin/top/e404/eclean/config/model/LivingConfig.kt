@@ -20,7 +20,6 @@ data class LivingTypeRule(
 data class LivingConfig(
     val enabled: Boolean = true,
     val disabledWorlds: List<@Serializable(with = RegexSerializer::class) Regex> = emptyList(),
-    val finishMessage: String = "",
     val settings: EntityRuleSettings = EntityRuleSettings(),
     val blacklistMode: Boolean = true,
     val matchers: List<@Serializable(with = RegexSerializer::class) Regex> = emptyList(),

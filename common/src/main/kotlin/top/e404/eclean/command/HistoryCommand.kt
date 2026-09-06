@@ -28,7 +28,7 @@ fun historyCommandHandler(
             rawLimit.toIntOrNull() in 1..100 -> rawLimit.toInt()
             else -> {
                 sender.sendMessage(
-                    miniMessage.deserialize(messageProvider.get("message.invalid_number", "number" to rawLimit))
+                    miniMessage.deserialize(messageProvider.get("command.invalid.number", "number" to rawLimit))
                 )
                 return true
             }

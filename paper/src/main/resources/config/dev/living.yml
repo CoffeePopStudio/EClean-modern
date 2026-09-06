@@ -8,8 +8,6 @@
 enabled: true
 # 不参与生物清理的世界
 disabledWorlds: []
-# 清理完成后的提示消息；留空使用语言文件默认
-finishMessage: ""
 # 是否清理有名字/被拴绳/被骑乘的生物
 settings:
   cleanNamed: false

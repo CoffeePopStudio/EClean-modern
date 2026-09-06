@@ -23,7 +23,7 @@ fun topCommandHandler(
         val world = rest.firstOrNull { it.toIntOrNull() == null }
         if (rawLimit !in 1..100) {
             sender.sendMessage(
-                miniMessage.deserialize(messageProvider.get("message.invalid_number", "number" to rawLimit))
+                miniMessage.deserialize(messageProvider.get("command.invalid.number", "number" to rawLimit))
             )
             return true
         }

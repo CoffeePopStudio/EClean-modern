@@ -1,6 +1,5 @@
 package top.e404.eclean.clean
 import top.e404.eclean.PL
-import top.e404.eclean.config.Config
 import top.e404.eclean.config.ModernConfig
 import top.e404.eclean.feature.cleanup.chunk.ChunkAlertService
 import top.e404.eclean.feature.cleanup.chunk.ChunkDensityScanner
@@ -8,7 +7,6 @@ import top.e404.eclean.lang.MLang
 import top.e404.eclean.platform.execution.ChunkRef
 import top.e404.eclean.util.noOnline
 import top.e404.eclean.util.noOnlineMessage
-import top.e404.eclean.util.placeholder
 
 private inline val chunkCfg get() = ModernConfig.chunkDensity
 
@@ -20,7 +18,7 @@ private val chunkAlertService by lazy {
         serverInfo = PL.services.commonPlatform.serverInfo,
         permissionService = PL.services.commonPlatform.permissionService,
         prefixProvider = { MLang["prefix"] },
-        alertFormatProvider = { Config.current.chunkDensity.alertFormat },
+        alertFormatProvider = { MLang.getOrNull("cleanup.alert.dense") },
     )
 }
 
@@ -57,9 +55,7 @@ fun scanDenseEntries(onComplete: (List<top.e404.eclean.feature.cleanup.chunk.Chu
 }
 
 private fun announceChunk() {
-    val finish = chunkCfg.finishMessage
-    if (finish.isBlank()) return
-    val message = finish.placeholder("clean" to lastChunk)
+    val message = MLang["cleanup.finish.chunk", "cleaned" to lastChunk]
     if (noOnline && !noOnlineMessage) return
     PL.services.cleanupAnnouncementService.announceFinish(message)
 }

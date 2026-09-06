@@ -5,6 +5,7 @@ import top.e404.eclean.common.api.PermissionService
 import top.e404.eclean.common.api.ServerInfo
 import top.e404.eclean.common.api.ScheduledTask
 import top.e404.eclean.config.Config
+import top.e404.eclean.lang.MLang
 import top.e404.eclean.platform.Schedulers
 import top.e404.eclean.util.miniMessage
 import top.e404.eclean.util.placeholder
@@ -40,7 +41,7 @@ class StatsAlertService(
                 result.entityCounts
                     .filter { it.value >= config.alertEntityThreshold }
                     .forEach { (type, count) ->
-                        val message = config.alertFormat.placeholder(
+                        val message = MLang["cleanup.alert.entity"].placeholder(
                             "world" to worldName,
                             "type" to type,
                             "count" to count,

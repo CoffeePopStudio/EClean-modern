@@ -22,7 +22,7 @@ import top.e404.eclean.ui.emptyItem
 open class TrashcanMenu(
     private val store: TrashcanItemStore,
     private val manager: TrashcanManager,
-) : UiMenu(PL, Config.current.advanced.menu.trashcanTitle ?: MLang["trash.title"], 6, true) {
+) : UiMenu(PL, MLang["menu.trashcan.title"], 6, true) {
 
     override fun isAllowed(player: Player): Boolean = player.hasPermission(PermissionNode.TRASH_OPEN)
 

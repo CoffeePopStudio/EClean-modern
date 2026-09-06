@@ -5,14 +5,8 @@
 # 包含完整参数，改错可能导致插件行为异常。
 # ============================================
 
-# 菜单 UI 高级设置
+# 菜单 UI 高级设置（菜单标题在 lang 文件中）
 menu:
-  # 自定义垃圾桶菜单标题；null 使用语言文件
-  trashcanTitle: null
-  # 自定义统计菜单标题；null 使用语言文件
-  statsTitle: null
-  # 自定义密集实体菜单标题；null 使用语言文件
-  denseTitle: null
   # 主题色
   primaryColor: "<gold>"
   secondaryColor: "<gray>"

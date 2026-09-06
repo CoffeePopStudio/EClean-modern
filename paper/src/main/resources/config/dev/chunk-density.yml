@@ -8,8 +8,6 @@
 enabled: true
 # 不参与密集区块清理的世界
 disabledWorlds: []
-# 清理完成后的提示消息；留空使用语言文件默认
-finishMessage: ""
 # 有名字/被拴绳/被骑乘的生物是否计入密度
 settings:
   cleanNamed: false
@@ -17,8 +15,6 @@ settings:
   cleanMounted: false
 # 区块实体数量超过该值视为密集
 alertThreshold: 50
-# 密集提醒格式；null 使用默认
-alertFormat: null
 # 每类实体的数量上限，例如:
 # entityLimits:
 #   "ZOMBIE": 30

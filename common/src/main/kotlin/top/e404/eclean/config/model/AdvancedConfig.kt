@@ -19,10 +19,6 @@ data class AdvancedConfig(
 
 @Serializable
 data class MenuAdvancedConfig(
-    /** Null means use the language-file title. */
-    val trashcanTitle: String? = null,
-    val statsTitle: String? = null,
-    val denseTitle: String? = null,
     val primaryColor: String = "<gold>",
     val secondaryColor: String = "<gray>",
     val accentColor: String = "<yellow>",

@@ -38,7 +38,7 @@ object CommandAccess {
     fun requireWorld(sender: CommandSender, name: String): World? {
         val world = Bukkit.getWorld(name)
         if (world != null) return world
-        PL.services.messages.send(sender, MLang["command.invalid_world", "world" to name])
+        PL.services.messages.send(sender, MLang["command.invalid.world", "world" to name])
         return null
     }
 }

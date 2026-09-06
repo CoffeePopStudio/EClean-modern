@@ -7,8 +7,17 @@ debug.console_enable: <white>Temporarily <green>enabled</green> <aqua>Debug</aqu
 debug.console_disable: <white>Temporarily <red>disabled</red> <aqua>Debug</aqua><white> (edit config.yml to make it permanent). You will stop receiving debug messages until the next restart. Use this command again to <green>enable</green>.</white>
 debug.player_enable: <white>Debug <green>enabled</green>. You will receive debug messages. Use this command again to <red>disable</red>.</white>
 debug.player_disable: <white>Debug <red>disabled</red>. You will stop receiving debug messages. Use this command again to <green>enable</green>.</white>
-message.invalid_number: '{number} is not a valid number'
-message.invalid_entity_type: <yellow>{type}</yellow><red> is not a valid entity type</red>
+command.invalid.number: '{number} is not a valid number'
+command.invalid.entity_type: <yellow>{type}</yellow><red> is not a valid entity type</red>
+cleanup.countdown.60: <white>Cleanup will start in 1 minute</white>
+cleanup.countdown.30: <white>Cleanup will start in 30 seconds</white>
+cleanup.countdown.10: <white>Cleanup will start in 10 seconds</white>
+cleanup.countdown.0: <white>Cleaning in progress</white>
+cleanup.finish.drop: '<white>Cleaned <gold>{cleaned}</gold>/<gold>{total}</gold> dropped items</white>'
+cleanup.finish.living: '<white>Cleaned <gold>{cleaned}</gold>/<gold>{total}</gold> living entities</white>'
+cleanup.finish.chunk: '<white>Cleaned <gold>{cleaned}</gold> dense entities</white>'
+cleanup.alert.entity: '<red>Entity count alert</red> <white>{world}: {type} has reached {count}</white>'
+cleanup.alert.dense: '<red>Dense chunk detected</red> <white>{chunk}: {entity} has reached {count}</white>'
 menu.dense.title: <gold>Dense Entity Detection</gold>
 menu.dense.item.name: <gold>{type}</gold>
 menu.dense.item.lore: '<white>{amount}</white>
@@ -57,7 +66,7 @@ menu.trashcan.sort.time_asc: <white>Time remaining</white>
 menu.trashcan.search.name: <gold>Search</gold>
 menu.trashcan.search.prompt: <white>Type a search keyword in chat. Type cancel to cancel.</white>
 menu.trashcan.search.reset: '<white>Search: {query} (click to clear)</white>'
-trash.title: <gold>Shared Trash Can - First come, first served, cleared regularly</gold>
+menu.trashcan.title: <gold>Shared Trash Can - First come, first served, cleared regularly</gold>
 command.reload_done: <green>Reload complete</green>
 command.trash_disable: <green>The trash can feature is disabled</green>
 command.trash_open: <green>Trash can opened</green>
@@ -72,23 +81,23 @@ command.clean_dry_drop: '<green>Preview — Drop: <gold>{cleaned}</gold>/<gold>{
 command.clean_dry_chunk: '<green>Preview — Chunk density: <gold>{cleaned}</gold> entities across <gold>{regions}</gold> dense regions</green>'
 command.clean_world_result: 'Cleanup: {cleaned}/{total}'
 command.clean_world_chunk_result: 'Cleanup: {cleaned}'
-command.status_header: <gold>Server-wide Statistics</gold>
-command.status_world: '<white>World <gold>{world}</gold>: entities {entities} / chunks {chunks} / force-loaded {force}</white>'
-command.status_total: '<white>Total entities on the server: <gold>{total}</gold></white>'
+command.status.header: <gold>Server-wide Statistics</gold>
+command.status.world: '<white>World <gold>{world}</gold>: entities {entities} / chunks {chunks} / force-loaded {force}</white>'
+command.status.total: '<white>Total entities on the server: <gold>{total}</gold></white>'
 command.history_empty: <red>No cleanup history</red>
 command.history_header: <gold>Recent Cleanup History</gold>
 command.history_line: <white>{time}</white> <gray>Drops {drop} / Living {living} / Dense {chunk}</gray>
 command.top_header: <gold>Top {type}</gold>
 command.top_entity: '<white>{rank}. {type}: {count}</white>'
 command.top_chunk: '<white>{rank}. {world} x:{x} z:{z}: {count}</white>'
-command.stats_gui.title: <gold>Statistics - {world}</gold>
-command.stats_gui.item_name: <gold>{type}</gold>
-command.stats_gui.item_lore: '<white>World: {world}</white>
+menu.stats.title: <gold>Statistics - {world}</gold>
+menu.stats.item.name: <gold>{type}</gold>
+menu.stats.item.lore: '<white>World: {world}</white>
 
   <white>Count: {count}</white>
 
   <gray>Click to view chunk distribution</gray>'
-command.invalid_world: <red>World <yellow>{world}</yellow> does not exist</red>
+command.invalid.world: <red>World <yellow>{world}</yellow> does not exist</red>
 command.stats_collect_failed: <red>Failed to collect world statistics</red>
 command.players_header: <gold>{world}</gold>:{lines}
 command.player_location: '  <aqua>{player}</aqua><white>: {x} {y} {z}</white>'

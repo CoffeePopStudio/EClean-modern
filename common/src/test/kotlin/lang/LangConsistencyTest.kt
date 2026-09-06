@@ -50,7 +50,7 @@ class LangConsistencyTest {
         val patterns = listOf(
             Regex("MLang\\[\\s*\"([^\"]+)\""),
             Regex("MLang\\.get\\(\\s*\"([^\"]+)\""),
-            Regex("\"((?:command|menu|debug|message|common|trash|prefix|debug_prefix)\\.[A-Za-z0-9_.$]+)\""),
+            Regex("\"((?:command|menu|debug|message|common|trash|prefix|debug_prefix|cleanup)\\.[A-Za-z0-9_.$]+)\""),
         )
         sourceDirs.forEach { sourceDir ->
             if (!sourceDir.exists()) return@forEach
@@ -68,6 +68,10 @@ class LangConsistencyTest {
 
         // Expand dynamic keys used by menus.
         keys += listOf(
+            "cleanup.countdown.60",
+            "cleanup.countdown.30",
+            "cleanup.countdown.10",
+            "cleanup.countdown.0",
             "menu.dense.temp.status.true",
             "menu.dense.temp.status.false",
             "menu.trashcan.category.all",
@@ -81,6 +85,9 @@ class LangConsistencyTest {
             "menu.trashcan.sort.time_asc",
         )
         // Remove the template forms that are expanded above.
+        keys.remove("cleanup.countdown.\$seconds")
+        // "cleanup.yml" is a config file name, not a language key.
+        keys.remove("cleanup.yml")
         keys.remove("menu.dense.temp.status.\$temp")
         keys.remove("menu.trashcan.category.\${category.key}")
         keys.remove("menu.trashcan.sort.\${sort.key}")

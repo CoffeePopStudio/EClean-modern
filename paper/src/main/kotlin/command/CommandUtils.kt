@@ -34,7 +34,7 @@ internal fun CommandSender.sendTrashStats() {
 internal fun CommandSender.sendWorldStats(worldName: String) {
     val world = Bukkit.getWorld(worldName)
     if (world == null) {
-        PL.services.messages.send(this, MLang["command.invalid_world", "world" to worldName])
+        PL.services.messages.send(this, MLang["command.invalid.world", "world" to worldName])
         return
     }
     val service = WorldStatsService()
@@ -74,14 +74,14 @@ internal fun CommandSender.sendEntityStats(
 ) {
     val world = Bukkit.getWorld(worldName)
     if (world == null) {
-        PL.services.messages.send(this, MLang["command.invalid_world", "world" to worldName])
+        PL.services.messages.send(this, MLang["command.invalid.world", "world" to worldName])
         return
     }
     val type = typeName.formatAsConst()
     try {
         EntityType.valueOf(type)
     } catch (t: Throwable) {
-        PL.services.messages.send(this, MLang["message.invalid_entity_type"])
+        PL.services.messages.send(this, MLang["command.invalid.entity_type"])
         return
     }
     val service = WorldStatsService()

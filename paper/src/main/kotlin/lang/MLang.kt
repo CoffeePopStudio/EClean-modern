@@ -20,6 +20,10 @@ object MLang {
     operator fun get(key: String, vararg placeholder: Pair<String, Any?>): String =
         backend?.get(key, *placeholder) ?: key
 
+    /** Returns null instead of the key itself when the key is missing. */
+    fun getOrNull(key: String, vararg placeholder: Pair<String, Any?>): String? =
+        backend?.getOrNull(key, *placeholder)
+
     fun load(sender: CommandSender? = null) {
         val language = Config.current.global.language.ifBlank { "zh_cn" }
         backend?.load(language)

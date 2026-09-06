@@ -104,7 +104,6 @@ fun resetConfig() {
             ),
             cleanup = CleanupConfig(
                 intervalSeconds = Long.MAX_VALUE,
-                countdownMessages = emptyMap(),
                 cleanWhenNoPlayers = true,
                 broadcastWhenNoPlayers = true,
             ),

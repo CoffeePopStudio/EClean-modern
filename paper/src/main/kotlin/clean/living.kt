@@ -4,9 +4,9 @@ import top.e404.eclean.PL
 import top.e404.eclean.config.ModernConfig
 import top.e404.eclean.feature.cleanup.living.LivingCleanupResult
 import top.e404.eclean.feature.cleanup.living.LivingCleanupService
+import top.e404.eclean.lang.MLang
 import top.e404.eclean.util.noOnline
 import top.e404.eclean.util.noOnlineMessage
-import top.e404.eclean.util.placeholder
 
 private inline val livingCfg get() = ModernConfig.living
 
@@ -40,9 +40,7 @@ fun cleanLiving(announce: Boolean = true, dryRun: Boolean = false, onComplete: (
 
 private fun announceLiving(results: List<LivingCleanupResult>) {
     val all = results.sumOf { it.total }
-    val finish = livingCfg.finishMessage
-    if (finish.isBlank()) return
-    val message = finish.placeholder(mapOf("clean" to lastLiving, "all" to all))
+    val message = MLang["cleanup.finish.living", "cleaned" to lastLiving, "total" to all]
     if (noOnline && !noOnlineMessage) return
     PL.services.cleanupAnnouncementService.announceFinish(message)
 }

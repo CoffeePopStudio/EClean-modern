@@ -7,8 +7,17 @@ debug.console_enable: <white>已临时(修改config.yml永久设置)<green>启�
 debug.console_disable: <white>已临时(修改config.yml永久设置)<red>禁用</red><aqua>Debug</aqua><white>, 下次重启前你不会收到<aqua>Debug</aqua><white>消息, 再使用一次此指令以<green>启用</green></white>
 debug.player_enable: <white>已<green>启用</green><aqua>Debug</aqua><white>, 你将会收到<aqua>Debug</aqua><white>消息, 再使用一次此指令以<red>禁用</red></white>
 debug.player_disable: <white>已<red>禁用</red><aqua>Debug</aqua><white>, 你不会收到<aqua>Debug</aqua><white>消息, 再使用一次此指令以<green>启用</green></white>
-message.invalid_number: '{number}不是有效数字'
-message.invalid_entity_type: <yellow>{type}</yellow><red>不是有效的实体类型</red>
+command.invalid.number: '{number}不是有效数字'
+command.invalid.entity_type: <yellow>{type}</yellow><red>不是有效的实体类型</red>
+cleanup.countdown.60: <white>将在1分钟后进行清理</white>
+cleanup.countdown.30: <white>将在30秒后进行清理</white>
+cleanup.countdown.10: <white>将在10秒后进行清理</white>
+cleanup.countdown.0: <white>正在清理</white>
+cleanup.finish.drop: '<white>已清理 <gold>{cleaned}</gold>/<gold>{total}</gold> 个掉落物</white>'
+cleanup.finish.living: '<white>已清理 <gold>{cleaned}</gold>/<gold>{total}</gold> 个生物</white>'
+cleanup.finish.chunk: '<white>已清理 <gold>{cleaned}</gold> 个密集实体</white>'
+cleanup.alert.entity: '<red>实体数量异常</red> <white>{world} 的 {type} 数量达到 {count}</white>'
+cleanup.alert.dense: '<red>检测到密集区块</red> <white>{chunk} 的 {entity} 数量达到 {count}</white>'
 menu.dense.title: <gold>密集实体检测</gold>
 menu.dense.item.name: <gold>{type}</gold>
 menu.dense.item.lore: '<white>{amount}</white>
@@ -57,7 +66,7 @@ menu.trashcan.sort.time_asc: <white>按剩余时间排序</white>
 menu.trashcan.search.name: <gold>搜索</gold>
 menu.trashcan.search.prompt: <white>请在聊天框输入搜索关键词，输入 cancel 取消</white>
 menu.trashcan.search.reset: '<white>当前搜索: {query}（点击清除）</white>'
-trash.title: <gold>共享垃圾桶 - 先到先得, 定期清空</gold>
+menu.trashcan.title: <gold>共享垃圾桶 - 先到先得, 定期清空</gold>
 command.reload_done: <green>重载完成</green>
 command.trash_disable: <green>垃圾桶功能已被禁用</green>
 command.trash_open: <green>已打开垃圾桶</green>
@@ -72,23 +81,23 @@ command.clean_dry_drop: '<green>预演 — 掉落物: <gold>{cleaned}</gold>/<go
 command.clean_dry_chunk: '<green>预演 — 密集实体: <gold>{cleaned}</gold> 个，共 <gold>{regions}</gold> 个密集区域</green>'
 command.clean_world_result: '<green>清理: {cleaned}/{total}</green>'
 command.clean_world_chunk_result: '<green>清理: {cleaned}</green>'
-command.status_header: <gold>全服统计</gold>
-command.status_world: '<white>世界 <gold>{world}</gold>: 实体{entities} 区块{chunks} 强加载{force}</white>'
-command.status_total: '<white>全服实体总数: <gold>{total}</gold></white>'
+command.status.header: <gold>全服统计</gold>
+command.status.world: '<white>世界 <gold>{world}</gold>: 实体{entities} 区块{chunks} 强加载{force}</white>'
+command.status.total: '<white>全服实体总数: <gold>{total}</gold></white>'
 command.history_empty: <red>暂无清理记录</red>
 command.history_header: <gold>最近清理记录</gold>
 command.history_line: <white>{time}</white> <gray>掉落 {drop} / 生物 {living} / 密集 {chunk}</gray>
 command.top_header: <gold>Top {type}</gold>
 command.top_entity: '<white>{rank}. {type}: {count}</white>'
 command.top_chunk: '<white>{rank}. {world} x:{x} z:{z}: {count}</white>'
-command.stats_gui.title: <gold>统计 - {world}</gold>
-command.stats_gui.item_name: <gold>{type}</gold>
-command.stats_gui.item_lore: '<white>世界: {world}</white>
+menu.stats.title: <gold>统计 - {world}</gold>
+menu.stats.item.name: <gold>{type}</gold>
+menu.stats.item.lore: '<white>世界: {world}</white>
 
   <white>数量: {count}</white>
 
   <gray>点击查看区块分布</gray>'
-command.invalid_world: <red>不存在名为<yellow>{world}</yellow>的世界</red>
+command.invalid.world: <red>不存在名为<yellow>{world}</yellow>的世界</red>
 command.stats_collect_failed: <red>收集世界统计信息失败</red>
 command.players_header: <gold>{world}</gold>:{lines}
 command.player_location: '  <aqua>{player}</aqua><white>: {x} {y} {z}</white>'

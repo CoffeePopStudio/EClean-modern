@@ -32,7 +32,7 @@ fun teleportCommandHandler(
         val worldName = args[1]
         if (worldName !in worldAccess.worldNames()) {
             sender.sendMessage(
-                miniMessage.deserialize(messageProvider.get("command.invalid_world", "world" to worldName))
+                miniMessage.deserialize(messageProvider.get("command.invalid.world", "world" to worldName))
             )
             return true
         }
@@ -42,7 +42,7 @@ fun teleportCommandHandler(
         if (x == null || y == null || z == null) {
             val invalid = listOf(args[2], args[3], args[4]).firstOrNull { it.toDoubleOrNull() == null } ?: ""
             sender.sendMessage(
-                miniMessage.deserialize(messageProvider.get("message.invalid_number", "number" to invalid))
+                miniMessage.deserialize(messageProvider.get("command.invalid.number", "number" to invalid))
             )
             return true
         }

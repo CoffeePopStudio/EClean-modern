@@ -65,7 +65,7 @@ class RuntimeServices {
         messageSender = commonPlatform.messageSender,
         serverInfo = commonPlatform.serverInfo,
         prefixProvider = { MLang["prefix"] },
-        countdownMessageProvider = { seconds -> Config.current.cleanup.countdownMessages[seconds] },
+        countdownMessageProvider = { seconds -> MLang.getOrNull("cleanup.countdown.$seconds") },
         shouldBroadcastWhenNoPlayers = { Config.current.cleanup.broadcastWhenNoPlayers },
     )
     val cleanupHistory = CleanupHistoryService()
