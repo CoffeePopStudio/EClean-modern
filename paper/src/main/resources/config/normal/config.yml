@@ -1,0 +1,89 @@
+# ============================================
+# EClean Normal 配置
+# ============================================
+# 此配置适合大多数服务器，只提供常用基础项。
+# 高级项全部隐藏，使用插件内置默认值。
+# 需要完整高级配置时，请把根目录 config.yml 的 profile 改为 dev。
+#
+# 修改后重启生效；也可以使用：
+#   /eclean config profile dev
+# ============================================
+
+# 全局设置
+global:
+  # 语言: zh_cn / en_us
+  language: zh_cn
+  # 调试模式
+  debug: false
+  # 自动检查更新
+  updateCheck: true
+
+# 清理设置
+cleanup:
+  # 自动清理间隔（秒）
+  intervalSeconds: 600
+  # Cron 表达式，例如每天 3:00: "0 0 3 * * *"；留空则使用 intervalSeconds
+  cron: ""
+  # 没有玩家在线时也照常清理
+  cleanWhenNoPlayers: true
+  # 没有玩家在线时也广播清理公告
+  broadcastWhenNoPlayers: true
+
+# 掉落物清理
+drop:
+  enabled: true
+  # true=黑名单模式（只清理匹配项）；false=白名单模式（只保留匹配项）
+  blacklistMode: false
+  # 保护附魔物品 / 带 lore 物品 / 成书
+  protectEnchanted: false
+  protectLore: false
+  protectWrittenBook: false
+  # 匹配规则，例如 "DIAMOND.*"
+  matchers: []
+  # 不参与掉落物清理的世界
+  disabledWorlds: []
+
+# 生物清理
+living:
+  enabled: true
+  # true=黑名单模式；false=白名单模式
+  blacklistMode: true
+  # 保护已驯服生物 / 悦灵
+  protectTamed: true
+  protectAllay: true
+  # 是否清理有名字/被拴绳/被骑乘的生物
+  settings:
+    cleanNamed: false
+    cleanLeashed: false
+    cleanMounted: false
+  # 匹配规则，例如 "ZOMBIE"
+  matchers: []
+  # 不参与生物清理的世界
+  disabledWorlds: []
+
+# 密集区块清理
+chunkDensity:
+  enabled: true
+  # 区块实体数量超过该值视为密集
+  alertThreshold: 50
+  # 每类实体的数量上限，例如:
+  # entityLimits:
+  #   "ZOMBIE": 30
+  entityLimits: {}
+  # 不参与密集区块清理的世界
+  disabledWorlds: []
+
+# 垃圾桶
+trashcan:
+  enabled: true
+  # 垃圾桶条目存活秒数；null 表示永不过期
+  clearIntervalSeconds: 600
+  # 相同物品自动堆叠为一个条目
+  stacking:
+    enabled: true
+    sortByCount: true
+    showRemainingTimeInLore: true
+
+# 单独世界覆盖（留空使用全局设置）
+perWorld:
+  worlds: {}

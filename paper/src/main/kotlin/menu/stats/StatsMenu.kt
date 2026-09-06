@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack
 import top.e404.eclean.PL
 import top.e404.eclean.command.PermissionNode
 import top.e404.eclean.command.hasPermission
+import top.e404.eclean.config.Config
 import top.e404.eclean.lang.MLang
 import top.e404.eclean.ui.UiDisplayable
 import top.e404.eclean.ui.UiMenu
@@ -16,7 +17,7 @@ import top.e404.eclean.ui.buildItemStack
 class StatsMenu(
     private val worldName: String,
     entries: List<Pair<String, Int>>,
-) : UiMenu(PL, MLang["command.stats_gui.title", "world" to worldName], 6, true) {
+) : UiMenu(PL, Config.current.advanced.menu.statsTitle ?: MLang["command.stats_gui.title", "world" to worldName], 6, true) {
 
     override fun isAllowed(player: Player): Boolean = player.hasPermission(PermissionNode.STATS_GUI)
 

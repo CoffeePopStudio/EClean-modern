@@ -14,6 +14,7 @@ object EcleanCommandCatalog {
     val entries: List<EcleanCommandSpec> = listOf(
         EcleanCommandSpec("debug", listOf("d"), Permissions.DEBUG),
         EcleanCommandSpec("reload", listOf("r"), Permissions.RELOAD),
+        EcleanCommandSpec("config", permission = Permissions.CONFIG),
         EcleanCommandSpec("clean"),
         EcleanCommandSpec("stats", listOf("s")),
         EcleanCommandSpec("status"),

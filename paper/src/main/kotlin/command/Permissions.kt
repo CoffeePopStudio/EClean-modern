@@ -18,6 +18,7 @@ enum class PermissionNode(
 
     DEBUG("eclean.command.debug", aliases = listOf("eclean.debug")),
     RELOAD("eclean.command.reload", aliases = listOf("eclean.reload")),
+    CONFIG("eclean.command.config", aliases = listOf("eclean.config")),
 
     CLEAN("eclean.command.clean", aliases = listOf("eclean.clean")),
     CLEAN_ALL(

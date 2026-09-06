@@ -8,6 +8,7 @@ enum class ConfigSection(val displayName: String) {
     CHUNK_DENSITY("chunk-density"),
     TRASHCAN("trashcan"),
     PER_WORLD("per-world"),
+    ADVANCED("advanced"),
 }
 
 fun ConfigBundle.diff(other: ConfigBundle): Set<ConfigSection> {
@@ -19,5 +20,6 @@ fun ConfigBundle.diff(other: ConfigBundle): Set<ConfigSection> {
     if (chunkDensity != other.chunkDensity) changed += ConfigSection.CHUNK_DENSITY
     if (trashcan != other.trashcan) changed += ConfigSection.TRASHCAN
     if (perWorld != other.perWorld) changed += ConfigSection.PER_WORLD
+    if (advanced != other.advanced) changed += ConfigSection.ADVANCED
     return changed
 }

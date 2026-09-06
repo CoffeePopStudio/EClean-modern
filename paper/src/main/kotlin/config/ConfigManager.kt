@@ -7,12 +7,15 @@ import org.bukkit.command.CommandSender
 import top.e404.eclean.PL
 import top.e404.eclean.config.model.ChunkDensityConfig
 import top.e404.eclean.config.model.CleanupConfig
+import top.e404.eclean.config.model.ConfigProfile
 import top.e404.eclean.config.model.DropConfig
 import top.e404.eclean.config.model.GlobalConfig
 import top.e404.eclean.config.model.LivingConfig
 import top.e404.eclean.config.model.PerWorldConfig
 import top.e404.eclean.config.model.TrashcanConfig
 import java.io.File
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 object ConfigManager {
     private val loader = ConfigLoader()
@@ -21,24 +24,57 @@ object ConfigManager {
     @Volatile
     private var snapshot = ConfigBundle()
 
+    @Volatile
+    var currentProfile: ConfigProfile = ConfigProfile.NORMAL
+        private set
+
     val current: ConfigBundle
         get() = snapshot
 
     fun loadAll(sender: CommandSender? = null) {
-        snapshot = loadCandidate()
-        ConfigRuntimeApplier.apply(snapshot) // first load: apply all
-        PL.services.messages.debug { "Modern config snapshot loaded" }
+        maybeBackupLegacyConfig()
+        currentProfile = loader.readProfile()
+        loader.ensureDefaults(currentProfile)
+        snapshot = loader.loadAll(currentProfile)
+        ConfigRuntimeApplier.apply(snapshot)
+        PL.services.messages.debug { "Config profile ${currentProfile.id} loaded" }
     }
 
     fun reloadAll(sender: CommandSender? = null) {
         val previous = snapshot
-        val candidate = runCatching { loadCandidate() }.getOrElse { error ->
+        val previousProfile = currentProfile
+        val candidate = runCatching {
+            maybeBackupLegacyConfig()
+            val profile = loader.readProfile()
+            loader.ensureDefaults(profile)
+            loader.loadAll(profile) to profile
+        }.getOrElse { error ->
             snapshot = previous
+            currentProfile = previousProfile
             throw IllegalStateException("Config reload failed: ${error.message}", error)
         }
-        snapshot = candidate
-        ConfigRuntimeApplier.apply(candidate)
-        PL.services.messages.debug { "Modern config snapshot reloaded" }
+        currentProfile = candidate.second
+        snapshot = candidate.first
+        ConfigRuntimeApplier.apply(snapshot)
+        PL.services.messages.debug { "Config profile ${currentProfile.id} reloaded" }
+    }
+
+    fun switchProfile(profile: ConfigProfile): ConfigProfile {
+        val previous = snapshot
+        val previousProfile = currentProfile
+        return try {
+            loader.ensureDefaults(ConfigProfile.NORMAL)
+            loader.ensureDefaults(profile)
+            loader.writeProfile(profile)
+            currentProfile = profile
+            snapshot = loader.loadAll(profile)
+            ConfigRuntimeApplier.apply(snapshot)
+            profile
+        } catch (e: Exception) {
+            snapshot = previous
+            currentProfile = previousProfile
+            throw IllegalStateException("Config switch failed: ${e.message}", e)
+        }
     }
 
     fun replaceSnapshotForTest(bundle: ConfigBundle) {
@@ -76,28 +112,25 @@ object ConfigManager {
         snapshot = candidate
     }
 
-    private fun loadCandidate(): ConfigBundle {
-        maybeBackupLegacyConfig()
-        loader.ensureDefaults()
-        return loader.loadAll()
-    }
-
     private fun maybeBackupLegacyConfig() {
-        val globalFile = File(PL.dataFolder, ConfigFiles.GLOBAL.diskName)
-        if (!globalFile.exists()) return
-        val otherFilesMissing = ConfigFiles.entries
-            .filterNot { it == ConfigFiles.GLOBAL }
-            .all { !File(PL.dataFolder, it.diskName).exists() }
-        if (!otherFilesMissing) return
+        val dataFolder = PL.dataFolder
+        val hasLegacy = ConfigFiles.LEGACY_FILES
+            .filter { it != "config.yml" }
+            .any { File(dataFolder, it).exists() }
+        if (!hasLegacy) return
 
-        val text = globalFile.readText(Charsets.UTF_8)
-        val legacyMarkers = listOf("duration:", "living:", "drop:", "chunk:", "trashcan:", "no_online:")
-        if (legacyMarkers.none { text.contains(it) }) return
+        val stamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
+        val backupDir = File(dataFolder, "config-backup-$stamp")
+        backupDir.mkdirs()
 
-        val backup = File(PL.dataFolder, "config.legacy.yml")
-        if (!backup.exists()) globalFile.copyTo(backup, overwrite = false)
-        globalFile.delete()
-        PL.services.messages.warn("Legacy single-file config detected, backed up to config.legacy.yml, please manually migrate to the new multi-file config")
+        ConfigFiles.LEGACY_FILES.forEach { name ->
+            val file = File(dataFolder, name)
+            if (file.exists()) {
+                file.copyTo(File(backupDir, name), overwrite = false)
+                file.delete()
+            }
+        }
+        PL.services.messages.warn("检测到旧版根目录配置，已备份到 ${backupDir.name}，并生成新的 normal/dev 配置")
     }
 
     private fun <T> encode(value: T, serializer: SerializationStrategy<T>): String {

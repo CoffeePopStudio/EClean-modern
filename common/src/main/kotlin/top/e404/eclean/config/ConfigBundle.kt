@@ -1,10 +1,12 @@
 package top.e404.eclean.config
 
+import top.e404.eclean.config.model.AdvancedConfig
 import top.e404.eclean.config.model.ChunkDensityConfig
 import top.e404.eclean.config.model.CleanupConfig
 import top.e404.eclean.config.model.DropConfig
 import top.e404.eclean.config.model.GlobalConfig
 import top.e404.eclean.config.model.LivingConfig
+import top.e404.eclean.config.model.NormalConfig
 import top.e404.eclean.config.model.PerWorldConfig
 import top.e404.eclean.config.model.TrashcanConfig
 
@@ -16,4 +18,16 @@ data class ConfigBundle(
     val chunkDensity: ChunkDensityConfig = ChunkDensityConfig(),
     val trashcan: TrashcanConfig = TrashcanConfig(),
     val perWorld: PerWorldConfig = PerWorldConfig(),
+    val advanced: AdvancedConfig = AdvancedConfig(),
+)
+
+fun NormalConfig.toBundle(): ConfigBundle = ConfigBundle(
+    global = global,
+    cleanup = cleanup,
+    drop = drop,
+    living = living,
+    chunkDensity = chunkDensity,
+    trashcan = trashcan,
+    perWorld = perWorld,
+    advanced = AdvancedConfig(),
 )

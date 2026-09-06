@@ -8,13 +8,14 @@ import org.bukkit.inventory.ItemFlag
 import top.e404.eclean.PL
 import top.e404.eclean.command.PermissionNode
 import top.e404.eclean.command.hasPermission
+import top.e404.eclean.config.Config
 import top.e404.eclean.lang.MLang
 import top.e404.eclean.ui.PageButton
 import top.e404.eclean.ui.UiButton
 import top.e404.eclean.ui.UiMenu
 import top.e404.eclean.ui.buildItemStack
 
-class DenseMenu(data: MutableList<EntityInfo>) : UiMenu(PL, MLang["menu.dense.title"], 6, true) {
+class DenseMenu(data: MutableList<EntityInfo>) : UiMenu(PL, Config.current.advanced.menu.denseTitle ?: MLang["menu.dense.title"], 6, true) {
     val zone = DenseZone(this, data)
     var temp = false
 

@@ -1,0 +1,30 @@
+# ============================================
+# EClean Dev 配置 - drop
+# ============================================
+# 警告: 此配置适合高度自由度的技术玩家。
+# 包含完整参数，改错可能导致插件行为异常。
+# ============================================
+
+enabled: true
+# 不参与掉落物清理的世界
+disabledWorlds: []
+# 清理完成后的提示消息；留空使用语言文件默认
+finishMessage: ""
+# true=黑名单模式（只清理匹配项）；false=白名单模式（只保留匹配项）
+blacklistMode: false
+# 保护附魔物品
+protectEnchanted: false
+# 保护带 lore 物品
+protectLore: false
+# 保护成书
+protectWrittenBook: false
+# 匹配规则，例如 "DIAMOND.*"
+matchers: []
+# 距离最近玩家超过该值才清理（米）；null=不限制
+maxDistance: null
+# 按物品类型单独覆盖
+# typeRules:
+#   DIAMOND:
+#     enabled: false
+#     maxDistance: 10
+typeRules: {}

@@ -102,7 +102,24 @@
 
 ## 配置
 
-插件默认配置已拆分到 `src/main/resources/config/` 目录下的多文件模板中，配置项均带注释描述用法和含义
+EClean 提供两套配置预设：
+
+- `normal`（默认）：简洁基础配置，只提供常用项。
+  - 配置文件：`config/normal/config.yml`
+  - 适合大多数服务器，避免给普通用户过多繁琐配置。
+- `dev`：完整高级配置，适合高度自由度的技术玩家。
+  - 配置文件目录：`config/dev/`
+  - 包含全部现有参数，以及菜单 UI、调度性能、PAPI / bStats / 更新检查、垃圾桶行为等高级项。
+  - 每个 dev 文件顶部都有“仅适合技术玩家”的警告。
+
+切换方式：
+
+- 修改根目录 `config.yml` 的 `profile: normal|dev`，然后重启；或
+- 使用命令：
+  - `/eclean config show` 查看当前预设
+  - `/eclean config profile <normal|dev>` 立即切换并热重载
+
+首次从旧版升级时，插件会把旧的根目录配置文件备份到 `config-backup-<时间戳>/`，然后生成新的 normal/dev 配置模板。
 
 ## 下载
 - [最新版](https://github.com/CoffeePopStudio/EClean-modern/releases/latest)

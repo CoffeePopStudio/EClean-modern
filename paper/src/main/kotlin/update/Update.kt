@@ -15,7 +15,7 @@ object Update {
     private val httpClient = HttpClient.newHttpClient()
 
     fun register() {
-        if (!Config.current.global.updateCheck) return
+        if (!Config.current.global.updateCheck || !Config.current.advanced.update.enabled) return
         val plugin = top.e404.eclean.PL
         plugin.server.asyncScheduler.runAtFixedRate(
             plugin,

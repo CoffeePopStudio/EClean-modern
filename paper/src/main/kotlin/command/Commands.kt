@@ -27,6 +27,7 @@ object Commands : CommandExecutor, TabCompleter {
         when (args[0].lowercase()) {
             "d", "debug" -> DebugCommand.handle(sender)
             "r", "reload" -> ReloadCommand.handle(sender)
+            "config" -> ConfigCommand.handle(sender, args)
             "clean" -> CleanCommand.handle(sender, args)
             "s", "stats" -> StatsCommand.handle(sender, args)
             "status" -> StatusCommand.handle(sender, args)
@@ -60,6 +61,7 @@ object Commands : CommandExecutor, TabCompleter {
         }
         return when (root) {
             "clean" -> completeClean(sender, args)
+            "config" -> completeConfig(sender, args)
             "s", "stats" -> completeStats(sender, args)
             "e", "entity" -> completeEntity(sender, args)
             "t", "trash" -> completeTrash(sender, args)
@@ -67,6 +69,17 @@ object Commands : CommandExecutor, TabCompleter {
             "top" -> completeTop(sender, args)
             else -> emptyList()
         }
+    }
+
+    private fun completeConfig(sender: CommandSender, args: Array<out String>): List<String> {
+        if (!sender.hasPermission(PermissionNode.CONFIG)) return emptyList()
+        if (args.size == 2) {
+            return listOf("show", "profile").filter { it.startsWith(args[1], ignoreCase = true) }
+        }
+        if (args.size == 3 && args[1].equals("profile", ignoreCase = true)) {
+            return listOf("normal", "dev").filter { it.startsWith(args[2], ignoreCase = true) }
+        }
+        return emptyList()
     }
 
     private fun completeClean(sender: CommandSender, args: Array<out String>): List<String> {
@@ -151,6 +164,7 @@ object Commands : CommandExecutor, TabCompleter {
         val keys = listOf(
             "command.usage.debug" to PermissionNode.DEBUG,
             "command.usage.reload" to PermissionNode.RELOAD,
+            "command.usage.config" to PermissionNode.CONFIG,
             "command.usage.clean" to null,
             "command.usage.stats" to null,
             "command.usage.status" to null,

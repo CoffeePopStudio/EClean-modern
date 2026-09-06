@@ -1,0 +1,43 @@
+# ============================================
+# EClean Dev 配置 - advanced
+# ============================================
+# 警告: 此配置适合高度自由度的技术玩家。
+# 包含完整参数，改错可能导致插件行为异常。
+# ============================================
+
+# 菜单 UI 高级设置
+menu:
+  # 自定义垃圾桶菜单标题；null 使用语言文件
+  trashcanTitle: null
+  # 自定义统计菜单标题；null 使用语言文件
+  statsTitle: null
+  # 自定义密集实体菜单标题；null 使用语言文件
+  denseTitle: null
+  # 主题色
+  primaryColor: "<gold>"
+  secondaryColor: "<gray>"
+  accentColor: "<yellow>"
+
+# 调度与性能参数
+scheduler:
+  # 清理 tick 服务的运行间隔（tick）
+  cleanupTickIntervalTicks: 20
+  # 垃圾桶 tick 服务的运行间隔（tick）
+  trashcanTickIntervalTicks: 20
+  # 区块扫描每批处理数量
+  chunkScanBatchSize: 100
+  # 区块扫描间隔（tick）
+  chunkScanIntervalTicks: 10
+
+# PlaceholderAPI
+papi:
+  enabled: true
+
+# bStats 统计上报
+bStats:
+  enabled: true
+
+# 更新检查
+update:
+  # 是否检查更新（同时需要全局 updateCheck 为 true）
+  enabled: true

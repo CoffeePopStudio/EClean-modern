@@ -145,3 +145,14 @@ command.usage.top: '<green>/eclean top entity [amount] [world]</green> <white>Sh
 command.usage.teleport: '<green>/eclean tp <world> <x> <y> <z></green> <white>Teleport to coordinates</white>'
 command.no_permission: <red>You do not have permission to use this command</red>
 command.player_only: <red>This command can only be used by a player</red>
+
+command.usage.config: '<green>/eclean config show</green> <white>Show the active config preset</white>
+
+  <green>/eclean config profile <normal|dev></green> <white>Switch the config preset and reload immediately</white>'
+command.config.show: <gold>===== EClean Config Preset =====</gold>
+command.config.current: '<white>Current preset: <yellow>{profile}</yellow></white>'
+command.config.normal_path: '<white>Normal config: <gray>{path}</gray></white>'
+command.config.dev_path: '<white>Dev config directory: <gray>{path}</gray></white>'
+command.config.switched: <green>Switched to config preset <yellow>{profile}</yellow> and reloaded</green>
+command.config.already: <yellow>Already using <yellow>{profile}</yellow> config preset</yellow>
+command.config.invalid_profile: '<red>Invalid config preset: {value} (choose normal / dev)</red>'

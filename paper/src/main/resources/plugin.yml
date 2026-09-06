@@ -18,6 +18,7 @@ permissions:
     children:
       eclean.command.debug: true
       eclean.command.reload: true
+      eclean.command.config: true
       eclean.command.clean: true
       eclean.command.clean.all: true
       eclean.command.clean.entity: true
@@ -60,6 +61,9 @@ permissions:
   eclean.command.reload:
     default: op
     description: 重载插件配置和语言
+  eclean.command.config:
+    default: op
+    description: 查看/切换配置预设
   eclean.command.clean:
     default: op
     description: 允许执行清理操作（父权限）

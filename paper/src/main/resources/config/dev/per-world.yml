@@ -1,0 +1,15 @@
+# ============================================
+# EClean Dev 配置 - per-world
+# ============================================
+# 警告: 此配置适合高度自由度的技术玩家。
+# 包含完整参数，改错可能导致插件行为异常。
+# ============================================
+# Per-world cleanup overrides
+# 留空则使用全局设置。
+#
+# Example:
+# world:
+#   enabled: false         # disable cleanup in this world
+# world_nether:
+#   intervalSeconds: 1800  # override cleanup interval for this world
+worlds: {}

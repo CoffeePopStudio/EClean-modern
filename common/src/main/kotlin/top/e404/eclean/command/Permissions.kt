@@ -4,6 +4,7 @@ object Permissions {
     // Core
     const val DEBUG = "eclean.command.debug"
     const val RELOAD = "eclean.command.reload"
+    const val CONFIG = "eclean.command.config"
 
     // Clean
     const val CLEAN_ALL = "eclean.command.clean.all"

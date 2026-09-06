@@ -145,3 +145,14 @@ command.usage.top: '<green>/eclean top entity [数量] [世界名]</green> <whit
 command.usage.teleport: '<green>/eclean tp <世界名> <x> <y> <z></green> <white>传送到指定坐标</white>'
 command.no_permission: <red>你没有权限使用该命令</red>
 command.player_only: <red>该命令只能由玩家执行</red>
+
+command.usage.config: '<green>/eclean config show</green> <white>查看当前配置预设</white>
+
+  <green>/eclean config profile <normal|dev></green> <white>切换配置预设并立即生效</white>'
+command.config.show: <gold>===== EClean 配置预设 =====</gold>
+command.config.current: '<white>当前预设: <yellow>{profile}</yellow></white>'
+command.config.normal_path: '<white>Normal 配置: <gray>{path}</gray></white>'
+command.config.dev_path: '<white>Dev 配置目录: <gray>{path}</gray></white>'
+command.config.switched: <green>已切换到配置预设 <yellow>{profile}</yellow>，配置已重新加载</green>
+command.config.already: <yellow>当前已经是 <yellow>{profile}</yellow> 配置预设</yellow>
+command.config.invalid_profile: '<red>无效的配置预设: {value}（可选 normal / dev）</red>'
